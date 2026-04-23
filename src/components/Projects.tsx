@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import { projects } from "@/data/portfolio";
 import ScrollReveal from "./ScrollReveal";
 import styles from "./Projects.module.css";
@@ -15,6 +16,17 @@ export default function Projects() {
         {projects.map((p, i) => (
           <ScrollReveal key={p.id} delay={i * 0.1}>
             <article className={`${styles.card} card`}>
+              {p.imageUrl && (
+                <div className={styles.imageWrap}>
+                  <Image
+                    src={p.imageUrl}
+                    alt={p.title}
+                    fill
+                    className={styles.image}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  />
+                </div>
+              )}
               <div className={styles.cardTop}>
                 <div className={styles.folder}>
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
