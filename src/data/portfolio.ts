@@ -93,7 +93,7 @@ export const projects = [
     tech: ["Next.js", "AI Automation", "n8n", "Web Services"],
     liveUrl: "",
     githubUrl: "",
-    imageUrl: "",
+    imageUrl: "https://res.cloudinary.com/dk5pnej6r/image/upload/v1776946438/1e37c573-c5d4-49bd-9ed4-308b66204527.png",
     featured: true,
   },
   {
@@ -130,6 +130,30 @@ export const projects = [
     liveUrl: "",
     githubUrl: "https://github.com/TalibIbrahim/GitChat",
     imageUrl: "https://res.cloudinary.com/dk5pnej6r/image/upload/v1776235651/Radix%20Systems/1f830205-26ac-4a5e-941e-410d1e9e7d44.png",
+    featured: true,
+  },
+  {
+    id: "solara",
+    title: "Solara",
+    subtitle: "Weather App",
+    description:
+      "A simple glass UI weather app featuring current as well as daily weather using the Open-Meteo API.",
+    tech: ["React.js", "Open-Meteo API", "CSS"],
+    liveUrl: "",
+    githubUrl: "",
+    imageUrl: "https://res.cloudinary.com/dk5pnej6r/image/upload/v1776193664/Radix%20Systems/000fdd6f-9cea-485e-9f75-dc2ec186d8a4.png",
+    featured: true,
+  },
+  {
+    id: "slingkick",
+    title: "SlingKick",
+    subtitle: "2D Puzzle Game",
+    description:
+      "A 2D slingshot mechanic puzzle game made for the Mindstorm Studios game jam.",
+    tech: ["Unity", "C#", "2D Physics"],
+    liveUrl: "",
+    githubUrl: "",
+    imageUrl: "https://res.cloudinary.com/dk5pnej6r/image/upload/v1776193971/Radix%20Systems/85a9cf36-676b-45c9-9270-93f309f101b2.png",
     featured: true,
   },
 ];
