@@ -8,6 +8,22 @@
   flex-direction: column;
   min-height: 300px;
 }
+.imageWrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  margin-bottom: 24px;
+  border: 1px solid var(--border);
+}
+.image {
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+.card:hover .image {
+  transform: scale(1.05);
+}
 .cardTop {
   display: flex;
   justify-content: space-between;

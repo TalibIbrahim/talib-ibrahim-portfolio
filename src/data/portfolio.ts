@@ -85,6 +85,18 @@ export const experience = [
 
 export const projects = [
   {
+    id: "radix",
+    title: "Radix Systems",
+    subtitle: "Software Agency",
+    description:
+      "A software agency offering AI automation, n8n workflows, custom chatbots, scalable web services, and reliable hosting solutions.",
+    tech: ["Next.js", "AI Automation", "n8n", "Web Services"],
+    liveUrl: "",
+    githubUrl: "",
+    imageUrl: "",
+    featured: true,
+  },
+  {
     id: "byters",
     title: "Byters",
     subtitle: "Food Review Platform",
@@ -93,6 +105,7 @@ export const projects = [
     tech: ["Next.js", "MongoDB", "Redux", "Tailwind CSS", "Vercel"],
     liveUrl: "https://byters.vercel.app/",
     githubUrl: "",
+    imageUrl: "https://res.cloudinary.com/dk5pnej6r/image/upload/v1776194008/Radix%20Systems/cfaca28d-245a-47d2-b658-879a9d8d3c4c.png",
     featured: true,
   },
   {
@@ -104,6 +117,7 @@ export const projects = [
     tech: ["React.js", "MongoDB", "Cloudinary", "Socket.IO", "PeerJS"],
     liveUrl: "https://quickdrop-file.vercel.app/",
     githubUrl: "",
+    imageUrl: "https://res.cloudinary.com/dk5pnej6r/image/upload/v1776193606/Radix%20Systems/b37e4ed6-e19b-4811-8c42-2a645463ec5b.png",
     featured: true,
   },
   {
@@ -115,6 +129,7 @@ export const projects = [
     tech: ["Next.js", "Vercel AI SDK", "LangChain", "MongoDB", "Ollama"],
     liveUrl: "",
     githubUrl: "https://github.com/TalibIbrahim/GitChat",
+    imageUrl: "https://res.cloudinary.com/dk5pnej6r/image/upload/v1776235651/Radix%20Systems/1f830205-26ac-4a5e-941e-410d1e9e7d44.png",
     featured: true,
   },
 ];
