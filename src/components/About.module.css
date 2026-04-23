@@ -1,0 +1,71 @@
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+}
+.bio p {
+  font-size: 1rem;
+  line-height: 1.85;
+  margin-bottom: 32px;
+}
+.edu {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.eduItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.eduLabel {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.eduValue {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+.skillsWrap {
+  composes: card from global;
+}
+.skillsTitle {
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--text-secondary);
+}
+.skillGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.certList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.certItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+.certDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+}

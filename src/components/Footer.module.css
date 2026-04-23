@@ -1,0 +1,43 @@
+.footer {
+  padding: 40px 24px;
+  border-top: 1px solid var(--border);
+}
+.inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+.credit {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.credit strong {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+.links {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.links a {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  transition: color var(--transition-fast);
+}
+.links a:hover {
+  color: var(--text-primary);
+}
+.sep {
+  color: var(--border);
+  font-size: 0.8rem;
+}
+.copy {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
