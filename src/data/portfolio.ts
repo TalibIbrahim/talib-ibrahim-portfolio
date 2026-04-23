@@ -91,7 +91,7 @@ export const projects = [
     description:
       "A software agency offering AI automation, n8n workflows, custom chatbots, scalable web services, and reliable hosting solutions.",
     tech: ["Next.js", "AI Automation", "n8n", "Web Services"],
-    liveUrl: "",
+    liveUrl: "https://www.radixsystems.online/",
     githubUrl: "",
     imageUrl: "https://res.cloudinary.com/dk5pnej6r/image/upload/v1776946438/1e37c573-c5d4-49bd-9ed4-308b66204527.png",
     featured: true,
@@ -139,7 +139,7 @@ export const projects = [
     description:
       "A simple glass UI weather app featuring current as well as daily weather using the Open-Meteo API.",
     tech: ["React.js", "Open-Meteo API", "CSS"],
-    liveUrl: "",
+    liveUrl: "https://talibibrahim.github.io/Solara/",
     githubUrl: "",
     imageUrl: "https://res.cloudinary.com/dk5pnej6r/image/upload/v1776193664/Radix%20Systems/000fdd6f-9cea-485e-9f75-dc2ec186d8a4.png",
     featured: true,
