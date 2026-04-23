@@ -38,11 +38,11 @@
   gap: 12px;
 }
 .extLink {
-  color: var(--text-muted);
+  color: #3b82f6;
   transition: color var(--transition-fast), transform var(--transition-fast);
 }
 .extLink:hover {
-  color: var(--text-primary);
+  color: #60a5fa;
   transform: translateY(-2px);
 }
 .title {
