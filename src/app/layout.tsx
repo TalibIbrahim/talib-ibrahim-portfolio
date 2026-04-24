@@ -3,7 +3,7 @@ import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://talibibrahim.dev"),
+  metadataBase: new URL("https://muhammad-talib.dev"),
   title: "Muhammad Talib Ibrahim — Full Stack Developer",
   description:
     "Full Stack Developer specializing in MERN & Next.js. Building scalable web apps, real-time systems, and AI-powered tools. Based in Lahore, Pakistan.",
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     title: "Muhammad Talib Ibrahim — Full Stack Developer",
     description:
       "Building scalable web apps with modern JavaScript. MERN & Next.js specialist.",
-    url: "https://talibibrahim.dev",
+    url: "https://muhammad-talib.dev",
     siteName: "Muhammad Talib Ibrahim Portfolio",
     type: "website",
     locale: "en_US",

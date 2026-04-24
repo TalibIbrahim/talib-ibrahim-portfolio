@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://talibibrahim.dev/sitemap.xml",
+    sitemap: "https://muhammad-talib.dev/sitemap.xml",
   };
 }
