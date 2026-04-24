@@ -3,6 +3,7 @@ import { Analytics } from "@vercel/analytics/react";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://talibibrahim.dev"),
   title: "Muhammad Talib Ibrahim — Full Stack Developer",
   description:
     "Full Stack Developer specializing in MERN & Next.js. Building scalable web apps, real-time systems, and AI-powered tools. Based in Lahore, Pakistan.",
@@ -20,6 +21,8 @@ export const metadata: Metadata = {
     title: "Muhammad Talib Ibrahim — Full Stack Developer",
     description:
       "Building scalable web apps with modern JavaScript. MERN & Next.js specialist.",
+    url: "https://talibibrahim.dev",
+    siteName: "Muhammad Talib Ibrahim Portfolio",
     type: "website",
     locale: "en_US",
   },
@@ -28,6 +31,10 @@ export const metadata: Metadata = {
     title: "Muhammad Talib Ibrahim — Full Stack Developer",
     description:
       "Building scalable web apps with modern JavaScript. MERN & Next.js specialist.",
+  },
+  verification: {
+    // Replace with your Google Search Console verification code if you are not using domain (DNS) verification
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "",
   },
 };
 
