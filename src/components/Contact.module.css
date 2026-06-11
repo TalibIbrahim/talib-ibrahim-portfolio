@@ -162,10 +162,32 @@
   font-weight: 500;
 }
 
-.textarea.typing {
+.textarea.magicFadeIn {
+  animation: magicFade 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
   border-color: var(--text-muted);
   box-shadow: 0 0 0 2px var(--glass-border);
-  animation: typingPulse 1s infinite ease-in-out;
+}
+
+.textarea.typing {
+  animation: magicFade 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards, typingPulse 1.5s infinite ease-in-out 0.8s;
+}
+
+@keyframes magicFade {
+  0% { 
+    opacity: 0; 
+    filter: blur(8px) brightness(1.5); 
+    transform: translateY(10px) scale(0.98); 
+  }
+  50% {
+    filter: blur(2px) brightness(1.2);
+    box-shadow: 0 0 0 4px var(--glass-border);
+  }
+  100% { 
+    opacity: 1; 
+    filter: blur(0) brightness(1); 
+    transform: translateY(0) scale(1);
+    box-shadow: 0 0 0 2px var(--glass-border);
+  }
 }
 
 @keyframes typingPulse {
