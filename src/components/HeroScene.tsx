@@ -6,13 +6,15 @@ import * as THREE from "three";
 function FloatingIcosahedron() {
   const meshRef = useRef<THREE.Mesh>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
+  const timeRef = useRef(0);
   const { viewport } = useThree();
 
   const geo = useMemo(() => new THREE.IcosahedronGeometry(1.8, 1), []);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     if (!meshRef.current) return;
-    const t = state.clock.elapsedTime;
+    timeRef.current += delta;
+    const t = timeRef.current;
     meshRef.current.rotation.x = t * 0.08 + mouseRef.current.y * 0.3;
     meshRef.current.rotation.y = t * 0.12 + mouseRef.current.x * 0.3;
     meshRef.current.position.y = Math.sin(t * 0.5) * 0.15;
@@ -33,6 +35,7 @@ function FloatingIcosahedron() {
 
 function Particles() {
   const ref = useRef<THREE.Points>(null);
+  const timeRef = useRef(0);
   const count = 120;
 
   const positions = useMemo(() => {
@@ -45,10 +48,11 @@ function Particles() {
     return arr;
   }, []);
 
-  useFrame((state) => {
+  useFrame((state, delta) => {
     if (!ref.current) return;
-    ref.current.rotation.y = state.clock.elapsedTime * 0.015;
-    ref.current.rotation.x = state.clock.elapsedTime * 0.008;
+    timeRef.current += delta;
+    ref.current.rotation.y = timeRef.current * 0.015;
+    ref.current.rotation.x = timeRef.current * 0.008;
   });
 
   return (
