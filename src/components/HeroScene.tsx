@@ -7,7 +7,6 @@ function FloatingIcosahedron() {
   const meshRef = useRef<THREE.Mesh>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
   const timeRef = useRef(0);
-  const { viewport } = useThree();
 
   const geo = useMemo(() => new THREE.IcosahedronGeometry(1.8, 1), []);
 
@@ -15,19 +14,18 @@ function FloatingIcosahedron() {
     if (!meshRef.current) return;
     timeRef.current += delta;
     const t = timeRef.current;
-    meshRef.current.rotation.x = t * 0.08 + mouseRef.current.y * 0.3;
-    meshRef.current.rotation.y = t * 0.12 + mouseRef.current.x * 0.3;
+    
+    // Smoothly interpolate the mouse position for buttery smooth rotation
+    mouseRef.current.x = THREE.MathUtils.lerp(mouseRef.current.x, state.pointer.x, 0.05);
+    mouseRef.current.y = THREE.MathUtils.lerp(mouseRef.current.y, state.pointer.y, 0.05);
+
+    meshRef.current.rotation.x = t * 0.08 + mouseRef.current.y * 0.5;
+    meshRef.current.rotation.y = t * 0.12 + mouseRef.current.x * 0.5;
     meshRef.current.position.y = Math.sin(t * 0.5) * 0.15;
   });
 
-  const handlePointerMove = (e: THREE.Event) => {
-    const event = e as unknown as { point: THREE.Vector3 };
-    mouseRef.current.x = (event.point.x / viewport.width) * 2;
-    mouseRef.current.y = (event.point.y / viewport.height) * 2;
-  };
-
   return (
-    <mesh ref={meshRef} geometry={geo} onPointerMove={handlePointerMove}>
+    <mesh ref={meshRef} geometry={geo}>
       <meshBasicMaterial wireframe color="#ffffff" transparent opacity={0.12} />
     </mesh>
   );
