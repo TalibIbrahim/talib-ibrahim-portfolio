@@ -1,0 +1,982 @@
+/**
+ * React Bits - Staggered Menu Stylesheet
+ * Multi-layered curtain depths, kinetic typography, and theme-adaptive hardware styling.
+ */
+
+.menuRoot {
+  position: relative;
+  z-index: 950;
+}
+
+/* ══════════════════════════════════════════════════
+   FLOATING MAGNETIZED TRIGGER BUTTON
+   ══════════════════════════════════════════════════ */
+
+.triggerWrapper {
+  position: fixed;
+  top: 1.5rem;
+  right: 1.5rem;
+  z-index: 950;
+  pointer-events: auto;
+}
+
+.triggerBtn {
+  appearance: none;
+  background: rgba(14, 14, 18, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: var(--theme-radius, 9999px);
+  padding: 0.45rem 0.85rem 0.45rem 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+  color: var(--text-primary, #ffffff);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition:
+    background-color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.triggerBtn:hover {
+  border-color: var(--accent, #ccff00);
+  box-shadow: 0 4px 28px rgba(0, 0, 0, 0.6), 0 0 16px rgba(var(--accent-rgb, 204, 255, 0), 0.25);
+}
+
+.triggerBtn:focus-visible {
+  outline: 2px solid var(--accent, #ccff00);
+  outline-offset: 3px;
+}
+
+.triggerBtnOpen {
+  background: rgba(22, 22, 28, 0.96);
+  border-color: var(--accent, #ccff00);
+}
+
+/* Kinetic Animated Hamburger Icon */
+.hamburgerIcon {
+  width: 18px;
+  height: 14px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.iconLine {
+  display: block;
+  height: 2px;
+  background-color: var(--accent, #ccff00);
+  border-radius: 2px;
+  transition:
+    transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    width 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.2s ease;
+}
+
+.lineTop {
+  width: 18px;
+  transform-origin: center;
+}
+
+.lineBottom {
+  width: 12px;
+  transform-origin: center;
+}
+
+.triggerBtn:hover .lineBottom {
+  width: 18px;
+}
+
+.triggerBtnOpen .lineTop {
+  width: 18px;
+  transform: translateY(6px) rotate(45deg);
+}
+
+.triggerBtnOpen .lineBottom {
+  width: 18px;
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+.triggerLabel {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.triggerBadge {
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+/* ══════════════════════════════════════════════════
+   REACT BITS STAGGERED CURTAIN OVERLAY LAYERS
+   ══════════════════════════════════════════════════ */
+
+.overlayContainer {
+  position: fixed;
+  inset: 0;
+  z-index: 940;
+  pointer-events: auto;
+  overflow: hidden;
+}
+
+/* Layer 1: Accent Underlay */
+.staggerLayer1 {
+  position: absolute;
+  inset: 0;
+  background: var(--accent, #ccff00);
+  opacity: 0.12;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Layer 2: Frosted Glass Underlay */
+.staggerLayer2 {
+  position: absolute;
+  inset: 0;
+  background: rgba(10, 10, 14, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Layer 3: Main Menu Panel Sheet */
+.staggerLayer3 {
+  position: absolute;
+  inset: 0;
+  background: rgba(12, 12, 16, 0.96);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border, rgba(255, 255, 255, 0.2)) transparent;
+}
+
+/* ══════════════════════════════════════════════════
+   PANEL HEADER
+   ══════════════════════════════════════════════════ */
+
+.panelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem 2.5rem;
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  background: rgba(16, 16, 22, 0.4);
+}
+
+.brandBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-family: var(--font-mono, monospace);
+}
+
+.brandDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent, #ccff00);
+  box-shadow: 0 0 10px var(--accent, #ccff00);
+  animation: pulseDot 2s infinite ease-in-out;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 0.5; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.brandTitle {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-primary, #ffffff);
+}
+
+.brandDivider {
+  color: var(--text-muted, #71717a);
+  font-size: 0.8rem;
+}
+
+.brandMeta {
+  font-size: 0.72rem;
+  color: var(--text-muted, #71717a);
+  letter-spacing: 0.06em;
+}
+
+.closeBtn {
+  appearance: none;
+  background: transparent;
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.15));
+  border-radius: var(--theme-radius, 9999px);
+  color: var(--text-primary, #ffffff);
+  padding: 0.35rem 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--accent, #ccff00);
+  color: var(--accent, #ccff00);
+}
+
+.closeKeyTag {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  opacity: 0.7;
+}
+
+/* ══════════════════════════════════════════════════
+   INTERIOR GRID: NAVIGATION + SETTINGS
+   ══════════════════════════════════════════════════ */
+
+.interiorGrid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+  gap: 2.5rem;
+  padding: 2.5rem;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.columnHeader {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--accent, #ccff00);
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+}
+
+.columnIcon {
+  color: var(--accent, #ccff00);
+}
+
+/* ─── Column 1: Navigation List ─── */
+.navColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.navList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.navLink {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+  border-radius: var(--theme-radius, 12px);
+  text-decoration: none;
+  color: var(--text-primary, #ffffff);
+  transition:
+    transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+
+.navLink:hover {
+  transform: translateX(8px);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--accent, #ccff00);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), inset 0 0 16px rgba(var(--accent-rgb, 204, 255, 0), 0.06);
+}
+
+.navIndex {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent, #ccff00);
+  margin-right: 1.25rem;
+  letter-spacing: 0.04em;
+}
+
+.navLabel {
+  font-family: var(--theme-display, var(--font-sans));
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  flex: 1;
+  transition: color 0.18s ease;
+}
+
+.navLink:hover .navLabel {
+  color: var(--accent, #ccff00);
+}
+
+.navCategory {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--text-muted, #71717a);
+  letter-spacing: 0.08em;
+  margin-right: 0.75rem;
+}
+
+.navArrow {
+  color: var(--text-muted, #71717a);
+  transition:
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.2s ease;
+}
+
+.navLink:hover .navArrow {
+  transform: translate(2px, -2px);
+  color: var(--accent, #ccff00);
+}
+
+/* ─── Column 2: Settings Command Center ─── */
+.settingsColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.settingsDeck {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.settingCard {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.06));
+  border-radius: var(--theme-radius, 12px);
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: border-color 0.2s ease;
+}
+
+.settingCard:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.settingMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.settingLabel {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--text-muted, #a1a1aa);
+  text-transform: uppercase;
+}
+
+.settingValue {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--accent, #ccff00);
+  letter-spacing: 0.04em;
+}
+
+/* Mode Switch Button */
+.modeSwitchBtn {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  padding: 0.65rem 1rem;
+  border-radius: var(--theme-radius, 8px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btnHyper {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.15));
+  color: #ffffff;
+}
+
+.btnHyper:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: #ffffff;
+}
+
+.btnBoring {
+  background: var(--accent, #ccff00);
+  border: 1px solid var(--accent, #ccff00);
+  color: #000000;
+  box-shadow: 0 0 16px rgba(var(--accent-rgb, 204, 255, 0), 0.35);
+}
+
+.btnBoring:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+/* Theme Option Buttons Group */
+.themeButtonGroup {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.themeOptionBtn {
+  position: relative;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: var(--theme-radius, 8px);
+  padding: 0.55rem 0.65rem;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  outline: none;
+  color: var(--text-muted, #a1a1aa);
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.themeOptionBtn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+}
+
+.themeOptionActive {
+  background: rgba(var(--accent-rgb, 204, 255, 0), 0.12);
+  border-color: var(--accent, #ccff00);
+  color: var(--accent, #ccff00);
+  box-shadow: 0 0 14px rgba(var(--accent-rgb, 204, 255, 0), 0.25);
+}
+
+.themeOptionIcon {
+  flex-shrink: 0;
+}
+
+.themeOptionName {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.activeDot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--accent, #ccff00);
+  box-shadow: 0 0 6px var(--accent, #ccff00);
+}
+
+/* Generic Action Toggle Button (Light/Dark, Audio) */
+.actionToggleBtn {
+  appearance: none;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  border-radius: var(--theme-radius, 8px);
+  padding: 0.55rem 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  cursor: pointer;
+  outline: none;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--text-primary, #ffffff);
+  text-transform: uppercase;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.actionToggleBtn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: var(--accent, #ccff00);
+  color: var(--accent, #ccff00);
+}
+
+.audioActiveSpan {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.audioWaveBars {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+
+.waveBar {
+  width: 2.5px;
+  background: var(--accent, #ccff00);
+  border-radius: 1px;
+  animation: bounceBar 1.2s infinite ease-in-out;
+}
+
+.waveBar:nth-child(1) { height: 6px; animation-delay: 0s; }
+.waveBar:nth-child(2) { height: 12px; animation-delay: 0.2s; }
+.waveBar:nth-child(3) { height: 8px; animation-delay: 0.4s; }
+
+@keyframes bounceBar {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+}
+
+/* Resume Setting Card Special */
+.settingCardSpecial {
+  background: linear-gradient(135deg, rgba(var(--accent-rgb, 204, 255, 0), 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+  border: 1px dashed var(--accent, #ccff00);
+  border-radius: var(--theme-radius, 12px);
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.resumeHeader {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.resumeIcon {
+  color: var(--accent, #ccff00);
+}
+
+.resumeTitle {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--accent, #ccff00);
+}
+
+.resumeDesc {
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--text-muted, #a1a1aa);
+  margin: 0;
+}
+
+.resumeDispatchBtn {
+  appearance: none;
+  background: rgba(var(--accent-rgb, 204, 255, 0), 0.12);
+  border: 1px solid var(--accent, #ccff00);
+  border-radius: var(--theme-radius, 6px);
+  padding: 0.55rem 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--accent, #ccff00);
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  margin-top: 0.25rem;
+}
+
+.resumeDispatchBtn:hover {
+  background: var(--accent, #ccff00);
+  color: #000000;
+  box-shadow: 0 0 16px rgba(var(--accent-rgb, 204, 255, 0), 0.35);
+}
+
+/* ══════════════════════════════════════════════════
+   PANEL FOOTER
+   ══════════════════════════════════════════════════ */
+
+.panelFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 2.5rem;
+  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  background: rgba(16, 16, 22, 0.4);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  color: var(--text-muted, #71717a);
+}
+
+.footerCoordinates {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.footerSep {
+  opacity: 0.4;
+}
+
+.footerSocials {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.socialLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--text-muted, #a1a1aa);
+  text-decoration: none;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  transition: color 0.18s ease;
+}
+
+.socialLink:hover {
+  color: var(--accent, #ccff00);
+}
+
+/* ══════════════════════════════════════════════════
+   M SPORT THEME STAGGERED MENU ADAPTATIONS
+   ══════════════════════════════════════════════════ */
+
+:global([data-theme="msport"]) .triggerBtn {
+  border-radius: 0px !important;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  transform: skewX(-8deg);
+  background: rgba(12, 14, 18, 0.95);
+  border: 1px solid rgba(129, 196, 255, 0.35);
+}
+
+:global([data-theme="msport"]) .triggerLabel,
+:global([data-theme="msport"]) .triggerBadge {
+  transform: skewX(8deg);
+  font-family: var(--font-rajdhani), 'Rajdhani', sans-serif !important;
+  font-style: italic;
+  font-weight: 700;
+}
+
+:global([data-theme="msport"]) .staggerLayer1 {
+  background: var(--msport-stripe);
+  opacity: 0.25;
+}
+
+:global([data-theme="msport"]) .staggerLayer3 {
+  background: rgba(10, 11, 15, 0.98);
+}
+
+:global([data-theme="msport"]) .panelHeader {
+  position: relative;
+}
+
+:global([data-theme="msport"]) .panelHeader::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--msport-stripe);
+}
+
+:global([data-theme="msport"]) .navLink {
+  border-radius: 0px !important;
+  clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+  background: rgba(20, 24, 32, 0.5);
+  border-color: rgba(129, 196, 255, 0.15);
+}
+
+:global([data-theme="msport"]) .navLabel {
+  font-family: var(--font-rajdhani), 'Rajdhani', sans-serif !important;
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+:global([data-theme="msport"]) .settingCard,
+:global([data-theme="msport"]) .settingCardSpecial {
+  border-radius: 0px !important;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  border-color: rgba(129, 196, 255, 0.2);
+}
+
+:global([data-theme="msport"]) .themeOptionBtn,
+:global([data-theme="msport"]) .actionToggleBtn,
+:global([data-theme="msport"]) .modeSwitchBtn,
+:global([data-theme="msport"]) .resumeDispatchBtn {
+  border-radius: 0px !important;
+  font-family: var(--font-rajdhani), 'Rajdhani', sans-serif !important;
+  font-style: italic;
+  font-weight: 700;
+}
+
+/* ══════════════════════════════════════════════════
+   NOTHING THEME STAGGERED MENU ADAPTATIONS
+   ══════════════════════════════════════════════════ */
+
+:global([data-theme="nothing"]) .triggerBtn {
+  border-radius: 0px !important;
+  background: rgba(10, 10, 10, 0.95);
+  background-image: var(--nothing-grain);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+:global([data-theme="nothing"]) .triggerBtn:hover {
+  border-color: #D71921;
+}
+
+:global([data-theme="nothing"]) .triggerLabel {
+  font-family: var(--font-dot-matrix, monospace) !important;
+  letter-spacing: 0.12em;
+}
+
+:global([data-theme="nothing"]) .staggerLayer1 {
+  background: #D71921;
+  opacity: 0.15;
+}
+
+:global([data-theme="nothing"]) .staggerLayer3 {
+  background: rgba(8, 8, 8, 0.98);
+  background-image: var(--nothing-grain);
+}
+
+:global([data-theme="nothing"]) .navLink {
+  border-radius: 0px !important;
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(20, 20, 20, 0.6);
+  background-image: var(--nothing-grain);
+}
+
+:global([data-theme="nothing"]) .navLink:hover {
+  border-color: #D71921;
+}
+
+:global([data-theme="nothing"]) .navIndex {
+  color: #D71921;
+}
+
+:global([data-theme="nothing"]) .navLabel {
+  font-family: var(--font-dot-matrix, monospace) !important;
+  font-size: 1.1rem;
+  letter-spacing: 0.08em;
+}
+
+:global([data-theme="nothing"]) .settingCard,
+:global([data-theme="nothing"]) .settingCardSpecial {
+  border-radius: 0px !important;
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(16, 16, 16, 0.7);
+  background-image: var(--nothing-grain);
+}
+
+:global([data-theme="nothing"]) .settingCardSpecial {
+  border-color: #D71921;
+}
+
+:global([data-theme="nothing"]) .resumeTitle {
+  color: #D71921;
+  font-family: var(--font-dot-matrix, monospace) !important;
+}
+
+:global([data-theme="nothing"]) .resumeDispatchBtn {
+  border-radius: 0px !important;
+  border-color: #D71921;
+  color: #D71921;
+  font-family: var(--font-dot-matrix, monospace) !important;
+}
+
+:global([data-theme="nothing"]) .resumeDispatchBtn:hover {
+  background: #D71921;
+  color: #ffffff;
+}
+
+:global([data-theme="nothing"]) .themeOptionBtn,
+:global([data-theme="nothing"]) .actionToggleBtn,
+:global([data-theme="nothing"]) .modeSwitchBtn {
+  border-radius: 0px !important;
+  font-family: var(--font-dot-matrix, monospace) !important;
+  transition: all 0.12s steps(3);
+}
+
+:global([data-theme="nothing"]) .themeOptionActive {
+  border-color: #D71921;
+  color: #ffffff;
+  background: rgba(215, 25, 33, 0.15);
+}
+
+:global([data-theme="nothing"]) .activeDot {
+  background: #D71921;
+  box-shadow: 0 0 6px #D71921;
+}
+
+/* ══════════════════════════════════════════════════
+   LIGHT MODE VARIANTS
+   ══════════════════════════════════════════════════ */
+
+:global([data-mode="light"]) .staggerLayer2 {
+  background: rgba(250, 250, 252, 0.75);
+}
+
+:global([data-mode="light"]) .staggerLayer3 {
+  background: rgba(255, 255, 255, 0.97);
+  color: #09090b;
+}
+
+:global([data-mode="light"]) .triggerBtn {
+  background: rgba(255, 255, 255, 0.9);
+  color: #09090b;
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+:global([data-mode="light"]) .panelHeader,
+:global([data-mode="light"]) .panelFooter {
+  background: rgba(245, 245, 247, 0.7);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+:global([data-mode="light"]) .brandTitle {
+  color: #09090b;
+}
+
+:global([data-mode="light"]) .closeBtn {
+  color: #09090b;
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+:global([data-mode="light"]) .closeBtn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+:global([data-mode="light"]) .navLink {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.08);
+  color: #09090b;
+}
+
+:global([data-mode="light"]) .navLink:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+:global([data-mode="light"]) .settingCard {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.08);
+}
+
+:global([data-mode="light"]) .themeOptionBtn,
+:global([data-mode="light"]) .actionToggleBtn {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: #09090b;
+}
+
+:global([data-mode="light"]) .themeOptionBtn:hover,
+:global([data-mode="light"]) .actionToggleBtn:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+:global([data-mode="light"]) .btnHyper {
+  background: #09090b;
+  color: #ffffff;
+}
+
+/* ══════════════════════════════════════════════════
+   RESPONSIVE DESIGN
+   ══════════════════════════════════════════════════ */
+
+@media (max-width: 1024px) {
+  .interiorGrid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 1.75rem;
+  }
+
+  .navLabel {
+    font-size: 1.1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .triggerWrapper {
+    top: 1rem;
+    right: 1rem;
+  }
+
+  .triggerBtn {
+    padding: 0.35rem 0.65rem;
+    gap: 0.45rem;
+  }
+
+  .triggerLabel {
+    font-size: 0.7rem;
+  }
+
+  .panelHeader {
+    padding: 1rem 1.25rem;
+  }
+
+  .brandMeta,
+  .brandDivider {
+    display: none;
+  }
+
+  .interiorGrid {
+    padding: 1.25rem;
+    gap: 1.5rem;
+  }
+
+  .navLink {
+    padding: 0.75rem 1rem;
+  }
+
+  .navLabel {
+    font-size: 0.95rem;
+  }
+
+  .navCategory {
+    display: none;
+  }
+
+  .panelFooter {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem 1.25rem;
+    align-items: flex-start;
+  }
+}

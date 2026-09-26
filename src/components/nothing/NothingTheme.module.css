@@ -1,0 +1,1289 @@
+/* ═════════════════════════════════════════════════════════════════
+   NOTHING OS DEDICATED THEME (CARL PEI HARDWARE & DOTO DOT-MATRIX)
+   Authentic Nothing Phone (Phone 1/2) White Transparent Hardware Base
+   Substrate Canvas: #F5F5F7 Near-White Frosted Plate
+   Primary Ink: #0A0A0C | Secondary: #5A5A62 | Tertiary: #767680
+   Surgical Accent: #D71921 (Nothing Red)
+   Doto Dot-Matrix Type for Headings & Display Numerals
+   Inter Grotesque for Precision Body Copy & Descriptions
+   JetBrains Mono for Part Numbers & Hardware Telemetry
+   ═════════════════════════════════════════════════════════════════ */
+
+.nothingPage {
+  min-height: 100vh;
+  background-color: #F5F5F7;
+  color: #0A0A0C;
+  font-family: var(--font-inter), -apple-system, sans-serif;
+  overflow-x: hidden;
+  position: relative;
+  /* Authentic Carl Pei dot-matrix background texture on near-white base */
+  background-image: radial-gradient(rgba(0, 0, 0, 0.07) 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+}
+
+/* ── Top Hardware Accent Line ── */
+.topGridLine {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.12);
+  z-index: 999;
+}
+
+/* ── Navigation ── */
+.navContainer {
+  position: sticky;
+  top: 0;
+  z-index: 900;
+  background: rgba(245, 245, 247, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.navInner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1.1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brandCluster {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.brandDotMatrix {
+  font-family: 'Doto', monospace;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  color: #0A0A0C;
+  text-decoration: none;
+  line-height: 1;
+}
+
+.brandRevision {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #5A5A62;
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  background: rgba(255, 255, 255, 0.7);
+  padding: 0.2rem 0.5rem;
+  letter-spacing: 0.08em;
+}
+
+.liveIndicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: #0A0A0C;
+  letter-spacing: 0.08em;
+}
+
+.redDot {
+  width: 7px;
+  height: 7px;
+  background: #D71921;
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(215, 25, 33, 0.4);
+  animation: nothingPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes nothingPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.85); }
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.navLink {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: #5A5A62;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.navLink:hover {
+  color: #0A0A0C;
+}
+
+.navCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1.15rem;
+  border: 1px solid #0A0A0C;
+  color: #FFFFFF;
+  background: #0A0A0C;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.navCta:hover {
+  background: #D71921;
+  border-color: #D71921;
+  color: #FFFFFF;
+}
+
+/* ── Hero Section ── */
+.heroSection {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 4.5rem 1.5rem 5.5rem;
+  display: grid;
+  grid-template-columns: 1.25fr 0.75fr;
+  gap: 3.5rem;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.hardwareTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #5A5A62;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 0.35rem 0.85rem;
+  width: fit-content;
+  margin-bottom: 1.5rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  letter-spacing: 0.08em;
+}
+
+.heroTitle {
+  font-family: 'Doto', monospace;
+  font-size: clamp(2.4rem, 5vw, 4.2rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: #0A0A0C;
+  margin-bottom: 1.25rem;
+}
+
+.heroTitleRed {
+  color: #D71921;
+}
+
+.heroSubhead {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 1.15rem;
+  line-height: 1.65;
+  color: #5A5A62;
+  max-width: 580px;
+  margin-bottom: 2.25rem;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.btnSolid {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem 1.85rem;
+  background: #0A0A0C;
+  color: #FFFFFF;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  border: 1px solid #0A0A0C;
+  transition: all 0.15s ease;
+}
+
+.btnSolid:hover {
+  background: #D71921;
+  border-color: #D71921;
+  color: #FFFFFF;
+}
+
+.btnOutline {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.85rem 1.85rem;
+  background: rgba(255, 255, 255, 0.8);
+  color: #0A0A0C;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.15s ease;
+}
+
+.btnOutline:hover {
+  border-color: #0A0A0C;
+  background: #FFFFFF;
+}
+
+/* ── Hardware Telemetry Strip ── */
+.hardwareStrip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.12);
+  padding-top: 1.75rem;
+}
+
+.stripItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stripLabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #767680;
+  letter-spacing: 0.08em;
+}
+
+.stripValue {
+  font-family: 'Doto', monospace;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #0A0A0C;
+  line-height: 1;
+}
+
+.statusNominal {
+  color: #D71921;
+}
+
+/* ── Right Column: Circular Widget & PCB Enclosure ── */
+.hardwareWidgetCard {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+  position: relative;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.03);
+}
+
+.cardCrosshairTL {
+  position: absolute;
+  top: -5px;
+  left: -5px;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid #0A0A0C;
+  border-left: 2px solid #0A0A0C;
+}
+
+.cardCrosshairBR {
+  position: absolute;
+  bottom: -5px;
+  right: -5px;
+  width: 10px;
+  height: 10px;
+  border-bottom: 2px solid #0A0A0C;
+  border-right: 2px solid #0A0A0C;
+}
+
+.widgetHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding-bottom: 0.75rem;
+}
+
+.widgetTitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #5A5A62;
+  letter-spacing: 0.08em;
+}
+
+/* Circular Clock / Dial Widget */
+.clockDialWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0;
+}
+
+.clockRing {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 2px dashed rgba(0, 0, 0, 0.22);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.clockInner {
+  transform: rotate(0deg);
+  text-align: center;
+}
+
+.clockTime {
+  font-family: 'Doto', monospace;
+  font-size: 1.7rem;
+  font-weight: 900;
+  color: #0A0A0C;
+  line-height: 1;
+}
+
+.clockZone {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: #D71921;
+  letter-spacing: 0.08em;
+  margin-top: 0.35rem;
+}
+
+/* ── Fixed Portrait Pilot Photo (No Head Cutoff) ── */
+.hardwarePilotPhoto {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 4 / 5;
+  margin: 0 auto;
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  overflow: hidden;
+  background: #EBECEF;
+}
+
+.pilotImage {
+  object-fit: cover;
+  object-position: top center;
+  filter: grayscale(1) contrast(1.08);
+}
+
+.pilotMeta {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: #5A5A62;
+  letter-spacing: 0.06em;
+}
+
+/* ── Projects Section ── */
+.projectsSection {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem 6.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.sectionHeader {
+  margin-bottom: 3.5rem;
+}
+
+.sectionFig {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #D71921;
+  letter-spacing: 0.12em;
+  margin-bottom: 0.4rem;
+}
+
+.sectionTitle {
+  font-family: 'Doto', monospace;
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  font-weight: 800;
+  color: #0A0A0C;
+  letter-spacing: -0.01em;
+}
+
+/* ── Flagship Project: BYTERS (#1) ── */
+.flagshipCard {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  margin-bottom: 3.5rem;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  position: relative;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.03);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.flagshipCard:hover {
+  border-color: rgba(215, 25, 33, 0.6);
+  box-shadow: 0 8px 30px rgba(215, 25, 33, 0.1);
+}
+
+.flagshipBody {
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.partNoHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.partNo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #767680;
+  letter-spacing: 0.08em;
+}
+
+.surgicalBadge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #D71921;
+  border: 1px solid #D71921;
+  background: rgba(215, 25, 33, 0.04);
+  padding: 0.2rem 0.55rem;
+  letter-spacing: 0.08em;
+}
+
+.flagshipTitle {
+  font-family: 'Doto', monospace;
+  font-size: 2.6rem;
+  font-weight: 900;
+  color: #0A0A0C;
+  margin-bottom: 0.75rem;
+  line-height: 1;
+}
+
+.flagshipSubtitle {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: #5A5A62;
+  margin-bottom: 1.75rem;
+}
+
+.featureSpecList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding: 1.5rem 0;
+  margin-bottom: 2rem;
+}
+
+.featureSpecItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.9rem;
+  color: #3A3A40;
+  line-height: 1.5;
+}
+
+.specSquare {
+  width: 5px;
+  height: 5px;
+  background: #D71921;
+  margin-top: 7px;
+  flex-shrink: 0;
+}
+
+.featureSpecItem strong {
+  color: #0A0A0C;
+}
+
+.flagshipActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: auto;
+}
+
+.flagshipMediaCol {
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: #F0F0F3;
+}
+
+.flagshipScreenshotCard {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.flagshipImage {
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.flagshipScreenshotCard:hover .flagshipImage {
+  transform: scale(1.03);
+}
+
+/* ── Secondary Projects Grid (#2 QuickDrop & #3 GitChat) ── */
+.secondaryProjectsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+}
+
+.secondaryCard {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.secondaryCard:hover {
+  border-color: rgba(0, 0, 0, 0.35);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.06);
+}
+
+.secondaryHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.secondaryFigBadge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: #767680;
+  letter-spacing: 0.08em;
+}
+
+.secondaryTitle {
+  font-family: 'Doto', monospace;
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #0A0A0C;
+  margin-bottom: 0.65rem;
+  line-height: 1;
+}
+
+.secondaryDesc {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: #5A5A62;
+  margin-bottom: 1.75rem;
+}
+
+.chipList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.hardwareChip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 0.3rem 0.65rem;
+  color: #3A3A42;
+  background: rgba(0, 0, 0, 0.04);
+  letter-spacing: 0.06em;
+}
+
+.secondaryActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: auto;
+}
+
+/* ── Hardware Specs Section ── */
+.hardwareSection {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem 6.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.specsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.specCard {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.specCardHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  padding-bottom: 0.85rem;
+}
+
+.specCategory {
+  font-family: 'Doto', monospace;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #0A0A0C;
+}
+
+.specQty {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #D71921;
+  letter-spacing: 0.08em;
+}
+
+.specItemsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.specItemRow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: #4A4A52;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  letter-spacing: 0.04em;
+}
+
+.specItemDot {
+  width: 4px;
+  height: 4px;
+  background: #0A0A0C;
+  flex-shrink: 0;
+}
+
+/* ── Transmit Contact Section ── */
+.transmitSection {
+  max-width: 880px;
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem 6.5rem;
+  position: relative;
+  z-index: 1;
+}
+
+.transmitCard {
+  border: 1px solid rgba(0, 0, 0, 0.14);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  padding: 3.25rem;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+}
+
+.transmitForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.fieldLabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #5A5A62;
+  letter-spacing: 0.08em;
+}
+
+.fieldInput,
+.fieldSelect,
+.fieldTextarea {
+  background: #FFFFFF;
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  color: #0A0A0C;
+  padding: 0.85rem 1rem;
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.95rem;
+  border-radius: 0;
+  transition: border-color 0.15s ease;
+}
+
+.fieldInput:focus,
+.fieldSelect:focus,
+.fieldTextarea:focus {
+  outline: none;
+  border-color: #D71921;
+}
+
+.fieldTextarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.submitBtn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.9rem 2.25rem;
+  background: #0A0A0C;
+  border: 1px solid #0A0A0C;
+  color: #FFFFFF;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.submitBtn:hover {
+  background: #D71921;
+  border-color: #D71921;
+  color: #FFFFFF;
+}
+
+.statusMessage {
+  padding: 1.25rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.82rem;
+  border: 1px solid #D71921;
+  background: rgba(215, 25, 33, 0.06);
+  color: #0A0A0C;
+  line-height: 1.6;
+}
+
+.statusSuccessHeader {
+  margin-bottom: 0.5rem;
+  color: #D71921;
+}
+
+.statusErrorBox {
+  padding: 0.75rem;
+  border: 1px solid #D71921;
+  color: #D71921;
+  font-size: 0.75rem;
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.06em;
+}
+
+/* ── Footer ── */
+.hardwareFooter {
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 3rem 1.5rem;
+  background: #EBECEF;
+  position: relative;
+  z-index: 1;
+}
+
+.footerInner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.footerChassis {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: #5A5A62;
+  letter-spacing: 0.06em;
+}
+
+.footerSub {
+  color: #767680;
+  margin-top: 0.25rem;
+}
+
+.footerLinks {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.footerLink {
+  color: #5A5A62;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.footerLink:hover {
+  color: #0A0A0C;
+}
+
+.footerIcon {
+  display: inline;
+  margin-left: 4px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .heroSection {
+    grid-template-columns: 1fr;
+    padding: 3rem 1.5rem;
+  }
+
+  .flagshipCard {
+    grid-template-columns: 1fr;
+  }
+
+  .flagshipMediaCol {
+    border-left: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 1.5rem;
+  }
+
+  .flagshipBody {
+    padding: 2rem 1.5rem;
+  }
+
+  .secondaryProjectsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .specsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .hardwareStrip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+
+  .navLinks {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .heroTitle {
+    font-size: clamp(2rem, 9vw, 2.7rem);
+    line-height: 1.05;
+    word-break: break-word;
+  }
+
+  .hardwareStrip {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .flagshipTitle {
+    font-size: 2rem;
+  }
+
+  .flagshipBody {
+    padding: 1.5rem 1rem;
+  }
+
+  .flagshipActions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .flagshipActions .btnSolid,
+  .flagshipActions .btnOutline {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .secondaryCard {
+    padding: 1.5rem 1rem;
+  }
+
+  .secondaryActions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .secondaryActions .btnSolid,
+  .secondaryActions .btnOutline {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .specCard,
+  .transmitCard {
+    padding: 1.5rem 1rem;
+  }
+
+  .footerInner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .hardwareStrip {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ═════════════════════════════════════════════════════════════════
+   NOTHING OS DEDICATED DARK MODE THEME ADAPTATIONS
+   Obsidian Substrate (#08080A), Crisp Dot Matrix, White & Red
+   ═════════════════════════════════════════════════════════════════ */
+
+.nothingPage[data-mode="dark"],
+:global([data-mode="dark"]) .nothingPage {
+  background-color: #08080A;
+  color: #F0F0F2;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1.2px, transparent 1.2px);
+}
+
+.nothingPage[data-mode="dark"] .topGridLine,
+:global([data-mode="dark"]) .nothingPage .topGridLine {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.nothingPage[data-mode="dark"] .navContainer,
+:global([data-mode="dark"]) .nothingPage .navContainer {
+  background: rgba(8, 8, 10, 0.85);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.nothingPage[data-mode="dark"] .brandDotMatrix,
+:global([data-mode="dark"]) .nothingPage .brandDotMatrix {
+  color: #FFFFFF;
+}
+
+.nothingPage[data-mode="dark"] .brandRevision,
+:global([data-mode="dark"]) .nothingPage .brandRevision {
+  color: #A0A0A8;
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.nothingPage[data-mode="dark"] .liveIndicator,
+:global([data-mode="dark"]) .nothingPage .liveIndicator {
+  color: #FFFFFF;
+}
+
+.nothingPage[data-mode="dark"] .navLink,
+:global([data-mode="dark"]) .nothingPage .navLink {
+  color: #8E8E98;
+}
+
+.nothingPage[data-mode="dark"] .navLink:hover,
+:global([data-mode="dark"]) .nothingPage .navLink:hover {
+  color: #FFFFFF;
+}
+
+.nothingPage[data-mode="dark"] .navCta,
+:global([data-mode="dark"]) .nothingPage .navCta {
+  background: #FFFFFF;
+  color: #08080A;
+  border-color: #FFFFFF;
+}
+
+.nothingPage[data-mode="dark"] .navCta:hover,
+:global([data-mode="dark"]) .nothingPage .navCta:hover {
+  background: #D71921;
+  color: #FFFFFF;
+  border-color: #D71921;
+}
+
+.nothingPage[data-mode="dark"] .hardwareTag,
+:global([data-mode="dark"]) .nothingPage .hardwareTag {
+  color: #A0A0A8;
+  background: rgba(20, 20, 25, 0.8);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.nothingPage[data-mode="dark"] .heroTitle,
+:global([data-mode="dark"]) .nothingPage .heroTitle {
+  color: #FFFFFF;
+}
+
+.nothingPage[data-mode="dark"] .heroSubhead,
+:global([data-mode="dark"]) .nothingPage .heroSubhead {
+  color: #8E8E98;
+}
+
+.nothingPage[data-mode="dark"] .btnSolid,
+:global([data-mode="dark"]) .nothingPage .btnSolid {
+  background: #FFFFFF;
+  color: #08080A;
+  border-color: #FFFFFF;
+}
+
+.nothingPage[data-mode="dark"] .btnSolid:hover,
+:global([data-mode="dark"]) .nothingPage .btnSolid:hover {
+  background: #D71921;
+  color: #FFFFFF;
+  border-color: #D71921;
+}
+
+.nothingPage[data-mode="dark"] .btnOutline,
+:global([data-mode="dark"]) .nothingPage .btnOutline {
+  background: rgba(255, 255, 255, 0.05);
+  color: #FFFFFF;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.nothingPage[data-mode="dark"] .btnOutline:hover,
+:global([data-mode="dark"]) .nothingPage .btnOutline:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #FFFFFF;
+}
+
+.nothingPage[data-mode="dark"] .hardwareStrip,
+:global([data-mode="dark"]) .nothingPage .hardwareStrip {
+  border-top-color: rgba(255, 255, 255, 0.12);
+}
+
+.nothingPage[data-mode="dark"] .stripLabel,
+:global([data-mode="dark"]) .nothingPage .stripLabel {
+  color: #8E8E98;
+}
+
+.nothingPage[data-mode="dark"] .stripValue,
+:global([data-mode="dark"]) .nothingPage .stripValue {
+  color: #FFFFFF;
+}
+
+.nothingPage[data-mode="dark"] .hardwareWidgetCard,
+.nothingPage[data-mode="dark"] .flagshipCard,
+.nothingPage[data-mode="dark"] .secondaryCard,
+.nothingPage[data-mode="dark"] .specCard,
+.nothingPage[data-mode="dark"] .transmitCard,
+:global([data-mode="dark"]) .nothingPage .hardwareWidgetCard,
+:global([data-mode="dark"]) .nothingPage .flagshipCard,
+:global([data-mode="dark"]) .nothingPage .secondaryCard,
+:global([data-mode="dark"]) .nothingPage .specCard,
+:global([data-mode="dark"]) .nothingPage .transmitCard {
+  background: rgba(16, 16, 20, 0.88);
+  border-color: rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+}
+
+.nothingPage[data-mode="dark"] .cardCrosshairTL,
+.nothingPage[data-mode="dark"] .cardCrosshairBR,
+:global([data-mode="dark"]) .nothingPage .cardCrosshairTL,
+:global([data-mode="dark"]) .nothingPage .cardCrosshairBR {
+  border-color: #FFFFFF;
+}
+
+.nothingPage[data-mode="dark"] .widgetHeader,
+.nothingPage[data-mode="dark"] .specCardHeader,
+:global([data-mode="dark"]) .nothingPage .widgetHeader,
+:global([data-mode="dark"]) .nothingPage .specCardHeader {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.nothingPage[data-mode="dark"] .widgetTitle,
+.nothingPage[data-mode="dark"] .partNo,
+.nothingPage[data-mode="dark"] .secondaryFigBadge,
+:global([data-mode="dark"]) .nothingPage .widgetTitle,
+:global([data-mode="dark"]) .nothingPage .partNo,
+:global([data-mode="dark"]) .nothingPage .secondaryFigBadge {
+  color: #8E8E98;
+}
+
+.nothingPage[data-mode="dark"] .clockRing,
+:global([data-mode="dark"]) .nothingPage .clockRing {
+  border-color: rgba(255, 255, 255, 0.22);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.nothingPage[data-mode="dark"] .clockTime,
+.nothingPage[data-mode="dark"] .sectionTitle,
+.nothingPage[data-mode="dark"] .flagshipTitle,
+.nothingPage[data-mode="dark"] .secondaryTitle,
+.nothingPage[data-mode="dark"] .specCategory,
+:global([data-mode="dark"]) .nothingPage .clockTime,
+:global([data-mode="dark"]) .nothingPage .sectionTitle,
+:global([data-mode="dark"]) .nothingPage .flagshipTitle,
+:global([data-mode="dark"]) .nothingPage .secondaryTitle,
+:global([data-mode="dark"]) .nothingPage .specCategory {
+  color: #FFFFFF;
+}
+
+.nothingPage[data-mode="dark"] .flagshipSubtitle,
+.nothingPage[data-mode="dark"] .secondaryDesc,
+:global([data-mode="dark"]) .nothingPage .flagshipSubtitle,
+:global([data-mode="dark"]) .nothingPage .secondaryDesc {
+  color: #8E8E98;
+}
+
+.nothingPage[data-mode="dark"] .featureSpecList,
+:global([data-mode="dark"]) .nothingPage .featureSpecList {
+  border-top-color: rgba(255, 255, 255, 0.08);
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.nothingPage[data-mode="dark"] .featureSpecItem,
+:global([data-mode="dark"]) .nothingPage .featureSpecItem {
+  color: #C0C0C8;
+}
+
+.nothingPage[data-mode="dark"] .featureSpecItem strong,
+:global([data-mode="dark"]) .nothingPage .featureSpecItem strong {
+  color: #FFFFFF;
+}
+
+.nothingPage[data-mode="dark"] .flagshipMediaCol,
+:global([data-mode="dark"]) .nothingPage .flagshipMediaCol {
+  background: #111116;
+  border-left-color: rgba(255, 255, 255, 0.1);
+}
+
+.nothingPage[data-mode="dark"] .flagshipScreenshotCard,
+:global([data-mode="dark"]) .nothingPage .flagshipScreenshotCard {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.nothingPage[data-mode="dark"] .hardwareChip,
+:global([data-mode="dark"]) .nothingPage .hardwareChip {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+  color: #C0C0C8;
+}
+
+.nothingPage[data-mode="dark"] .specItemRow,
+:global([data-mode="dark"]) .nothingPage .specItemRow {
+  color: #A0A0A8;
+}
+
+.nothingPage[data-mode="dark"] .specItemDot,
+:global([data-mode="dark"]) .nothingPage .specItemDot {
+  background: #FFFFFF;
+}
+
+.nothingPage[data-mode="dark"] .fieldLabel,
+:global([data-mode="dark"]) .nothingPage .fieldLabel {
+  color: #8E8E98;
+}
+
+.nothingPage[data-mode="dark"] .fieldInput,
+.nothingPage[data-mode="dark"] .fieldSelect,
+.nothingPage[data-mode="dark"] .fieldTextarea,
+:global([data-mode="dark"]) .nothingPage .fieldInput,
+:global([data-mode="dark"]) .nothingPage .fieldSelect,
+:global([data-mode="dark"]) .nothingPage .fieldTextarea {
+  background: #121216;
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #FFFFFF;
+}
+
+.nothingPage[data-mode="dark"] .submitBtn,
+:global([data-mode="dark"]) .nothingPage .submitBtn {
+  background: #FFFFFF;
+  color: #08080A;
+  border-color: #FFFFFF;
+}
+
+.nothingPage[data-mode="dark"] .submitBtn:hover,
+:global([data-mode="dark"]) .nothingPage .submitBtn:hover {
+  background: #D71921;
+  color: #FFFFFF;
+  border-color: #D71921;
+}
+
+.nothingPage[data-mode="dark"] .hardwareFooter,
+:global([data-mode="dark"]) .nothingPage .hardwareFooter {
+  background: #0B0B0E;
+  border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+.nothingPage[data-mode="dark"] .footerChassis,
+.nothingPage[data-mode="dark"] .footerLink,
+:global([data-mode="dark"]) .nothingPage .footerChassis,
+:global([data-mode="dark"]) .nothingPage .footerLink {
+  color: #8E8E98;
+}
+
+.nothingPage[data-mode="dark"] .footerLink:hover,
+:global([data-mode="dark"]) .nothingPage .footerLink:hover {
+  color: #FFFFFF;
+}
+

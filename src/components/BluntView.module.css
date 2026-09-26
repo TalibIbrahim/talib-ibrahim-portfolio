@@ -1,0 +1,769 @@
+.container {
+  min-height: 100vh;
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 6.5rem 1.5rem 5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  color: #f1f5f9;
+  background: transparent;
+  font-family: var(--font-inter, sans-serif);
+  box-sizing: border-box;
+}
+
+/* Editorial Top Tag */
+.metaHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  margin-bottom: 2.5rem;
+}
+
+.statusTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #ccff00;
+  text-transform: uppercase;
+}
+
+.statusDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 9999px;
+  background: #ccff00;
+  box-shadow: 0 0 8px #ccff00;
+}
+
+.locationTag {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Hero Header */
+.headerSection {
+  margin-bottom: 3.5rem;
+}
+
+.heroTitle {
+  font-family: var(--font-oswald, var(--font-inter, sans-serif));
+  font-size: clamp(2.75rem, 7.5vw, 6.5rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0 0 1rem 0;
+}
+
+.heroSub {
+  font-family: var(--font-mono, monospace);
+  font-size: clamp(0.85rem, 1.6vw, 1.1rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.65);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* Blunt Honest Line / Quotes Section */
+.quoteSection {
+  background: rgba(18, 18, 20, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-left: 3px solid #ccff00;
+  padding: 2.25rem 2.5rem;
+  border-radius: 4px;
+  margin-bottom: 3rem;
+  position: relative;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.quoteSection:hover {
+  border-color: rgba(255, 255, 255, 0.25);
+  border-left-color: #ccff00;
+  background: rgba(22, 22, 26, 0.85);
+}
+
+.quoteControlBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.quoteIndicator {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #ccff00;
+  text-transform: uppercase;
+}
+
+.quotePills {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.quoteTabBtn {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.5);
+  color: rgba(255, 255, 255, 0.65);
+  border-radius: 2px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.quoteTabBtn:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.quoteTabBtn:focus-visible {
+  outline: 2px solid #ccff00;
+  outline-offset: 2px;
+}
+
+.quoteTabActive {
+  background: #ccff00;
+  color: #050505 !important;
+  border-color: #ccff00;
+  font-weight: 800;
+}
+
+.quoteInteractiveArea {
+  cursor: pointer;
+}
+
+.quoteText {
+  font-size: clamp(1.35rem, 3.2vw, 2.5rem);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  color: #ffffff;
+  margin: 0;
+  font-family: var(--font-inter, sans-serif);
+}
+
+.quoteHint {
+  display: inline-block;
+  margin-top: 1.25rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.4);
+  text-transform: uppercase;
+}
+
+/* Fast Action Bar */
+.actionBarSection {
+  margin-bottom: 3.5rem;
+}
+
+.actionBarLabel {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.45);
+  text-transform: uppercase;
+  margin-bottom: 0.85rem;
+}
+
+.actionBarGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.85rem;
+}
+
+.actionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.95rem 1.25rem;
+  background: rgba(15, 15, 18, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 4px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-decoration: none;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.actionBtn:hover {
+  background: #ccff00;
+  color: #050505;
+  border-color: #ccff00;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(204, 255, 0, 0.25);
+}
+
+.actionBtn:focus-visible {
+  outline: 2px solid #ccff00;
+  outline-offset: 3px;
+}
+
+.actionBtnResume {
+  background: rgba(204, 255, 0, 0.08);
+  border-color: rgba(204, 255, 0, 0.35);
+  color: #ccff00;
+}
+
+.actionBtnResume:hover {
+  background: #ccff00;
+  color: #050505;
+  border-color: #ccff00;
+}
+
+/* Key Metrics / Snapshot */
+.snapshotGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 4rem;
+  padding: 1.75rem 2rem;
+  background: rgba(12, 12, 14, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+}
+
+.snapshotItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.snapshotLabel {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #ccff00;
+  text-transform: uppercase;
+}
+
+.snapshotValue {
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Minimalistic Contact Box at Bottom */
+.contactBox {
+  padding: 2.5rem;
+  background: rgba(15, 15, 18, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 4px;
+  position: relative;
+}
+
+.contactBoxHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.contactBoxTitle {
+  font-family: var(--font-oswald, var(--font-inter, sans-serif));
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin: 0;
+}
+
+.contactSlaBadge {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #ccff00;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: rgba(204, 255, 0, 0.1);
+  border: 1px solid rgba(204, 255, 0, 0.25);
+  padding: 0.2rem 0.6rem;
+  border-radius: 2px;
+}
+
+.contactBoxDesc {
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0 0 1.75rem 0;
+  max-width: 650px;
+}
+
+.emailDirectRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.emailPill {
+  font-family: var(--font-mono, monospace);
+  font-size: clamp(0.85rem, 1.8vw, 1.05rem);
+  font-weight: 700;
+  color: #ffffff;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.65rem 1.1rem;
+  border-radius: 4px;
+  letter-spacing: 0.03em;
+  user-select: all;
+}
+
+.copyEmailBtn {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.7rem 1.2rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border-radius: 4px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.copyEmailBtn:hover {
+  background: #ccff00;
+  color: #050505;
+  border-color: #ccff00;
+}
+
+.copyEmailBtn:focus-visible {
+  outline: 2px solid #ccff00;
+  outline-offset: 2px;
+}
+
+.copiedActive {
+  background: #ccff00 !important;
+  color: #050505 !important;
+  border-color: #ccff00 !important;
+}
+
+.contactChannels {
+  display: flex;
+  gap: 1.25rem;
+  flex-wrap: wrap;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  padding-top: 1.25rem;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.channelLink {
+  color: rgba(255, 255, 255, 0.6);
+  text-decoration: none;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: color 0.18s ease;
+}
+
+.channelLink:hover {
+  color: #ccff00;
+}
+
+.channelLink:focus-visible {
+  outline: 1px solid #ccff00;
+  outline-offset: 2px;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+  .container {
+    padding: 5.5rem 1.25rem 4rem 1.25rem;
+  }
+
+  .quoteSection {
+    padding: 1.75rem 1.5rem;
+  }
+
+  .contactBox {
+    padding: 1.75rem 1.5rem;
+  }
+
+  .actionBarGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .actionBarGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .emailDirectRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .copyEmailBtn {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   M SPORT THEME BLUNT VIEW ADAPTATIONS
+   ══════════════════════════════════════════════════ */
+
+:global([data-theme="msport"]) .quoteSection {
+  border-left: 3px solid #81C4FF;
+  position: relative;
+  border-radius: 4px;
+}
+
+:global([data-theme="msport"]) .quoteSection::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--msport-stripe);
+}
+
+:global([data-theme="msport"]) .statusDot {
+  background: #81C4FF;
+  box-shadow: 0 0 8px #81C4FF;
+}
+
+:global([data-theme="msport"]) .statusTag {
+  color: #81C4FF;
+}
+
+:global([data-theme="msport"]) .quoteIndicator {
+  color: #81C4FF;
+}
+
+:global([data-theme="msport"]) .primaryBtn {
+  background: #81C4FF;
+  color: #0a0b0e;
+}
+
+:global([data-theme="msport"]) .primaryBtn:hover {
+  background: #ffffff;
+  box-shadow: 0 0 16px rgba(129, 196, 255, 0.4);
+}
+
+/* Light Mode M Sport Blunt View */
+:global([data-theme="msport"][data-mode="light"]) .container,
+:global([data-theme-variant="msport-light"]) .container {
+  color: #0a0e18;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .quoteSection,
+:global([data-theme-variant="msport-light"]) .quoteSection {
+  background: #ffffff;
+  border-color: rgba(0, 102, 177, 0.2);
+  border-left-color: #0066b1;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+:global([data-theme="msport"][data-mode="light"]) .heroTitle,
+:global([data-theme-variant="msport-light"]) .heroTitle {
+  color: #0a0e18;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .heroSub,
+:global([data-theme-variant="msport-light"]) .heroSub {
+  color: #4a5468;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .quoteText,
+:global([data-theme-variant="msport-light"]) .quoteText {
+  color: #1a202c;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .statusTag,
+:global([data-theme-variant="msport-light"]) .statusTag,
+:global([data-theme="msport"][data-mode="light"]) .quoteIndicator,
+:global([data-theme-variant="msport-light"]) .quoteIndicator {
+  color: #0066b1;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .primaryBtn,
+:global([data-theme-variant="msport-light"]) .primaryBtn {
+  background: #0066b1;
+  color: #ffffff;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .contactBox,
+:global([data-theme-variant="msport-light"]) .contactBox {
+  background: #ffffff;
+  border-color: rgba(0, 102, 177, 0.2);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+:global([data-theme="msport"][data-mode="light"]) .contactHeading,
+:global([data-theme-variant="msport-light"]) .contactHeading {
+  color: #0a0e18;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .emailAddress,
+:global([data-theme-variant="msport-light"]) .emailAddress {
+  color: #0066b1;
+}
+
+:global([data-theme="msport"]) .heroTitle {
+  font-family: var(--font-rajdhani), 'Rajdhani', sans-serif !important;
+  font-style: italic;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+:global([data-theme="msport"]) .statusTag,
+:global([data-theme="msport"]) .quoteIndicator {
+  font-family: var(--font-rajdhani), 'Rajdhani', sans-serif !important;
+  font-style: italic;
+  font-weight: 700;
+}
+
+:global([data-theme="msport"]) .quoteSection {
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px)) !important;
+  border-radius: 0px !important;
+}
+
+:global([data-theme="msport"]) .primaryBtn {
+  border-radius: 0px !important;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  transform: skewX(-8deg);
+  font-family: var(--font-rajdhani), 'Rajdhani', sans-serif !important;
+  font-style: italic;
+  font-weight: 700;
+}
+
+/* ══════════════════════════════════════════════════
+   NOTHING THEME BLUNT VIEW ADAPTATIONS (Dark & Light)
+   ══════════════════════════════════════════════════ */
+
+:global([data-theme="nothing"]) .heroTitle {
+  font-family: var(--font-dot-matrix, monospace) !important;
+  letter-spacing: 0.03em;
+}
+
+:global([data-theme="nothing"]) .quoteSection {
+  border-radius: 0px !important;
+  border-left: 3px solid #D71921;
+  background: rgba(14, 14, 14, 0.9);
+  background-image: var(--nothing-grain);
+  border-color: rgba(255, 255, 255, 0.16);
+  border-left-color: #D71921;
+}
+
+:global([data-theme="nothing"]) .quoteSection:hover {
+  border-color: rgba(255, 255, 255, 0.28);
+  border-left-color: #D71921;
+  background: rgba(18, 18, 18, 0.95);
+  background-image: var(--nothing-grain);
+}
+
+:global([data-theme="nothing"]) .statusDot {
+  border-radius: 0px !important;
+  background: #D71921;
+  box-shadow: 0 0 8px #D71921;
+}
+
+:global([data-theme="nothing"]) .statusTag {
+  color: #D71921;
+  font-family: var(--font-dot-matrix, monospace) !important;
+  letter-spacing: 0.12em;
+}
+
+:global([data-theme="nothing"]) .quoteIndicator {
+  color: #D71921;
+  font-family: var(--font-dot-matrix, monospace) !important;
+  letter-spacing: 0.14em;
+}
+
+:global([data-theme="nothing"]) .quoteTabBtn {
+  border-radius: 0px !important;
+  font-family: var(--font-dot-matrix, monospace) !important;
+}
+
+:global([data-theme="nothing"]) .quoteTabActive {
+  background: #D71921;
+  border-color: #D71921;
+  color: #ffffff;
+}
+
+:global([data-theme="nothing"]) .primaryBtn {
+  border-radius: 0px !important;
+  background: #D71921;
+  color: #ffffff;
+  font-family: var(--font-dot-matrix, monospace) !important;
+}
+
+:global([data-theme="nothing"]) .primaryBtn:hover {
+  background: #ffffff;
+  color: #000000;
+  box-shadow: 0 0 16px rgba(215, 25, 33, 0.4);
+}
+
+:global([data-theme="nothing"]) .secondaryBtn {
+  border-radius: 0px !important;
+}
+
+:global([data-theme="nothing"]) .secondaryBtn:hover {
+  border-color: #D71921;
+  color: #ffffff;
+}
+
+:global([data-theme="nothing"]) .contactBox {
+  border-radius: 0px !important;
+  background: rgba(14, 14, 14, 0.9);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+:global([data-theme="nothing"]) .copyEmailBtn {
+  border-radius: 0px !important;
+}
+
+:global([data-theme="nothing"]) .copyEmailBtn:hover {
+  border-color: #D71921;
+}
+
+/* Light Mode Nothing Theme Blunt View */
+:global([data-theme="nothing"][data-mode="light"]) .container,
+:global([data-theme-variant="nothing-light"]) .container {
+  color: #000000;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .quoteSection,
+:global([data-theme-variant="nothing-light"]) .quoteSection {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.16);
+  border-left-color: #D71921;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .quoteSection:hover,
+:global([data-theme-variant="nothing-light"]) .quoteSection:hover {
+  border-color: rgba(0, 0, 0, 0.3);
+  border-left-color: #D71921;
+  background: #fbfbfb;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .heroTitle,
+:global([data-theme-variant="nothing-light"]) .heroTitle {
+  color: #000000;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .heroSub,
+:global([data-theme-variant="nothing-light"]) .heroSub {
+  color: #555555;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .quoteText,
+:global([data-theme-variant="nothing-light"]) .quoteText {
+  color: #111111;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .statusTag,
+:global([data-theme-variant="nothing-light"]) .statusTag,
+:global([data-theme="nothing"][data-mode="light"]) .quoteIndicator,
+:global([data-theme-variant="nothing-light"]) .quoteIndicator {
+  color: #D71921;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .quoteTabBtn,
+:global([data-theme-variant="nothing-light"]) .quoteTabBtn {
+  background: #f2f2f2;
+  border-color: rgba(0, 0, 0, 0.15);
+  color: #555555;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .quoteTabActive,
+:global([data-theme-variant="nothing-light"]) .quoteTabActive {
+  background: #D71921;
+  border-color: #D71921;
+  color: #ffffff;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .primaryBtn,
+:global([data-theme-variant="nothing-light"]) .primaryBtn {
+  background: #D71921;
+  color: #ffffff;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .primaryBtn:hover,
+:global([data-theme-variant="nothing-light"]) .primaryBtn:hover {
+  background: #000000;
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(215, 25, 33, 0.35);
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .secondaryBtn,
+:global([data-theme-variant="nothing-light"]) .secondaryBtn {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.2);
+  color: #000000;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .secondaryBtn:hover,
+:global([data-theme-variant="nothing-light"]) .secondaryBtn:hover {
+  border-color: #D71921;
+  color: #D71921;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .contactBox,
+:global([data-theme-variant="nothing-light"]) .contactBox {
+  background: #ffffff;
+  border-color: rgba(0, 0, 0, 0.16);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .contactHeading,
+:global([data-theme-variant="nothing-light"]) .contactHeading {
+  color: #000000;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .emailAddress,
+:global([data-theme-variant="nothing-light"]) .emailAddress {
+  color: #D71921;
+}
+
+

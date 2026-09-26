@@ -1,107 +1,292 @@
-"use client";
-import dynamic from "next/dynamic";
-import { Suspense } from "react";
-import { motion } from "framer-motion";
-import Image from "next/image";
-import { personalInfo, socials } from "@/data/portfolio";
-import styles from "./Hero.module.css";
+'use client';
+/* eslint-disable react-hooks/set-state-in-effect */
 
-const HeroScene = dynamic(() => import("./HeroScene"), { ssr: false });
+import Image from 'next/image';
+import { HeroData } from '../data/types';
+import styles from './Hero.module.css';
+import {
+  motion,
+  useMotionValue,
+  useSpring,
+  useMotionTemplate,
+  useScroll,
+  useTransform,
+  useVelocity,
+} from 'framer-motion';
+import { useEffect, useState, useRef, useCallback } from 'react';
+import DecryptedText from './react-bits/DecryptedText';
+import Magnet from './react-bits/Magnet';
+import { useThemeSystem } from '@/hooks/useThemeSystem';
 
-const stagger = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.12, delayChildren: 0.3 } },
-};
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] as const } },
-};
+export interface HeroProps {
+  data: HeroData;
+}
 
-export default function Hero() {
+export default function Hero({ data }: HeroProps) {
+  const containerRef = useRef<HTMLElement>(null);
+  const { theme } = useThemeSystem();
+  
+  const [isVariantA, setIsVariantA] = useState(true);
+  const [hasMounted, setHasMounted] = useState(false);
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+  // Live Clock for Nothing Theme
+  const [currentTime, setCurrentTime] = useState<string>('00:00:00');
+  const [currentDate, setCurrentDate] = useState<string>('26.09.26');
+
+  useEffect(() => {
+    const updateClock = () => {
+      const now = new Date();
+      const h = String(now.getHours()).padStart(2, '0');
+      const m = String(now.getMinutes()).padStart(2, '0');
+      const s = String(now.getSeconds()).padStart(2, '0');
+      setCurrentTime(`${h}:${m}:${s}`);
+      const d = String(now.getDate()).padStart(2, '0');
+      const mon = String(now.getMonth() + 1).padStart(2, '0');
+      const y = String(now.getFullYear()).slice(-2);
+      setCurrentDate(`${d}.${mon}.${y}`);
+    };
+    updateClock();
+    const timer = setInterval(updateClock, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    setIsVariantA(Math.random() > 0.5);
+    setHasMounted(true);
+    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    setPrefersReducedMotion(window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  }, []);
+
+  // --- Cursor tracking (desktop) ---
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+  const springConfig = { damping: 25, stiffness: 120, mass: 0.5 };
+  const springX = useSpring(mouseX, springConfig);
+  const springY = useSpring(mouseY, springConfig);
+  const maskSize = useMotionValue(0);
+  const springMaskSize = useSpring(maskSize, { damping: 20, stiffness: 150 });
+
+  // --- Scroll-based reveal for touch/mobile ---
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end start"]
+  });
+  // Map scroll 0-0.3 to mask size 0-800px (reveal as user starts scrolling)
+  const scrollMaskSize = useTransform(scrollYProgress, [0, 0.3], [0, 800]);
+  const springScrollMask = useSpring(scrollMaskSize, { damping: 30, stiffness: 100 });
+
+  // --- Velocity-reactive Marquee Skew ---
+  const { scrollY } = useScroll();
+  const scrollVelocity = useVelocity(scrollY);
+  const smoothVelocity = useSpring(scrollVelocity, { damping: 50, stiffness: 400 });
+  const tickerSkewX = useTransform(smoothVelocity, [-2000, 2000], [-8, 8]);
+
+  // --- Multi-speed Parallax (Mid depth 0) ---
+  // Portrait drifts upward at 0.4× as page scrolls past hero
+  const portraitY = useTransform(scrollYProgress, [0, 1], ["0%", "-40%"]);
+  // Hero text container drifts with a subtle y offset (0.6× speed)
+  const textY = useTransform(scrollYProgress, [0, 1], [0, 50]);
+
+  // --- Camera Transition: Dolly-in exit (Hero -> BentoShowcase) ---
+  // Scale down slightly on exit as user approaches the bottom of Hero
+  const heroScale = useTransform(scrollYProgress, [0.7, 1.0], [1.0, 0.96], { clamp: true });
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!containerRef.current || isTouchDevice) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    mouseX.set(e.clientX - rect.left);
+    mouseY.set(e.clientY - rect.top);
+  }, [isTouchDevice, mouseX, mouseY]);
+
+  const handleMouseEnter = useCallback(() => {
+    if (isTouchDevice) return;
+    maskSize.set(500);
+  }, [isTouchDevice, maskSize]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (isTouchDevice) return;
+    maskSize.set(0);
+  }, [isTouchDevice, maskSize]);
+
+  // Desktop: cursor-following radial mask
+  const desktopMask = useMotionTemplate`radial-gradient(${springMaskSize}px circle at ${springX}px ${springY}px, black 70%, transparent 100%)`;
+  
+  // Mobile/touch: scroll-driven centered radial mask
+  const mobileMask = useMotionTemplate`radial-gradient(${springScrollMask}px circle at 50% 50%, black 70%, transparent 100%)`;
+
+  const renderContent = (isRevealLayer: boolean) => {
+    const isNeonMode = isVariantA ? isRevealLayer : !isRevealLayer;
+    const layerModeClass = isNeonMode ? styles.neonMode : styles.grayscaleMode;
+
+    return (
+      <div className={`${styles.layerContent} ${layerModeClass}`}>
+        {/* ── NOTHING THEME STRUCTURAL PRIMITIVES ── */}
+        {theme === 'nothing' && (
+          <>
+            {/* Live Nothing Circular Clock Widget */}
+            <div className={styles.nothingClockWidget} aria-label="Nothing clinical clock widget">
+              <span className={styles.nothingClockTime}>{currentTime}</span>
+              <span className={styles.nothingClockDate}>{`${currentDate} // LHR`}</span>
+              <div className={styles.nothingClockPip} />
+              <span className={styles.crosshairTL}>+</span>
+              <span className={styles.crosshairBR}>+</span>
+            </div>
+
+            {/* Abstract Geometric Shapes with Soft Grain Fill & Crosshairs & Single Red Pop */}
+            <div className={styles.nothingAbstractMotif} aria-hidden="true">
+              <div className={styles.nothingBlockModule}>
+                <span className={styles.nothingBlockLabel}>{'FIG. 01 // ARCHITECTURE'}</span>
+                <span className={styles.crosshairTL}>+</span>
+                <span className={styles.crosshairTR}>+</span>
+                <span className={styles.crosshairBL}>+</span>
+                <span className={styles.crosshairBR}>+</span>
+              </div>
+
+              <div className={styles.nothingCapsuleShape}>
+                <span className={styles.nothingCapsuleDot} />
+                <span className={styles.nothingCapsuleDot} />
+              </div>
+
+              <div className={styles.nothingRedHalfCircle} />
+            </div>
+          </>
+        )}
+
+        {/* ── BMW M SPORT STRUCTURAL PRIMITIVES ── */}
+        {theme === 'msport' && (
+          <div className={styles.msportHeaderBar} aria-label="BMW M Sport Telemetry">
+            <div className={styles.msportInsigniaGroup}>
+              <div className={styles.msportStripeIcon}>
+                <span className={styles.mBlue} />
+                <span className={styles.mDarkBlue} />
+                <span className={styles.mRed} />
+              </div>
+              <span className={styles.msportTitleText}>{'/// M-PERFORMANCE TELEMETRY // SECTOR 01'}</span>
+            </div>
+            <div className={styles.msportTachometer}>
+              <span className={styles.msportTachoLabel}>RPM</span>
+              <div className={styles.msportTachoLeds}>
+                <span className={`${styles.tachoLed} ${styles.ledGreen}`} />
+                <span className={`${styles.tachoLed} ${styles.ledGreen}`} />
+                <span className={`${styles.tachoLed} ${styles.ledGreen}`} />
+                <span className={`${styles.tachoLed} ${styles.ledYellow}`} />
+                <span className={`${styles.tachoLed} ${styles.ledYellow}`} />
+                <span className={`${styles.tachoLed} ${styles.ledRed}`} />
+                <span className={`${styles.tachoLed} ${styles.ledRed}`} />
+                <span className={`${styles.tachoLed} ${styles.ledBlue}`} />
+              </div>
+              <span className={styles.msportTachoValue}>8,250</span>
+            </div>
+          </div>
+        )}
+
+        <motion.div 
+          className={styles.helmetImageWrapper}
+          style={{ y: portraitY }}
+        >
+          <Image 
+            src="/talib.png"
+            alt="Muhammad Talib Ibrahim"
+            width={700}
+            height={900}
+            className={styles.helmetImage}
+            priority
+          />
+        </motion.div>
+
+        <motion.div 
+          className={styles.container}
+          style={{ y: textY }}
+        >
+          <Magnet padding={30} magnetStrength={0.25}>
+            <div className={styles.statusBadgeWrapper}>
+              <span className={styles.statusBadgeDot}></span>
+              <span className={styles.statusBadgeText}>
+                {theme === 'nothing' ? (
+                  '00 // LAHORE, PK — (NOTHING OS 2.5)'
+                ) : theme === 'msport' ? (
+                  '/// M-SPORT // LAHORE, PK — TRACK READY'
+                ) : (
+                  <DecryptedText
+                    text="00 // LAHORE, PK — ACTIVE DISPATCH"
+                    speed={40}
+                    maxIterations={12}
+                    animateOn="view"
+                  />
+                )}
+              </span>
+            </div>
+          </Magnet>
+          
+          <h1 className={styles.headline}>
+            {data.headline.split(' ').map((word, i) => (
+              <span key={i} className={styles.headlineWord}>{word}</span>
+            ))}
+          </h1>
+          
+          <p className={styles.subheadline}>
+            {data.subheadline}
+          </p>
+        </motion.div>
+
+        <div className={styles.tickerContainer}>
+          <motion.div 
+            className={styles.tickerTrack}
+            style={{ skewX: prefersReducedMotion ? 0 : tickerSkewX }}
+          >
+            {[...data.tickerStrings, ...data.tickerStrings, ...data.tickerStrings, ...data.tickerStrings].map((str, idx) => (
+              <span key={idx} className={styles.tickerItem}>
+                {str}
+                <span className={styles.tickerSeparator}>{"//"}</span>
+              </span>
+            ))}
+          </motion.div>
+        </div>
+      </div>
+    );
+  };
+
+  if (!hasMounted) {
+    return <section className={styles.heroSection} style={{ minHeight: '100vh', backgroundColor: '#0d0d0f' }} />;
+  }
+
+  // If user prefers reduced motion, show neon mode statically
+  if (prefersReducedMotion) {
+    return (
+      <section ref={containerRef} className={styles.heroSection}>
+        <div className={styles.baseLayer}>
+          {renderContent(false)}
+        </div>
+      </section>
+    );
+  }
+
+  const activeMask = isTouchDevice ? mobileMask : desktopMask;
+
   return (
-    <section className={styles.hero} id="hero">
-      <div className={styles.canvasWrap}>
-        <Suspense fallback={null}>
-          <HeroScene />
-        </Suspense>
+    <motion.section 
+      ref={containerRef}
+      className={styles.heroSection}
+      style={{ scale: heroScale }}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      <div className={styles.baseLayer}>
+        {renderContent(false)}
       </div>
 
-      <motion.div
-        className={styles.content}
-        variants={stagger}
-        initial="hidden"
-        animate="show"
+      <motion.div 
+        className={styles.revealLayer}
+        style={{
+          WebkitMaskImage: activeMask,
+          maskImage: activeMask,
+        }}
       >
-        <motion.p className={`${styles.greeting} mono`} variants={fadeUp}>
-          Hi, my name is
-        </motion.p>
-
-        <motion.h1 className={styles.name} variants={fadeUp}>
-          {personalInfo.name.split(" ").map((word, i) => (
-            <span key={i} className={i === 0 || i === 2 ? styles.bold : styles.light}>
-              {word}{" "}
-            </span>
-          ))}
-        </motion.h1>
-
-        <motion.p className={styles.tagline} variants={fadeUp}>
-          {personalInfo.tagline}
-        </motion.p>
-
-        <motion.div className={styles.ctas} variants={fadeUp}>
-          <a href="#projects" className="btn btn-primary">
-            View my work
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M7 17L17 7M17 7H7M17 7v10" />
-            </svg>
-          </a>
-          <a href="#contact" className="btn btn-outline">
-            Get in touch
-          </a>
-        </motion.div>
-
-        <motion.div className={styles.socialRow} variants={fadeUp}>
-          <a href={socials.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub" className={styles.socialLink}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-          </a>
-          <a href={socials.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className={styles.socialLink}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-          </a>
-          <a href={socials.email} aria-label="Email" className={styles.socialLink}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13 2 4"/></svg>
-          </a>
-        </motion.div>
+        {renderContent(true)}
       </motion.div>
-
-      <motion.div
-        className={styles.imageWrap}
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.8, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      >
-        <div className={styles.imageGlow} />
-        <Image
-          src="/headshot-no-bg.png"
-          alt="Muhammad Talib Ibrahim"
-          width={380}
-          height={480}
-          priority
-          className={styles.image}
-        />
-      </motion.div>
-
-      <motion.div
-        className={styles.scrollIndicator}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1.5, duration: 1 }}
-      >
-        <motion.div
-          className={styles.scrollDot}
-          animate={{ y: [0, 8, 0] }}
-          transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
-        />
-      </motion.div>
-    </section>
+    </motion.section>
   );
 }

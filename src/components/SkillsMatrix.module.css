@@ -1,0 +1,909 @@
+.section {
+  padding: 8rem 4rem;
+  background-color: var(--bg-primary, #0d0d10);
+  color: var(--text-primary, #f4f4ed);
+  font-family: var(--font-sans, system-ui);
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Subtle Tactical Grid Background */
+.gridBackground {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(rgba(204, 255, 0, 0.04) 1px, transparent 1px),
+    linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 36px 36px, 144px 144px, 144px 144px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ambientGlow {
+  position: absolute;
+  top: 20%;
+  right: -10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(204, 255, 0, 0.06) 0%, rgba(204, 255, 0, 0) 70%);
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.container {
+  max-width: 1320px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+
+/* Section Header */
+.badgeWrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(204, 255, 0, 0.06);
+  border: 1px solid rgba(204, 255, 0, 0.25);
+  padding: 0.35rem 0.85rem;
+  border-radius: 4px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  color: #ccff00;
+  margin-bottom: 1.25rem;
+}
+
+.badgeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #ccff00;
+  box-shadow: 0 0 8px #ccff00;
+  flex-shrink: 0;
+}
+
+.badgeText {
+  font-family: var(--font-mono, monospace);
+  font-weight: 500;
+}
+
+.headerRow {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 3.5rem;
+  flex-wrap: wrap;
+}
+
+.sectionTitle {
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.titleDot {
+  color: #ccff00;
+}
+
+/* Category Filter Bar */
+.filterBar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  background: rgba(18, 19, 24, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 8px;
+  padding: 0.35rem;
+}
+
+.filterBtn {
+  background: transparent;
+  border: none;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: rgba(244, 244, 237, 0.6);
+  padding: 0.45rem 0.85rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filterBtn:hover {
+  color: #f4f4ed;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.filterBtnActive {
+  background: rgba(204, 255, 0, 0.12) !important;
+  color: #ccff00 !important;
+  font-weight: 600;
+  box-shadow: 0 0 12px rgba(204, 255, 0, 0.1);
+}
+
+/* Two-column Matrix Layout */
+.matrixGrid {
+  display: grid;
+  grid-template-columns: 1.25fr 0.95fr;
+  gap: 3.5rem;
+  align-items: start;
+}
+
+/* Left Column: Skill Groups */
+.skillsColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 2.75rem;
+}
+
+.categoryGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.6rem;
+}
+
+.groupTitle {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  color: #ccff00;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.groupCode {
+  color: rgba(204, 255, 0, 0.5);
+  font-weight: 400;
+}
+
+.groupCount {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  color: rgba(244, 244, 237, 0.4);
+  letter-spacing: 0.08em;
+}
+
+.pillsCluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 0.6rem;
+}
+
+/* Magnet Wrapper */
+.magnetItem {
+  display: inline-flex;
+}
+
+/* Interactive Skill Pill */
+.skillPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(22, 23, 29, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border-radius: 9999px;
+  padding: 0.55rem 1.15rem;
+  color: #deded6;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.84rem;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.skillPill:hover,
+.skillPill:focus-visible {
+  border-color: #ccff00;
+  color: #ccff00;
+  background: rgba(204, 255, 0, 0.08);
+  box-shadow: 0 0 22px rgba(204, 255, 0, 0.35), inset 0 0 12px rgba(204, 255, 0, 0.12);
+  transform: translateY(-2px);
+}
+
+.skillPillActive {
+  border-color: #ccff00 !important;
+  color: #ccff00 !important;
+  background: rgba(204, 255, 0, 0.12) !important;
+  box-shadow: 0 0 25px rgba(204, 255, 0, 0.4), inset 0 0 14px rgba(204, 255, 0, 0.15) !important;
+}
+
+.pillDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.3);
+  transition: all 0.25s ease;
+}
+
+.skillPill:hover .pillDot,
+.skillPillActive .pillDot {
+  background-color: #ccff00;
+  box-shadow: 0 0 8px #ccff00;
+  transform: scale(1.3);
+}
+
+.pillText {
+  white-space: nowrap;
+}
+
+/* Right Column: Sticky Radar Telemetry HUD */
+.hudStickyWrapper {
+  position: sticky;
+  top: 5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.hudCard {
+  background: rgba(14, 15, 19, 0.88);
+  border: 1px solid rgba(204, 255, 0, 0.25);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-radius: 12px;
+  padding: 1.75rem;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7), 0 0 30px rgba(204, 255, 0, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Corner Calipers */
+.cornerTL,
+.cornerTR,
+.cornerBL,
+.cornerBR {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+}
+
+.cornerTL {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid #ccff00;
+  border-left: 2px solid #ccff00;
+}
+
+.cornerTR {
+  top: -1px;
+  right: -1px;
+  border-top: 2px solid #ccff00;
+  border-right: 2px solid #ccff00;
+}
+
+.cornerBL {
+  bottom: -1px;
+  left: -1px;
+  border-bottom: 2px solid #ccff00;
+  border-left: 2px solid #ccff00;
+}
+
+.cornerBR {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 2px solid #ccff00;
+  border-right: 2px solid #ccff00;
+}
+
+/* Top HUD Banner */
+.hudTopBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(204, 255, 0, 0.15);
+  padding-bottom: 0.85rem;
+  margin-bottom: 1.25rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+}
+
+.hudCallsign {
+  color: #ccff00;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.hudStatusTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: rgba(244, 244, 237, 0.7);
+  letter-spacing: 0.08em;
+}
+
+.hudStatusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #ccff00;
+  box-shadow: 0 0 8px #ccff00;
+  animation: pulseDot 2s ease-in-out infinite;
+}
+
+/* Radar Visual Graphic inside HUD */
+.radarGraphicWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 150px;
+  position: relative;
+  margin-bottom: 1.25rem;
+  background: radial-gradient(circle, rgba(204, 255, 0, 0.04) 0%, transparent 75%);
+  border-radius: 8px;
+  border: 1px solid rgba(204, 255, 0, 0.08);
+  overflow: hidden;
+}
+
+.radarGraphicSvg {
+  width: 100%;
+  height: 100%;
+  max-width: 280px;
+  max-height: 140px;
+  color: rgba(204, 255, 0, 0.25);
+}
+
+.radarSweepHand {
+  transform-origin: 150px 75px;
+  animation: radarRotate 6s linear infinite;
+}
+
+@keyframes radarRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Active Skill Content */
+.activeSkillTitle {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #f4f4ed;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.5rem 0;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.activeSkillCategory {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.75rem;
+  color: #ccff00;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.85rem;
+}
+
+.activeRoleDescription {
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: rgba(244, 244, 237, 0.78);
+  margin-bottom: 1.25rem;
+}
+
+/* Connected Architectures */
+.connectedSection {
+  margin-bottom: 1.25rem;
+}
+
+.connectedLabel {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  color: rgba(204, 255, 0, 0.85);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+  display: block;
+}
+
+.connectedChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.connectedChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  color: #e6e6dc;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(204, 255, 0, 0.2);
+  padding: 0.28rem 0.65rem;
+  border-radius: 4px;
+}
+
+.chipIndicator {
+  color: #ccff00;
+}
+
+/* Telemetry Key-Value Specs */
+.metricsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  border-top: 1px dashed rgba(204, 255, 0, 0.15);
+  padding-top: 1rem;
+  font-family: var(--font-mono, monospace);
+}
+
+.metricBox {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  background: rgba(0, 0, 0, 0.3);
+  padding: 0.6rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.metricLabel {
+  font-size: 0.65rem;
+  color: rgba(244, 244, 237, 0.5);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.metricVal {
+  font-size: 0.78rem;
+  color: #ccff00;
+  font-weight: 600;
+}
+
+/* Standby Empty State */
+.standbyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 1.5rem 0.5rem;
+}
+
+.standbyIcon {
+  width: 48px;
+  height: 48px;
+  color: #ccff00;
+  margin-bottom: 1rem;
+  animation: pulseStandby 2.5s ease-in-out infinite;
+}
+
+@keyframes pulseStandby {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+.standbyTitle {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.95rem;
+  color: #ccff00;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
+}
+
+.standbyText {
+  font-size: 0.82rem;
+  color: rgba(244, 244, 237, 0.6);
+  line-height: 1.5;
+  max-width: 320px;
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1024px) {
+  .section {
+    padding: 6rem 2.5rem;
+  }
+  .matrixGrid {
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+  .hudStickyWrapper {
+    position: relative;
+    top: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 5rem 1.5rem;
+  }
+  .headerRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .filterBar {
+    width: 100%;
+    overflow-x: auto;
+    padding: 0.25rem;
+  }
+  .skillPill {
+    font-size: 0.78rem;
+    padding: 0.45rem 0.9rem;
+  }
+  .hudCard {
+    padding: 1.25rem;
+  }
+  .metricsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   M SPORT THEME SKILLS MATRIX ADAPTATIONS
+   ══════════════════════════════════════════════════ */
+
+:global([data-theme="msport"]) .badgeWrapper {
+  border-radius: 4px;
+  background: rgba(129, 196, 255, 0.08);
+  border-color: rgba(129, 196, 255, 0.35);
+  color: #81C4FF;
+}
+
+:global([data-theme="msport"]) .badgeDot {
+  background-color: #81C4FF;
+  box-shadow: 0 0 8px #81C4FF;
+}
+
+:global([data-theme="msport"]) .titleDot {
+  color: #81C4FF;
+}
+
+:global([data-theme="msport"]) .filterBtn.activeFilter {
+  background: rgba(129, 196, 255, 0.15);
+  color: #81C4FF;
+  border-color: #81C4FF;
+}
+
+:global([data-theme="msport"]) .skillPill {
+  border-radius: 4px;
+  border-color: rgba(129, 196, 255, 0.2);
+}
+
+:global([data-theme="msport"]) .skillPill:hover {
+  border-color: #81C4FF;
+  box-shadow: 0 0 16px rgba(129, 196, 255, 0.35);
+}
+
+:global([data-theme="msport"]) .hudCard {
+  border-radius: 4px;
+  background: rgba(16, 18, 23, 0.9);
+  border-color: rgba(129, 196, 255, 0.25);
+  position: relative;
+  overflow: hidden;
+}
+
+:global([data-theme="msport"]) .hudCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--msport-stripe);
+}
+
+/* Light Mode M Sport Skills */
+:global([data-theme="msport"][data-mode="light"]) .badgeWrapper,
+:global([data-theme-variant="msport-light"]) .badgeWrapper {
+  background: rgba(0, 102, 177, 0.08);
+  border-color: rgba(0, 102, 177, 0.3);
+  color: #0066b1;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .badgeDot,
+:global([data-theme-variant="msport-light"]) .badgeDot {
+  background-color: #0066b1;
+  box-shadow: 0 0 8px rgba(0, 102, 177, 0.5);
+}
+
+:global([data-theme="msport"][data-mode="light"]) .titleDot,
+:global([data-theme-variant="msport-light"]) .titleDot {
+  color: #0066b1;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .filterBar,
+:global([data-theme-variant="msport-light"]) .filterBar {
+  background: #ffffff;
+  border-color: rgba(0, 102, 177, 0.15);
+}
+
+:global([data-theme="msport"][data-mode="light"]) .filterBtn,
+:global([data-theme-variant="msport-light"]) .filterBtn {
+  color: #4a5468;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .filterBtn.activeFilter,
+:global([data-theme-variant="msport-light"]) .filterBtn.activeFilter {
+  background: rgba(0, 102, 177, 0.1);
+  color: #0066b1;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .skillPill,
+:global([data-theme-variant="msport-light"]) .skillPill {
+  background: #ffffff;
+  border-color: rgba(0, 102, 177, 0.18);
+  color: #0a0e18;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .skillPill:hover,
+:global([data-theme-variant="msport-light"]) .skillPill:hover {
+  border-color: #0066b1;
+  box-shadow: 0 4px 16px rgba(0, 102, 177, 0.2);
+}
+
+:global([data-theme="msport"][data-mode="light"]) .hudCard,
+:global([data-theme-variant="msport-light"]) .hudCard {
+  background: #ffffff;
+  border-color: rgba(0, 102, 177, 0.2);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* ══════════════════════════════════════════════════
+   NOTHING THEME SKILLS MATRIX ADAPTATIONS
+   ══════════════════════════════════════════════════ */
+
+:global([data-theme="nothing"]) .badgeWrapper {
+  border-radius: 0px;
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+:global([data-theme="nothing"]) .badgeDot {
+  background-color: #D71921;
+  box-shadow: 0 0 8px #D71921;
+}
+
+:global([data-theme="nothing"]) .titleDot {
+  color: #D71921;
+}
+
+:global([data-theme="nothing"]) .filterBar {
+/* ══════════════════════════════════════════════════
+   M SPORT THEME SKILLS ADAPTATIONS (Parallelogram Pills + Cut-Corners)
+   ══════════════════════════════════════════════════ */
+
+:global([data-theme="msport"]) .badgeWrapper {
+  border-radius: 0px !important;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  transform: skewX(-10deg);
+  border-color: rgba(129, 196, 255, 0.35);
+  color: #81C4FF;
+}
+
+:global([data-theme="msport"]) .badgeText {
+  transform: skewX(10deg);
+  font-family: var(--font-rajdhani), 'Rajdhani', sans-serif !important;
+  font-style: italic;
+  font-weight: 700;
+}
+
+:global([data-theme="msport"]) .filterBar {
+  border-radius: 0px !important;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  transform: skewX(-8deg);
+  background: rgba(12, 14, 20, 0.95);
+  border: 1px solid rgba(129, 196, 255, 0.28);
+}
+
+:global([data-theme="msport"]) .filterBtn {
+  border-radius: 0px !important;
+  font-family: var(--font-rajdhani), 'Rajdhani', sans-serif !important;
+  font-style: italic;
+  font-weight: 700;
+  transform: skewX(8deg);
+  color: #9aa1b2;
+}
+
+:global([data-theme="msport"]) .filterBtn.activeFilter {
+  background: rgba(0, 138, 201, 0.25);
+  border: 1px solid #81C4FF;
+  color: #ffffff;
+}
+
+:global([data-theme="msport"]) .skillPill {
+  border-radius: 0px !important;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  transform: skewX(-10deg);
+  font-family: var(--font-rajdhani), 'Rajdhani', sans-serif !important;
+  font-style: italic;
+  font-weight: 700;
+  background: rgba(14, 18, 25, 0.9);
+  border: 1px solid rgba(129, 196, 255, 0.3);
+  color: #f4f6fa;
+}
+
+:global([data-theme="msport"]) .skillPill span {
+  transform: skewX(10deg);
+}
+
+:global([data-theme="msport"]) .skillPill:hover {
+  border-color: #81C4FF;
+  box-shadow: 0 0 18px rgba(129, 196, 255, 0.4);
+}
+
+:global([data-theme="msport"]) .hudCard {
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px)) !important;
+  border-radius: 0px !important;
+  position: relative;
+  background: rgba(12, 14, 20, 0.95);
+  border: 1px solid rgba(129, 196, 255, 0.35);
+}
+
+:global([data-theme="msport"]) .hudCard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--msport-stripe);
+  z-index: 10;
+}
+
+:global([data-theme="msport"]) .hudCallsign {
+  font-family: var(--font-rajdhani), 'Rajdhani', sans-serif !important;
+  font-style: italic;
+  font-weight: 700;
+  color: #81C4FF;
+}
+
+/* ══════════════════════════════════════════════════
+   NOTHING THEME SKILLS ADAPTATIONS
+   ══════════════════════════════════════════════════ */
+
+:global([data-theme="nothing"]) .badgeWrapper {
+  border-radius: 0px !important;
+  font-family: var(--font-dot-matrix, monospace) !important;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+:global([data-theme="nothing"]) .filterBar {
+  border-radius: 0px !important;
+  background: rgba(16, 16, 16, 0.9);
+  background-image: var(--nothing-grain);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+:global([data-theme="nothing"]) .filterBtn {
+  border-radius: 0px !important;
+  font-family: var(--font-dot-matrix, monospace) !important;
+}
+
+:global([data-theme="nothing"]) .filterBtn.activeFilter {
+  background: #D71921;
+  color: #ffffff;
+  border-color: #D71921;
+}
+
+:global([data-theme="nothing"]) .skillPill {
+  border-radius: 0px !important;
+  font-family: var(--font-dot-matrix, monospace) !important;
+  background-image: var(--nothing-grain);
+  border-color: rgba(255, 255, 255, 0.16);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+}
+
+:global([data-theme="nothing"]) .skillPill:hover {
+  border-color: #D71921;
+  box-shadow: 0 0 16px rgba(215, 25, 33, 0.35);
+}
+
+:global([data-theme="nothing"]) .hudCard {
+  border-radius: 0px !important;
+  background: rgba(12, 12, 12, 0.95);
+  background-image: var(--nothing-grain);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+:global([data-theme="nothing"]) .hudCallsign {
+  font-family: var(--font-dot-matrix, monospace) !important;
+  color: #D71921;
+}
+
+/* Light Mode Nothing Skills */
+:global([data-theme="nothing"][data-mode="light"]) .badgeWrapper,
+:global([data-theme-variant="nothing-light"]) .badgeWrapper {
+  border-radius: 0px;
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.18);
+  color: #000000;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .badgeDot,
+:global([data-theme-variant="nothing-light"]) .badgeDot {
+  background-color: #D71921;
+  box-shadow: 0 0 8px rgba(215, 25, 33, 0.6);
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .titleDot,
+:global([data-theme-variant="nothing-light"]) .titleDot {
+  color: #D71921;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .filterBar,
+:global([data-theme-variant="nothing-light"]) .filterBar {
+  border-radius: 0px;
+  background: #f5f5f5;
+  background-image: var(--nothing-grain-light);
+  border-color: rgba(0, 0, 0, 0.12);
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .filterBtn,
+:global([data-theme-variant="nothing-light"]) .filterBtn {
+  border-radius: 0px;
+  color: #555555;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .filterBtn.activeFilter,
+:global([data-theme-variant="nothing-light"]) .filterBtn.activeFilter {
+  background: #D71921;
+  color: #ffffff;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .skillPill,
+:global([data-theme-variant="nothing-light"]) .skillPill {
+  border-radius: 0px;
+  background: #ffffff;
+  background-image: var(--nothing-grain-light);
+  border-color: rgba(0, 0, 0, 0.14);
+  color: #000000;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .skillPill:hover,
+:global([data-theme-variant="nothing-light"]) .skillPill:hover {
+  border-color: #D71921;
+  box-shadow: 0 4px 16px rgba(215, 25, 33, 0.2);
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .hudCard,
+:global([data-theme-variant="nothing-light"]) .hudCard {
+  border-radius: 0px;
+  background: #ffffff;
+  background-image: var(--nothing-grain-light);
+  border-color: rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+}
+
+
+

@@ -1,5 +1,5 @@
 "use client";
-import { experience } from "@/data/portfolio";
+import { experience } from "@/data/minimalPortfolio";
 import ScrollReveal from "./ScrollReveal";
 import styles from "./Experience.module.css";
 

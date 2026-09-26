@@ -1,0 +1,305 @@
+/* Gravitational Lens Cursor & Overdrive Easter Egg Styles */
+
+/* Custom cursor activation on HTML root */
+:global(html.has-custom-cursor),
+:global(html.has-custom-cursor a),
+:global(html.has-custom-cursor button),
+:global(html.has-custom-cursor [role="button"]),
+:global(html.has-custom-cursor [type="button"]),
+:global(html.has-custom-cursor [type="submit"]) {
+  cursor: none !important;
+}
+
+/* Ensure form text controls retain text cursor for typing accessibility */
+:global(html.has-custom-cursor input:not([type="button"]):not([type="submit"]):not([type="checkbox"]):not([type="radio"])),
+:global(html.has-custom-cursor textarea),
+:global(html.has-custom-cursor select),
+:global(html.has-custom-cursor [contenteditable="true"]) {
+  cursor: text !important;
+}
+
+/* Overdrive Turbo Global Body Boost */
+:global(body.overdriveActive) {
+  filter: contrast(1.08) saturate(1.22);
+  transition: filter 0.3s ease;
+}
+
+/* Center Precision Dot (1:1 with pointer) */
+.centerDot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  margin-left: -3px;
+  background-color: var(--accent, #ccff00);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  box-shadow: 0 0 8px var(--accent, #ccff00), 0 0 14px rgba(var(--accent-rgb, 204, 255, 0), 0.6);
+  transition: opacity 0.15s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+  will-change: transform;
+}
+
+.centerDotOverdrive {
+  background-color: #ffffff;
+  box-shadow: 0 0 12px var(--accent, #ccff00), 0 0 24px var(--accent, #ccff00), 0 0 36px rgba(var(--accent-rgb, 204, 255, 0), 0.8);
+}
+
+/* Outer Gravitational Lens Ring Anchor */
+.ringAnchor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+  z-index: 99998;
+  will-change: transform;
+  transition: opacity 0.18s ease;
+}
+
+/* Outer Gravitational Lens Ring */
+.lensRing {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  border: 1.5px solid rgba(var(--accent-rgb, 204, 255, 0), 0.7);
+  box-shadow: 0 0 15px rgba(var(--accent-rgb, 204, 255, 0), 0.4);
+  pointer-events: none;
+  box-sizing: border-box;
+  transition:
+    border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    backdrop-filter 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Expanded state on interactive hover */
+.lensRingHovered {
+  border-color: var(--accent, rgba(204, 255, 0, 0.95));
+  background: rgba(var(--accent-rgb, 204, 255, 0), 0.08);
+  backdrop-filter: blur(2px) invert(0.1);
+  -webkit-backdrop-filter: blur(2px) invert(0.1);
+  box-shadow:
+    0 0 22px rgba(var(--accent-rgb, 204, 255, 0), 0.55),
+    inset 0 0 12px rgba(var(--accent-rgb, 204, 255, 0), 0.2);
+}
+
+/* Hyper Overdrive state */
+.lensRingOverdrive {
+  border-color: var(--accent, #ccff00);
+  box-shadow:
+    0 0 25px rgba(var(--accent-rgb, 204, 255, 0), 0.8),
+    0 0 50px rgba(var(--accent-rgb, 204, 255, 0), 0.4),
+    inset 0 0 15px rgba(var(--accent-rgb, 204, 255, 0), 0.25);
+  animation: pulseOverdrive 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes pulseOverdrive {
+  0% {
+    box-shadow: 0 0 20px rgba(var(--accent-rgb, 204, 255, 0), 0.7), 0 0 40px rgba(var(--accent-rgb, 204, 255, 0), 0.3);
+  }
+  100% {
+    box-shadow: 0 0 32px rgba(var(--accent-rgb, 204, 255, 0), 0.95), 0 0 60px rgba(var(--accent-rgb, 204, 255, 0), 0.55);
+  }
+}
+
+/* MouseUp Transient Shockwave Ripple */
+.shockwave {
+  position: fixed;
+  border-radius: 50%;
+  border: 1.5px solid var(--accent, #ccff00);
+  box-shadow: 0 0 18px rgba(var(--accent-rgb, 204, 255, 0), 0.65);
+  pointer-events: none;
+  z-index: 99997;
+  transform-origin: center center;
+  box-sizing: border-box;
+}
+
+
+/* Overdrive Turbo Telemetry HUD Bar */
+.overdriveHud {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 38px;
+  background: rgba(6, 8, 6, 0.94);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(204, 255, 0, 0.6);
+  box-shadow:
+    0 4px 20px rgba(204, 255, 0, 0.2),
+    0 1px 0 rgba(204, 255, 0, 0.4);
+  z-index: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+}
+
+.hudContent {
+  width: 100%;
+  max-width: var(--max-width, 1100px);
+  padding: 0 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.hudLeft {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.hudGlitchDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ccff00;
+  box-shadow: 0 0 10px #ccff00;
+  animation: hudBlink 0.6s steps(2, start) infinite;
+}
+
+@keyframes hudBlink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.2;
+  }
+}
+
+.hudText {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #ccff00;
+  text-shadow: 0 0 10px rgba(204, 255, 0, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hudDismissBtn {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  border: 1px solid rgba(204, 255, 0, 0.5);
+  background: rgba(204, 255, 0, 0.12);
+  color: #ccff00;
+  cursor: pointer;
+  outline: none;
+  white-space: nowrap;
+  transition:
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.hudDismissBtn:hover {
+  background: rgba(204, 255, 0, 0.25);
+  border-color: #ccff00;
+  color: #ffffff;
+}
+
+.hudDismissBtn:focus-visible {
+  outline: 2px solid #ccff00;
+  outline-offset: 2px;
+}
+
+/* Mobile & Touch Viewports */
+@media (max-width: 768px) {
+  .hudText {
+    font-size: 0.62rem;
+    letter-spacing: 0.06em;
+  }
+  .hudDismissBtn {
+    font-size: 0.62rem;
+    padding: 0.15rem 0.4rem;
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   M SPORT THEME CURSOR & OVERDRIVE ADAPTATIONS
+   ══════════════════════════════════════════════════ */
+
+:global([data-theme="msport"]) .overdriveHud {
+  background: rgba(10, 11, 14, 0.95);
+  border-bottom: 2px solid #81C4FF;
+  position: relative;
+}
+
+:global([data-theme="msport"]) .overdriveHud::before {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--msport-stripe);
+}
+
+:global([data-theme="msport"]) .hudGlitchDot {
+  background-color: #81C4FF;
+  box-shadow: 0 0 10px #81C4FF;
+}
+
+:global([data-theme="msport"]) .hudText {
+  color: #81C4FF;
+  text-shadow: 0 0 10px rgba(129, 196, 255, 0.5);
+}
+
+:global([data-theme="msport"]) .hudDismissBtn {
+  border-color: rgba(129, 196, 255, 0.4);
+  background: rgba(129, 196, 255, 0.12);
+  color: #81C4FF;
+}
+
+:global([data-theme="msport"]) .hudDismissBtn:hover {
+  background: #81C4FF;
+  border-color: #81C4FF;
+  color: #0a0b0e;
+}
+
+/* Light Mode M Sport HUD */
+:global([data-theme="msport"][data-mode="light"]) .overdriveHud,
+:global([data-theme-variant="msport-light"]) .overdriveHud {
+  background: rgba(255, 255, 255, 0.95);
+  border-bottom: 2px solid #008AC9;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .hudGlitchDot,
+:global([data-theme-variant="msport-light"]) .hudGlitchDot {
+  background-color: #0066b1;
+  box-shadow: 0 0 8px rgba(0, 102, 177, 0.5);
+}
+
+:global([data-theme="msport"][data-mode="light"]) .hudText,
+:global([data-theme-variant="msport-light"]) .hudText {
+  color: #0066b1;
+  text-shadow: none;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .hudDismissBtn,
+:global([data-theme-variant="msport-light"]) .hudDismissBtn {
+  border-color: rgba(0, 102, 177, 0.4);
+  background: rgba(0, 102, 177, 0.08);
+  color: #0066b1;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .hudDismissBtn:hover,
+:global([data-theme-variant="msport-light"]) .hudDismissBtn:hover {
+  background: #0066b1;
+  color: #ffffff;
+}
+

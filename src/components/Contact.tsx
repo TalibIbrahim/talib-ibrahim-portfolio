@@ -1,217 +1,570 @@
-"use client";
-import { useState, useRef, useEffect } from "react";
-import { personalInfo, socials } from "@/data/portfolio";
-import ScrollReveal from "./ScrollReveal";
-import styles from "./Contact.module.css";
+'use client';
 
-export default function Contact() {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [selectedSubject, setSelectedSubject] = useState("general");
-  const [message, setMessage] = useState("");
+import { useState, useCallback, useId, useRef, type FormEvent, type ChangeEvent } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import type { ContactFormData, ContactApiResponse } from '../data/types';
+import styles from './Contact.module.css';
+import DecryptedText from './react-bits/DecryptedText';
+import Magnet from './react-bits/Magnet';
+
+export interface ContactProps {
+  readonly id?: string;
+  readonly className?: string;
+}
+
+const SUBJECT_OPTIONS = [
+  'Project Inquiry',
+  'Job Opportunity',
+  'Requesting Resume',
+  'General Inquiry',
+] as const;
+
+type SubjectOption = (typeof SUBJECT_OPTIONS)[number];
+
+interface FieldErrors {
+  name?: string;
+  email?: string;
+  message?: string;
+}
+
+interface FeedbackState {
+  type: 'success' | 'error';
+  message: string;
+}
+
+/**
+ * Validates email structure using standard RFC-compliant pattern.
+ */
+function isValidEmail(email: string): boolean {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email.trim());
+}
+
+/**
+ * Lucius Fox Applied Sciences — Client-Side Contact Form UI
+ *
+ * Implements a premier, glassmorphic contact terminal with deep carbon palette,
+ * neon lime (#ccff00) cybernetic accents, kinetic submission button,
+ * and validated dispatch to `/api/contact`.
+ */
+export default function Contact({ id = 'contact', className = '' }: ContactProps) {
+  const uniqueId = useId();
+  const nameId = `contact-name-${uniqueId}`;
+  const emailId = `contact-email-${uniqueId}`;
+  const messageId = `contact-message-${uniqueId}`;
+
+  const nameInputRef = useRef<HTMLInputElement>(null);
+  const emailInputRef = useRef<HTMLInputElement>(null);
+  const messageInputRef = useRef<HTMLTextAreaElement>(null);
+
+  const [formData, setFormData] = useState<ContactFormData>({
+    name: '',
+    email: '',
+    subject: SUBJECT_OPTIONS[0],
+    message: '',
+  });
+
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [errors, setErrors] = useState<FieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
-  const [magicKey, setMagicKey] = useState(0);
-  const [isTyping, setIsTyping] = useState(false);
-  
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const typingIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [feedback, setFeedback] = useState<FeedbackState | null>(null);
 
-  const subjectOptions = [
-    { value: "general", label: "General Inquiry" },
-    { value: "resume", label: "Ask for my Resume" },
-    { value: "project", label: "Project Idea" }
-  ];
-
-  const selectedLabel = subjectOptions.find(opt => opt.value === selectedSubject)?.label;
-  const resumeMessageTemplate = "Hi Talib,\n\nI'd love to learn more about your work. Could you please share your latest resume with me?\n\nBest,\n[Your Name]";
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setIsDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+  // Validate a single field
+  const validateField = useCallback((field: keyof ContactFormData, value: string): string | undefined => {
+    switch (field) {
+      case 'name':
+        if (!value.trim()) {
+          return 'Operator name is required.';
+        }
+        break;
+      case 'email':
+        if (!value.trim()) {
+          return 'Comm address is required.';
+        }
+        if (!isValidEmail(value)) {
+          return 'Invalid comm address: Please enter a valid email format.';
+        }
+        break;
+      case 'message':
+        if (!value.trim()) {
+          return 'Transmission payload cannot be empty.';
+        }
+        break;
+      default:
+        break;
+    }
+    return undefined;
   }, []);
 
-  useEffect(() => {
-    if (selectedSubject === "resume") {
-      setMagicKey(prev => prev + 1);
-      setMessage("");
-      setIsTyping(true);
-      
-      let i = 0;
-      if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
-      
-      typingIntervalRef.current = setInterval(() => {
-        setMessage(resumeMessageTemplate.slice(0, i + 1));
-        i++;
-        if (i >= resumeMessageTemplate.length) {
-          if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
-          setIsTyping(false);
+  const handleChange = useCallback((e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    // If the field was already touched, immediately clear or update its error
+    if (touched[name]) {
+      setErrors((prev) => {
+        const error = validateField(name as keyof ContactFormData, value);
+        if (!error) {
+          const next = { ...prev };
+          delete next[name as keyof FieldErrors];
+          return next;
         }
-      }, 15);
-    } else {
-      if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
-      setIsTyping(false);
-      setMessage("");
+        return { ...prev, [name]: error };
+      });
     }
+  }, [touched, validateField]);
 
-    return () => {
-      if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
-    };
-  }, [selectedSubject]);
+  const handleBlur = useCallback((e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    const error = validateField(name as keyof ContactFormData, value);
+    setErrors((prev) => ({
+      ...prev,
+      [name]: error,
+    }));
+  }, [validateField]);
 
-  const handleMessageChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (isTyping) {
-      if (typingIntervalRef.current) clearInterval(typingIntervalRef.current);
-      setIsTyping(false);
-    }
-    setMessage(e.target.value);
-  };
+  const handleSubjectSelect = useCallback((subject: SubjectOption) => {
+    if (isSubmitting) return;
+    setFormData((prev) => ({ ...prev, subject }));
+  }, [isSubmitting]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
-    const formData = new FormData(e.currentTarget);
-    const email = formData.get("email");
-    const subject = formData.get("subject");
-    
-    let subjectText = "Website Inquiry";
-    if (subject === "resume") subjectText = "Requesting your Resume";
-    else if (subject === "project") subjectText = "Project Idea";
+    // Mark all as touched
+    const newTouched = { name: true, email: true, message: true };
+    setTouched(newTouched);
+
+    // Validate all fields
+    const nameError = validateField('name', formData.name);
+    const emailError = validateField('email', formData.email);
+    const messageError = validateField('message', formData.message);
+
+    const validationErrors: FieldErrors = {};
+    if (nameError) validationErrors.name = nameError;
+    if (emailError) validationErrors.email = emailError;
+    if (messageError) validationErrors.message = messageError;
+
+    setErrors(validationErrors);
+
+    // If validation fails, focus the first erroneous input
+    if (nameError) {
+      nameInputRef.current?.focus();
+      return;
+    }
+    if (emailError) {
+      emailInputRef.current?.focus();
+      return;
+    }
+    if (messageError) {
+      messageInputRef.current?.focus();
+      return;
+    }
+
+    setIsSubmitting(true);
+    setFeedback(null);
 
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, subject: subjectText, message })
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          subject: formData.subject,
+          message: formData.message.trim(),
+        }),
       });
 
-      if (response.ok) {
-        setIsSuccess(true);
-        setMessage("");
-        (e.target as HTMLFormElement).reset();
-        setTimeout(() => setIsSuccess(false), 4000);
+      const data = (await response.json()) as ContactApiResponse;
+
+      if (response.ok && data.success) {
+        setFeedback({
+          type: 'success',
+          message: 'Message transmitted successfully // Will reply shortly',
+        });
+        // Reset form inputs upon confirmed transmission
+        setFormData({
+          name: '',
+          email: '',
+          subject: SUBJECT_OPTIONS[0],
+          message: '',
+        });
+        setTouched({});
+        setErrors({});
+      } else {
+        setFeedback({
+          type: 'error',
+          message: data.error || data.message || 'Transmission failed. Server rejected payload.',
+        });
       }
-    } catch (error) {
-      console.error("Failed to send message", error);
+    } catch {
+      setFeedback({
+        type: 'error',
+        message: 'Network anomaly detected. Relays unresponsive. Please verify connection and retry.',
+      });
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <section className="section" id="contact">
-      <ScrollReveal>
-        <p className="section-label">04 — Contact</p>
-        <h2 className="section-title">Let&apos;s connect</h2>
-      </ScrollReveal>
+    <section id={id} className={`${styles.section} ${className}`.trim()} aria-labelledby="contact-heading">
+      {/* Background radial ambient glow */}
+      <div className={styles.ambientGlow} aria-hidden="true" />
 
-      <ScrollReveal delay={0.1}>
-        <div className={styles.wrap}>
-          <p className={styles.intro}>
-            I&apos;m currently open to new opportunities and collaborations. 
-            Whether you have a question, a project idea, or just want to say hi — 
-            my inbox is always open.
-          </p>
-
-          <div className={styles.grid}>
-            <a href={socials.email} className={`${styles.contactCard} card`}>
-              <div className={styles.icon}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 4L12 13 2 4"/></svg>
-              </div>
-              <span className={`mono ${styles.label}`}>Email</span>
-              <span className={styles.value}>{personalInfo.email}</span>
-            </a>
-
-            <a href={socials.linkedin} target="_blank" rel="noopener noreferrer" className={`${styles.contactCard} card`}>
-              <div className={styles.icon}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-              </div>
-              <span className={`mono ${styles.label}`}>LinkedIn</span>
-              <span className={styles.value}>muhammad-talib-ibrahim</span>
-            </a>
-
-            <a href={socials.github} target="_blank" rel="noopener noreferrer" className={`${styles.contactCard} card`}>
-              <div className={styles.icon}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
-              </div>
-              <span className={`mono ${styles.label}`}>GitHub</span>
-              <span className={styles.value}>TalibIbrahim</span>
-            </a>
+      <motion.div
+        className={styles.container}
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-60px' }}
+        transition={{ type: 'spring', stiffness: 90, damping: 20, mass: 0.8 }}
+      >
+        {/* Section Header */}
+        <header className={styles.header}>
+          <div className={styles.badge}>
+            <span className={styles.badgeDot} aria-hidden="true" />
+            <span className={styles.badgeText}>
+              <DecryptedText
+                text="04 // TRANSMISSION PROTOCOL & INBOX"
+                speed={30}
+                maxIterations={10}
+                animateOn="view"
+              />
+            </span>
           </div>
+          <h2 id="contact-heading" className={styles.title}>
+            Initiate Transmission<span className={styles.titleAccent}>.</span>
+          </h2>
+          <p className={styles.description}>
+            Have an ambitious project, an engineering opportunity, or wish to review my resume?
+            Transmit your coordinates below.
+          </p>
+        </header>
 
-          <form className={styles.form} onSubmit={handleSubmit}>
-            <div className={styles.formRow}>
-              <div className={styles.formGroup}>
-                <label htmlFor="email" className={styles.formLabel}>Your Email</label>
-                <input type="email" id="email" name="email" className={styles.input} placeholder="johndoe@example.com" required disabled={isSubmitting || isSuccess} />
-              </div>
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Subject</label>
-                <div className={styles.customSelect} ref={dropdownRef}>
-                  <div className={styles.selectTrigger} onClick={() => !(isSubmitting || isSuccess) && setIsDropdownOpen(!isDropdownOpen)} style={{ opacity: isSubmitting || isSuccess ? 0.6 : 1, cursor: isSubmitting || isSuccess ? 'not-allowed' : 'pointer' }}>
-                    <span>{selectedLabel}</span>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ transform: isDropdownOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}><path d="M6 9l6 6 6-6"/></svg>
-                  </div>
-                  {isDropdownOpen && (
-                    <div className={styles.selectDropdown}>
-                      {subjectOptions.map(opt => (
-                        <div 
-                          key={opt.value} 
-                          className={`${styles.selectOption} ${selectedSubject === opt.value ? styles.selectedOption : ''}`}
-                          onClick={() => { setSelectedSubject(opt.value); setIsDropdownOpen(false); }}
-                        >
-                          {opt.label}
-                        </div>
-                      ))}
-                    </div>
+        {/* Glassmorphic Form Card */}
+        <div className={styles.formCard}>
+          {/* Cybernetic Corner Accents */}
+          <div className={`${styles.cornerAccent} ${styles.cornerTopLeft}`} aria-hidden="true" />
+          <div className={`${styles.cornerAccent} ${styles.cornerTopRight}`} aria-hidden="true" />
+          <div className={`${styles.cornerAccent} ${styles.cornerBottomLeft}`} aria-hidden="true" />
+          <div className={`${styles.cornerAccent} ${styles.cornerBottomRight}`} aria-hidden="true" />
+
+          {/* Feedback Status Banner */}
+          <AnimatePresence mode="wait">
+            {feedback && (
+              <motion.div
+                key={feedback.type + feedback.message}
+                initial={{ opacity: 0, y: -16, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -16, scale: 0.98 }}
+                transition={{ type: 'spring', stiffness: 260, damping: 24 }}
+                className={`${styles.feedbackBanner} ${
+                  feedback.type === 'success' ? styles.feedbackSuccess : styles.feedbackError
+                }`}
+                role="alert"
+                aria-live="polite"
+              >
+                <div className={styles.feedbackIconWrapper} aria-hidden="true">
+                  {feedback.type === 'success' ? (
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  ) : (
+                    <svg
+                      width="20"
+                      height="20"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="12" />
+                      <line x1="12" y1="16" x2="12.01" y2="16" />
+                    </svg>
                   )}
-                  <input type="hidden" name="subject" value={selectedSubject} />
                 </div>
+                <div className={styles.feedbackContent}>
+                  <div className={styles.feedbackHeader}>
+                    {feedback.type === 'success' ? 'SYSTEM // DISPATCH CONFIRMED' : 'SYSTEM // TRANSMISSION FAILED'}
+                  </div>
+                  <div className={styles.feedbackMessage}>{feedback.message}</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setFeedback(null)}
+                  className={styles.feedbackClose}
+                  aria-label="Dismiss notification"
+                >
+                  <svg
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                  </svg>
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} noValidate className={styles.form}>
+            {/* Operator Name & Comm Address (2-column on desktop, stacked on mobile) */}
+            <div className={styles.inputRow}>
+              <div className={styles.fieldGroup}>
+                <label htmlFor={nameId} className={styles.fieldLabel}>
+                  <span className={styles.labelPrefix}>{'//'}</span> OPERATOR NAME{' '}
+                  <span className={styles.requiredMark}>*</span>
+                </label>
+                <div className={styles.inputWrapper}>
+                  <input
+                    ref={nameInputRef}
+                    id={nameId}
+                    name="name"
+                    type="text"
+                    required
+                    disabled={isSubmitting}
+                    value={formData.name}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    placeholder="e.g. Bruce Wayne"
+                    autoComplete="name"
+                    aria-required="true"
+                    aria-invalid={Boolean(errors.name)}
+                    aria-describedby={errors.name ? `${nameId}-error` : undefined}
+                    className={`${styles.input} ${errors.name ? styles.inputError : ''}`}
+                  />
+                </div>
+                {errors.name && (
+                  <motion.p
+                    id={`${nameId}-error`}
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={styles.fieldError}
+                    role="alert"
+                  >
+                    {errors.name}
+                  </motion.p>
+                )}
+              </div>
+
+              <div className={styles.fieldGroup}>
+                <label htmlFor={emailId} className={styles.fieldLabel}>
+                  <span className={styles.labelPrefix}>{'//'}</span> COMM ADDRESS{' '}
+                  <span className={styles.requiredMark}>*</span>
+                </label>
+                <div className={styles.inputWrapper}>
+                  <input
+                    ref={emailInputRef}
+                    id={emailId}
+                    name="email"
+                    type="email"
+                    required
+                    disabled={isSubmitting}
+                    value={formData.email}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    placeholder="operator@domain.com"
+                    autoComplete="email"
+                    aria-required="true"
+                    aria-invalid={Boolean(errors.email)}
+                    aria-describedby={errors.email ? `${emailId}-error` : undefined}
+                    className={`${styles.input} ${errors.email ? styles.inputError : ''}`}
+                  />
+                </div>
+                {errors.email && (
+                  <motion.p
+                    id={`${emailId}-error`}
+                    initial={{ opacity: 0, y: -4 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className={styles.fieldError}
+                    role="alert"
+                  >
+                    {errors.email}
+                  </motion.p>
+                )}
               </div>
             </div>
-            <div className={styles.formGroup}>
-              <label htmlFor="message" className={styles.formLabel}>Message</label>
-              <textarea 
-                key={`msg-${magicKey}`}
-                id="message" 
-                name="message" 
-                className={`${styles.textarea} ${selectedSubject === 'resume' ? styles.magicFadeIn : ''} ${isTyping ? styles.typing : ''}`} 
-                placeholder="Write your message here..." 
-                required 
-                rows={5}
-                value={message}
-                onChange={handleMessageChange}
-                disabled={isSubmitting || isSuccess}
-              ></textarea>
-            </div>
-            <button 
-              type="submit" 
-              className={`btn btn-primary ${styles.submitBtn} ${isSuccess ? styles.successBtn : ''}`}
-              disabled={isSubmitting || isSuccess}
-            >
-              {isSubmitting ? (
-                <span className={styles.loader}></span>
-              ) : isSuccess ? (
-                <>
-                  Sent Successfully!
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 6L9 17l-5-5"/></svg>
-                </>
-              ) : (
-                <>
-                  Send Message
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
-                </>
-              )}
-            </button>
-          </form>
 
+            {/* Subject Selector (Interactive Pills) */}
+            <div className={styles.fieldGroup}>
+              <div className={styles.fieldLabel} id="subject-group-label">
+                <span className={styles.labelPrefix}>{'//'}</span> SELECT INQUIRY VECTOR
+              </div>
+              <div
+                className={styles.subjectGrid}
+                role="radiogroup"
+                aria-labelledby="subject-group-label"
+              >
+                {SUBJECT_OPTIONS.map((option) => {
+                  const isSelected = formData.subject === option;
+                  return (
+                    <Magnet
+                      key={option}
+                      padding={15}
+                      magnetStrength={0.2}
+                      className={styles.pillMagnet}
+                    >
+                      <button
+                        type="button"
+                        role="radio"
+                        aria-checked={isSelected}
+                        disabled={isSubmitting}
+                        className={`${styles.subjectPill} ${isSelected ? styles.subjectPillActive : ''}`}
+                        onClick={() => handleSubjectSelect(option)}
+                      >
+                        {isSelected && (
+                          <motion.div
+                            layoutId="activeSubjectPill"
+                            className={styles.pillActiveIndicator}
+                            transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                          />
+                        )}
+                        <span className={styles.pillContent}>
+                          <span
+                            className={`${styles.pillRadio} ${isSelected ? styles.pillRadioActive : ''}`}
+                            aria-hidden="true"
+                          />
+                          <span className={styles.pillText}>{option}</span>
+                        </span>
+                      </button>
+                    </Magnet>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Transmission Payload (Message) */}
+            <div className={styles.fieldGroup}>
+              <label htmlFor={messageId} className={styles.fieldLabel}>
+                <span className={styles.labelPrefix}>{'//'}</span> TRANSMISSION PAYLOAD{' '}
+                <span className={styles.requiredMark}>*</span>
+              </label>
+              <div className={styles.inputWrapper}>
+                <textarea
+                  ref={messageInputRef}
+                  id={messageId}
+                  name="message"
+                  required
+                  rows={5}
+                  disabled={isSubmitting}
+                  value={formData.message}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  placeholder="Detail your operational parameters, timelines, and technical requirements..."
+                  aria-required="true"
+                  aria-invalid={Boolean(errors.message)}
+                  aria-describedby={errors.message ? `${messageId}-error` : undefined}
+                  className={`${styles.textarea} ${errors.message ? styles.inputError : ''}`}
+                />
+              </div>
+              {errors.message && (
+                <motion.p
+                  id={`${messageId}-error`}
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className={styles.fieldError}
+                  role="alert"
+                >
+                  {errors.message}
+                </motion.p>
+              )}
+            </div>
+
+            {/* Kinetic Submit Button & Security Protocol Indicator */}
+            <div className={styles.submitRow}>
+              <Magnet padding={15} magnetStrength={0.2} className={styles.submitMagnet}>
+                <motion.button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className={styles.submitButton}
+                  whileHover={
+                    !isSubmitting
+                      ? { scale: 1.02, transition: { type: 'spring', stiffness: 400, damping: 20 } }
+                      : undefined
+                  }
+                  whileTap={!isSubmitting ? { scale: 0.98 } : undefined}
+                >
+                  <span className={styles.submitContent}>
+                    {isSubmitting ? (
+                      <>
+                        <svg
+                          className={styles.spinner}
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                          aria-hidden="true"
+                        >
+                          <circle
+                            className={styles.spinnerTrack}
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="3"
+                          />
+                          <path
+                            className={styles.spinnerHead}
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          />
+                        </svg>
+                        <span className={styles.submitText}>TRANSMITTING...</span>
+                      </>
+                    ) : (
+                      <>
+                        <span className={styles.submitText}>TRANSMIT MESSAGE</span>
+                        <svg
+                          className={styles.submitIcon}
+                          width="16"
+                          height="16"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2.5"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <line x1="5" y1="12" x2="19" y2="12" />
+                          <polyline points="12 5 19 12 12 19" />
+                        </svg>
+                      </>
+                    )}
+                  </span>
+                </motion.button>
+              </Magnet>
+
+              <div className={styles.securityNotice}>
+                <span className={styles.securityDot} aria-hidden="true" />
+                <span>DIRECT ENCRYPTED RELAY // 256-BIT PROTOCOL</span>
+              </div>
+            </div>
+          </form>
         </div>
-      </ScrollReveal>
+      </motion.div>
     </section>
   );
 }

@@ -1,0 +1,345 @@
+/* AudioToggle docked fixed at bottom-left */
+.fixedContainer {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  z-index: 800;
+  pointer-events: auto;
+}
+
+/* Base button capsule */
+.toggleBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.55rem 0.95rem;
+  border-radius: 9999px;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  user-select: none;
+  cursor: pointer;
+  outline: none;
+  transition:
+    background-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toggleBtn:focus-visible {
+  outline: 2px solid #ccff00;
+  outline-offset: 3px;
+}
+
+/* Hyper Mode - Sleek dark carbon capsule */
+.hyperMuted {
+  background: rgba(14, 14, 16, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-secondary, #8a8a8a);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+
+.hyperMuted:hover {
+  background: rgba(22, 22, 26, 0.95);
+  border-color: rgba(255, 255, 255, 0.24);
+  color: var(--text-primary, #f0f0f0);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Hyper Mode - Active / Unmuted glowing border */
+.hyperActive {
+  background: rgba(18, 22, 14, 0.9);
+  border: 1px solid rgba(204, 255, 0, 0.45);
+  color: #ccff00;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:
+    0 0 16px rgba(204, 255, 0, 0.2),
+    inset 0 0 10px rgba(204, 255, 0, 0.06),
+    0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.hyperActive:hover {
+  background: rgba(24, 30, 18, 0.96);
+  border-color: rgba(204, 255, 0, 0.75);
+  box-shadow:
+    0 0 22px rgba(204, 255, 0, 0.35),
+    inset 0 0 14px rgba(204, 255, 0, 0.1),
+    0 6px 22px rgba(0, 0, 0, 0.6);
+}
+
+/* Boring / Recruiter Mode - Flat brutalist capsule */
+.boringMuted {
+  background: #000;
+  border: 1px solid #333;
+  color: #888;
+  box-shadow: none;
+  backdrop-filter: none;
+  border-radius: 4px;
+}
+
+.boringMuted:hover {
+  border-color: #666;
+  color: #ccc;
+}
+
+.boringActive {
+  background: #000;
+  border: 1px solid #fff;
+  color: #fff;
+  box-shadow: none;
+  backdrop-filter: none;
+  border-radius: 4px;
+}
+
+.boringActive:hover {
+  background: #111;
+}
+
+/* Speaker icon */
+.speakerIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+/* Status text label */
+.statusLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-weight: 600;
+}
+
+/* Keyboard hint badge */
+.keyBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary, #8a8a8a);
+  letter-spacing: 0.05em;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.hyperActive .keyBadge {
+  background: rgba(204, 255, 0, 0.12);
+  border-color: rgba(204, 255, 0, 0.35);
+  color: #ccff00;
+}
+
+.boringMuted .keyBadge {
+  border: 1px solid #333;
+  background: #111;
+  color: #666;
+  border-radius: 2px;
+}
+
+.boringActive .keyBadge {
+  border: 1px solid #fff;
+  background: #222;
+  color: #fff;
+  border-radius: 2px;
+}
+
+/* Miniature Audio Frequency Equalizer */
+.equalizer {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 2.5px;
+  height: 12px;
+  width: 12px;
+  vertical-align: middle;
+}
+
+.eqBar {
+  width: 2.5px;
+  background-color: #ccff00;
+  border-radius: 1px;
+  transform-origin: bottom;
+  will-change: transform, height;
+}
+
+.eqBar:nth-child(1) {
+  height: 40%;
+  animation: bounceBar1 0.75s ease-in-out infinite alternate;
+}
+
+.eqBar:nth-child(2) {
+  height: 85%;
+  animation: bounceBar2 0.6s ease-in-out infinite alternate 0.15s;
+}
+
+.eqBar:nth-child(3) {
+  height: 60%;
+  animation: bounceBar3 0.85s ease-in-out infinite alternate 0.08s;
+}
+
+@keyframes bounceBar1 {
+  0% {
+    height: 25%;
+  }
+  50% {
+    height: 100%;
+  }
+  100% {
+    height: 45%;
+  }
+}
+
+@keyframes bounceBar2 {
+  0% {
+    height: 90%;
+  }
+  50% {
+    height: 30%;
+  }
+  100% {
+    height: 100%;
+  }
+}
+
+@keyframes bounceBar3 {
+  0% {
+    height: 40%;
+  }
+  50% {
+    height: 80%;
+  }
+  100% {
+    height: 20%;
+  }
+}
+
+/* Reduced motion fallback */
+@media (prefers-reduced-motion: reduce) {
+  .eqBar {
+    animation: none !important;
+    height: 60% !important;
+  }
+  .toggleBtn {
+    transition: none !important;
+  }
+}
+
+/* Mobile responsive padding */
+@media (max-width: 640px) {
+  .fixedContainer {
+    bottom: 1rem;
+    left: 1rem;
+  }
+  .toggleBtn {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.68rem;
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   M SPORT THEME AUDIO TOGGLE ADAPTATIONS
+   ══════════════════════════════════════════════════ */
+
+:global([data-theme="msport"]) .toggleBtn {
+  border-radius: 4px;
+}
+
+:global([data-theme="msport"]) .hyperActive {
+  background: rgba(16, 18, 23, 0.95);
+  border-color: rgba(129, 196, 255, 0.45);
+  color: #81C4FF;
+  box-shadow: 0 0 20px rgba(129, 196, 255, 0.25);
+}
+
+:global([data-theme="msport"]) .eqBar {
+  background-color: #81C4FF;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .hyperMuted,
+:global([data-theme-variant="msport-light"]) .hyperMuted {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 102, 177, 0.2);
+  color: #4a5468;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .hyperActive,
+:global([data-theme-variant="msport-light"]) .hyperActive {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: #0066b1;
+  color: #0066b1;
+  box-shadow: 0 4px 16px rgba(0, 102, 177, 0.2);
+}
+
+:global([data-theme="msport"][data-mode="light"]) .eqBar,
+:global([data-theme-variant="msport-light"]) .eqBar {
+  background-color: #0066b1;
+}
+
+/* ══════════════════════════════════════════════════
+   NOTHING THEME AUDIO TOGGLE ADAPTATIONS (Dark & Light)
+   ══════════════════════════════════════════════════ */
+
+:global([data-theme="nothing"]) .toggleBtn {
+  border-radius: 0px !important;
+}
+
+:global([data-theme="nothing"]) .hyperMuted {
+  background: rgba(10, 10, 10, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #888888;
+}
+
+:global([data-theme="nothing"]) .hyperMuted:hover {
+  border-color: #D71921;
+  color: #ffffff;
+}
+
+:global([data-theme="nothing"]) .hyperActive {
+  background: rgba(14, 14, 14, 0.95);
+  border: 1px solid #D71921;
+  color: #D71921;
+  box-shadow: 0 0 16px rgba(215, 25, 33, 0.3);
+}
+
+:global([data-theme="nothing"]) .eqBar {
+  background-color: #D71921;
+  border-radius: 0px !important;
+}
+
+/* Light Mode Nothing Theme Audio Toggle */
+:global([data-theme="nothing"][data-mode="light"]) .hyperMuted,
+:global([data-theme-variant="nothing-light"]) .hyperMuted {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(0, 0, 0, 0.18);
+  color: #555555;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .hyperMuted:hover,
+:global([data-theme-variant="nothing-light"]) .hyperMuted:hover {
+  border-color: #D71921;
+  color: #000000;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .hyperActive,
+:global([data-theme-variant="nothing-light"]) .hyperActive {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: #D71921;
+  color: #D71921;
+  box-shadow: 0 2px 14px rgba(215, 25, 33, 0.2);
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .eqBar,
+:global([data-theme-variant="nothing-light"]) .eqBar {
+  background-color: #D71921;
+}
+
+

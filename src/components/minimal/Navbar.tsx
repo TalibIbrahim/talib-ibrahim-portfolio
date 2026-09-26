@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { navLinks } from "@/data/portfolio";
+import { navLinks } from "@/data/minimalPortfolio";
 import { useTheme } from "@/hooks/useTheme";
+import { Sun, Moon } from "lucide-react";
 import styles from "./Navbar.module.css";
 
 export default function Navbar() {
@@ -64,7 +65,7 @@ export default function Navbar() {
                 exit={{ rotate: 90, opacity: 0, scale: 0.5 }}
                 transition={{ duration: 0.25 }}
               >
-                {theme === "dark" ? "☀" : "●"}
+                {theme === "dark" ? <Sun size={15} /> : <Moon size={15} />}
               </motion.span>
             </AnimatePresence>
           </button>

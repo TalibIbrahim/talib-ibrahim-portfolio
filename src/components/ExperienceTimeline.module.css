@@ -1,0 +1,347 @@
+.section {
+  padding: 8rem 4rem;
+  background-color: var(--bg-primary, #111112);
+  color: var(--text-primary, #efefe5);
+  font-family: var(--font-sans, system-ui);
+  overflow: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.badgeWrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(var(--accent-rgb, 204, 255, 0), 0.06);
+  border: 1px solid var(--border);
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--theme-radius, 4px);
+  font-family: var(--font-mono, monospace);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  color: var(--accent);
+  margin-bottom: 1.25rem;
+}
+
+.badgeDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  flex-shrink: 0;
+}
+
+.badgeText {
+  font-family: var(--font-mono, monospace);
+  font-weight: 500;
+}
+
+.sectionTitle {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  margin-bottom: 5rem;
+  font-weight: bold;
+}
+
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 4rem;
+}
+
+.item {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  gap: 3rem;
+  position: relative;
+}
+
+.durationWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  position: relative;
+}
+
+.duration {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-muted, rgba(239, 239, 229, 0.5));
+  text-align: right;
+  letter-spacing: -0.02em;
+}
+
+.line {
+  position: absolute;
+  right: -1.5rem;
+  top: 2rem;
+  bottom: -6rem; /* Extends to next item */
+  width: 1px;
+  background-color: var(--border, rgba(239, 239, 229, 0.1));
+}
+
+/* Hide line on last item via simple structural hack or let it fade. We'll just let it overflow a bit or it's fine. */
+.item:last-child .line {
+  display: none;
+}
+
+.dot {
+  position: absolute;
+  right: -1.8rem; /* Center over the 1px line */
+  top: 0.5rem;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+
+.content {
+  padding-top: 0.2rem;
+}
+
+.role {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: bold;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.company {
+  font-size: 1.25rem;
+  color: var(--accent);
+  margin: 0 0 1.5rem 0;
+  font-weight: 500;
+}
+
+.achievements {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.achievementItem {
+  font-size: 1.125rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.bullet {
+  flex-shrink: 0;
+  width: 6px;
+  height: 6px;
+  background-color: var(--accent);
+  border-radius: 50%;
+  margin-top: 0.5rem;
+}
+
+
+@media (max-width: 768px) {
+  .section {
+    padding: 4rem 2rem;
+  }
+  
+  .item {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .durationWrapper {
+    align-items: flex-start;
+  }
+  
+  .duration {
+    font-size: 1.25rem;
+    text-align: left;
+  }
+  
+  .line {
+    left: 0.25rem;
+    right: auto;
+    top: 2rem;
+  }
+  
+  .dot {
+    left: -0.1rem;
+    right: auto;
+    top: 0.5rem;
+  }
+  
+  .content {
+    padding-left: 2rem;
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   M SPORT THEME TIMELINE ADAPTATIONS
+   ══════════════════════════════════════════════════ */
+
+:global([data-theme="msport"]) .badgeWrapper {
+  border-radius: 4px;
+  background: rgba(129, 196, 255, 0.08);
+  border-color: rgba(129, 196, 255, 0.35);
+  color: #81C4FF;
+}
+
+:global([data-theme="msport"]) .badgeDot {
+  background-color: #81C4FF;
+  box-shadow: 0 0 8px #81C4FF;
+}
+
+:global([data-theme="msport"]) .company {
+  color: #81C4FF;
+}
+
+:global([data-theme="msport"]) .dot {
+  background-color: #81C4FF;
+  box-shadow: 0 0 12px #81C4FF;
+}
+
+:global([data-theme="msport"]) .bullet {
+  background-color: #81C4FF;
+}
+
+/* Light Mode M Sport Timeline */
+:global([data-theme="msport"][data-mode="light"]) .badgeWrapper,
+:global([data-theme-variant="msport-light"]) .badgeWrapper {
+  background: rgba(0, 102, 177, 0.08);
+  border-color: rgba(0, 102, 177, 0.3);
+  color: #0066b1;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .badgeDot,
+:global([data-theme-variant="msport-light"]) .badgeDot {
+  background-color: #0066b1;
+  box-shadow: 0 0 8px rgba(0, 102, 177, 0.5);
+}
+
+:global([data-theme="msport"][data-mode="light"]) .role,
+:global([data-theme-variant="msport-light"]) .role {
+  color: #0a0e18;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .company,
+:global([data-theme-variant="msport-light"]) .company {
+  color: #0066b1;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .duration,
+:global([data-theme-variant="msport-light"]) .duration {
+  color: #808b9f;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .achievementItem,
+:global([data-theme-variant="msport-light"]) .achievementItem {
+  color: #4a5468;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .bullet,
+:global([data-theme-variant="msport-light"]) .bullet {
+  background-color: #0066b1;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .line,
+:global([data-theme-variant="msport-light"]) .line {
+  background-color: rgba(0, 102, 177, 0.2);
+}
+
+:global([data-theme="msport"][data-mode="light"]) .dot,
+:global([data-theme-variant="msport-light"]) .dot {
+  background-color: #0066b1;
+  box-shadow: 0 0 10px rgba(0, 102, 177, 0.5);
+}
+
+/* ══════════════════════════════════════════════════
+   NOTHING THEME TIMELINE ADAPTATIONS
+   ══════════════════════════════════════════════════ */
+
+:global([data-theme="nothing"]) .badgeWrapper {
+  border-radius: 0px;
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+}
+
+:global([data-theme="nothing"]) .badgeDot {
+  background-color: #D71921;
+  box-shadow: 0 0 8px #D71921;
+}
+
+:global([data-theme="nothing"]) .company {
+  color: #D71921;
+}
+
+:global([data-theme="nothing"]) .dot {
+  background-color: #D71921;
+  box-shadow: 0 0 10px #D71921;
+}
+
+:global([data-theme="nothing"]) .bullet {
+  background-color: #D71921;
+  border-radius: 0px;
+}
+
+/* Light Mode Nothing Timeline */
+:global([data-theme="nothing"][data-mode="light"]) .badgeWrapper,
+:global([data-theme-variant="nothing-light"]) .badgeWrapper {
+  border-radius: 0px;
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.18);
+  color: #000000;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .badgeDot,
+:global([data-theme-variant="nothing-light"]) .badgeDot {
+  background-color: #D71921;
+  box-shadow: 0 0 8px rgba(215, 25, 33, 0.6);
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .role,
+:global([data-theme-variant="nothing-light"]) .role {
+  color: #000000;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .company,
+:global([data-theme-variant="nothing-light"]) .company {
+  color: #D71921;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .duration,
+:global([data-theme-variant="nothing-light"]) .duration {
+  color: #666666;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .achievementItem,
+:global([data-theme-variant="nothing-light"]) .achievementItem {
+  color: #444444;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .bullet,
+:global([data-theme-variant="nothing-light"]) .bullet {
+  background-color: #D71921;
+  border-radius: 0px;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .line,
+:global([data-theme-variant="nothing-light"]) .line {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .dot,
+:global([data-theme-variant="nothing-light"]) .dot {
+  background-color: #D71921;
+  box-shadow: 0 0 10px rgba(215, 25, 33, 0.5);
+}
+
+

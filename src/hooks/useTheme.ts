@@ -1,24 +1,24 @@
-"use client";
-import { useEffect, useState, useCallback } from "react";
+'use client';
 
-export function useTheme() {
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+import { useColorMode } from './useColorMode';
+import type { ColorMode } from '@/data/types';
 
-  useEffect(() => {
-    const stored = localStorage.getItem("portfolio-theme") as "dark" | "light" | null;
-    const initial = stored || "dark";
-    setTheme(initial);
-    document.documentElement.setAttribute("data-theme", initial);
-  }, []);
+/**
+ * Backward-compatible hook for minimal theme toggle in existing components (e.g. Navbar.tsx).
+ * Delegates state and DOM mutations directly to the universal useColorMode hook.
+ *
+ * @returns {{ theme: ColorMode, toggleTheme: () => void, setTheme: (mode: ColorMode) => void }}
+ */
+export function useTheme(): {
+  readonly theme: ColorMode;
+  readonly toggleTheme: () => void;
+  readonly setTheme: (mode: ColorMode) => void;
+} {
+  const { mode, toggleMode, setMode } = useColorMode();
 
-  const toggleTheme = useCallback(() => {
-    setTheme((prev) => {
-      const next = prev === "dark" ? "light" : "dark";
-      localStorage.setItem("portfolio-theme", next);
-      document.documentElement.setAttribute("data-theme", next);
-      return next;
-    });
-  }, []);
-
-  return { theme, toggleTheme };
+  return {
+    theme: mode,
+    toggleTheme: toggleMode,
+    setTheme: setMode,
+  };
 }

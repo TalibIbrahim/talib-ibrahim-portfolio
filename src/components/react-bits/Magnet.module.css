@@ -1,0 +1,9 @@
+.magnetContainer {
+  display: inline-block;
+  position: relative;
+}
+
+.magnetInner {
+  display: inline-block;
+  will-change: transform;
+}

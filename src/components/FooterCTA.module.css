@@ -1,0 +1,191 @@
+.footer {
+  position: relative;
+  background-color: var(--bg-primary, #111112);
+  color: var(--text-primary, #f4f4ed);
+  padding: 8rem 4rem 2rem;
+  font-family: var(--font-sans, system-ui);
+  overflow: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.glowEffect {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 800px;
+  height: 400px;
+  background: radial-gradient(circle at bottom center, rgba(var(--accent-rgb, 210, 255, 0), 0.15) 0%, rgba(17, 17, 18, 0) 70%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.container {
+  position: relative;
+  max-width: 1200px;
+  margin: 0 auto;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content {
+  text-align: center;
+  margin-bottom: 6rem;
+}
+
+.heading {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: bold;
+  margin: 0 0 1rem 0;
+  letter-spacing: -0.03em;
+}
+
+.subtext {
+  font-size: 1.25rem;
+  color: var(--text-secondary, rgba(244, 244, 237, 0.6));
+  margin-bottom: 3rem;
+}
+
+.socialsContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+}
+
+.socialLink {
+  color: var(--text-primary, #f4f4ed);
+  font-size: 1.125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  text-shadow: 0 0 5px rgba(var(--accent-rgb, 210, 255, 0), 0);
+}
+
+.socialLink:hover {
+  color: var(--accent);
+  transform: translateY(-3px) scale(1.05);
+  text-shadow: 0 0 15px rgba(var(--accent-rgb, 210, 255, 0), 0.4);
+}
+
+.bottomBar {
+  width: 100%;
+  border-top: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  padding-top: 2rem;
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-muted, rgba(244, 244, 237, 0.4));
+}
+
+/* ══════════════════════════════════════════════════
+   M SPORT THEME FOOTER ADAPTATIONS
+   ══════════════════════════════════════════════════ */
+
+:global([data-theme="msport"]) .bottomBar {
+  position: relative;
+}
+
+:global([data-theme="msport"]) .bottomBar::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: var(--msport-stripe);
+}
+
+:global([data-theme="msport"]) .socialLink:hover {
+  color: #81C4FF;
+  text-shadow: 0 0 15px rgba(129, 196, 255, 0.5);
+}
+
+/* Light Mode M Sport Footer */
+:global([data-theme="msport"][data-mode="light"]) .heading,
+:global([data-theme-variant="msport-light"]) .heading {
+  color: #0a0e18;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .subtext,
+:global([data-theme-variant="msport-light"]) .subtext {
+  color: #4a5468;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .socialLink,
+:global([data-theme-variant="msport-light"]) .socialLink {
+  color: #0a0e18;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .socialLink:hover,
+:global([data-theme-variant="msport-light"]) .socialLink:hover {
+  color: #0066b1;
+  text-shadow: none;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .bottomBar,
+:global([data-theme-variant="msport-light"]) .bottomBar {
+  border-top-color: rgba(0, 102, 177, 0.15);
+  color: #808b9f;
+}
+
+/* ══════════════════════════════════════════════════
+   NOTHING THEME FOOTER ADAPTATIONS (Dark & Light)
+   ══════════════════════════════════════════════════ */
+
+:global([data-theme="nothing"]) .glowEffect {
+  background: radial-gradient(circle at bottom center, rgba(215, 25, 33, 0.16) 0%, rgba(0, 0, 0, 0) 70%);
+}
+
+:global([data-theme="nothing"]) .socialLink:hover {
+  color: #D71921;
+  text-shadow: 0 0 15px rgba(215, 25, 33, 0.5);
+}
+
+:global([data-theme="nothing"]) .bottomBar {
+  border-top-color: rgba(255, 255, 255, 0.14);
+}
+
+/* Light Mode Nothing Theme Footer */
+:global([data-theme="nothing"][data-mode="light"]) .glowEffect,
+:global([data-theme-variant="nothing-light"]) .glowEffect {
+  background: radial-gradient(circle at bottom center, rgba(215, 25, 33, 0.08) 0%, rgba(255, 255, 255, 0) 70%);
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .heading,
+:global([data-theme-variant="nothing-light"]) .heading {
+  color: #000000;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .subtext,
+:global([data-theme-variant="nothing-light"]) .subtext {
+  color: #555555;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .socialLink,
+:global([data-theme-variant="nothing-light"]) .socialLink {
+  color: #000000;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .socialLink:hover,
+:global([data-theme-variant="nothing-light"]) .socialLink:hover {
+  color: #D71921;
+  text-shadow: none;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .bottomBar,
+:global([data-theme-variant="nothing-light"]) .bottomBar {
+  border-top-color: rgba(0, 0, 0, 0.12);
+  color: #888888;
+}
+
+@media (max-width: 768px) {
+
+  .footer {
+    padding: 6rem 2rem 2rem;
+  }
+}
+
