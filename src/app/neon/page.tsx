@@ -21,7 +21,6 @@ import Preloader from '@/components/Preloader';
 import SmoothScroll from '@/components/SmoothScroll';
 import ClickSpark from '@/components/react-bits/ClickSpark';
 import GravitationalCursor from '@/components/GravitationalCursor';
-import StaggeredMenu from '@/components/StaggeredMenu';
 
 const boringStageVariants: Variants = {
   initial: { opacity: 0, y: 10 },
@@ -55,7 +54,6 @@ export default function NeonRoute() {
   return (
     <>
       <GravitationalCursor />
-      <StaggeredMenu />
       <HyperBackgroundEffects />
       <Preloader />
       <SmoothScroll>
