@@ -1,0 +1,152 @@
+/* ═════════════════════════════════════════════════════════════════
+   NOTHING PHONE ABSTRACT GEOMETRIC BACKGROUND
+   Inspired by Nothing Phone (2), Phone (2a), and Phone (2a Plus)
+   Vector linework with vector-effect="non-scaling-stroke"
+   Full Dark Mode / Light Mode substrate switching
+   ═════════════════════════════════════════════════════════════════ */
+
+.backgroundWrapper {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  user-select: none;
+  transition: opacity 0.4s ease;
+
+  /* Baseline / Light Mode tokens */
+  --sub-stroke-primary: rgba(10, 10, 12, 0.22);
+  --sub-stroke-secondary: rgba(10, 10, 12, 0.12);
+  --sub-stroke-tertiary: rgba(10, 10, 12, 0.05);
+  --sub-fill-plate: rgba(255, 255, 255, 0.55);
+  --sub-fill-plate-subtle: rgba(0, 0, 0, 0.015);
+  --sub-fill-chip: rgba(10, 10, 12, 0.04);
+  --sub-text-primary: rgba(10, 10, 12, 0.45);
+  --sub-text-muted: rgba(10, 10, 12, 0.28);
+  --sub-glyph-fill: rgba(255, 255, 255, 0.95);
+  --sub-glyph-stroke: rgba(10, 10, 12, 0.28);
+  --sub-perf: rgba(10, 10, 12, 0.07);
+  --sub-hatch: rgba(10, 10, 12, 0.04);
+  --sub-camera-lens: #0A0A0E;
+  --sub-camera-ring: rgba(10, 10, 12, 0.15);
+  --sub-torx-head: #FFFFFF;
+  --sub-torx-slot: #2A2A30;
+}
+
+/* ── Light Mode Explicit ── */
+.backgroundWrapper[data-mode="light"],
+:global([data-mode="light"]) .backgroundWrapper {
+  --sub-stroke-primary: rgba(10, 10, 12, 0.22);
+  --sub-stroke-secondary: rgba(10, 10, 12, 0.12);
+  --sub-stroke-tertiary: rgba(10, 10, 12, 0.05);
+  --sub-fill-plate: rgba(255, 255, 255, 0.55);
+  --sub-fill-plate-subtle: rgba(0, 0, 0, 0.015);
+  --sub-fill-chip: rgba(10, 10, 12, 0.04);
+  --sub-text-primary: rgba(10, 10, 12, 0.45);
+  --sub-text-muted: rgba(10, 10, 12, 0.28);
+  --sub-glyph-fill: rgba(255, 255, 255, 0.95);
+  --sub-glyph-stroke: rgba(10, 10, 12, 0.28);
+  --sub-perf: rgba(10, 10, 12, 0.07);
+  --sub-hatch: rgba(10, 10, 12, 0.04);
+  --sub-camera-lens: #0A0A0E;
+  --sub-camera-ring: rgba(10, 10, 12, 0.15);
+  --sub-torx-head: #FFFFFF;
+  --sub-torx-slot: #2A2A30;
+  opacity: 0.88;
+}
+
+/* ── Dark Mode Explicit ── */
+.backgroundWrapper[data-mode="dark"],
+:global([data-mode="dark"]) .backgroundWrapper {
+  --sub-stroke-primary: rgba(255, 255, 255, 0.22);
+  --sub-stroke-secondary: rgba(255, 255, 255, 0.11);
+  --sub-stroke-tertiary: rgba(255, 255, 255, 0.04);
+  --sub-fill-plate: rgba(255, 255, 255, 0.03);
+  --sub-fill-plate-subtle: rgba(255, 255, 255, 0.015);
+  --sub-fill-chip: rgba(255, 255, 255, 0.05);
+  --sub-text-primary: rgba(255, 255, 255, 0.45);
+  --sub-text-muted: rgba(255, 255, 255, 0.26);
+  --sub-glyph-fill: rgba(255, 255, 255, 0.85);
+  --sub-glyph-stroke: rgba(255, 255, 255, 0.35);
+  --sub-perf: rgba(255, 255, 255, 0.08);
+  --sub-hatch: rgba(255, 255, 255, 0.04);
+  --sub-camera-lens: #050508;
+  --sub-camera-ring: rgba(255, 255, 255, 0.2);
+  --sub-torx-head: #1A1A1F;
+  --sub-torx-slot: #E0E0E6;
+  opacity: 0.82;
+}
+
+.svgAbstract {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* ── Surgical Red Tally Pulse ── */
+@keyframes redTallyPulse {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 6px rgba(215, 25, 33, 0.9)) drop-shadow(0 0 16px rgba(215, 25, 33, 0.5));
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    filter: drop-shadow(0 0 2px rgba(215, 25, 33, 0.3));
+    transform: scale(0.92);
+  }
+}
+
+.redTallyAnchor {
+  transform-origin: center;
+  animation: redTallyPulse 2s ease-in-out infinite;
+}
+
+/* ── Glyph Diffuser Breathing ── */
+@keyframes glyphPulse {
+  0%, 100% {
+    opacity: 0.95;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.35));
+  }
+  50% {
+    opacity: 0.65;
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.1));
+  }
+}
+
+.glyphConduit {
+  animation: glyphPulse 5s ease-in-out infinite;
+}
+
+/* ── Subtle Slow Rotation for Antenna Dial ── */
+@keyframes slowCompassDrift {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.compassDriftRing {
+  transform-origin: 360px 320px;
+  animation: slowCompassDrift 180s linear infinite;
+}
+
+/* ── Responsive Adaptations ── */
+@media (max-width: 768px) {
+  .backgroundWrapper {
+    opacity: 0.65;
+  }
+}
+
+@media (min-width: 1440px) {
+  .svgAbstract {
+    width: 100vw;
+    height: 100vh;
+  }
+}

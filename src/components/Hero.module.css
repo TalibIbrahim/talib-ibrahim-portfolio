@@ -1,142 +1,790 @@
-.hero {
+.heroSection {
+  background-color: var(--bg-primary, #0d0d0f);
   min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  font-family: var(--font-sans, system-ui);
+  cursor: crosshair;
+  transition: background-color 0.4s ease;
+}
+
+.baseLayer, .revealLayer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.revealLayer {
+  pointer-events: none;
+  z-index: 10;
+  background-color: var(--bg-primary, #0d0d0f);
+  will-change: mask-image, -webkit-mask-image;
+  transition: background-color 0.4s ease;
+}
+
+.layerContent {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+/* ----------------- PORTRAIT / HELMET ----------------- */
+.helmetImageWrapper {
+  position: absolute;
+  bottom: 0;
+  right: 5%;
+  height: 75vh;
+  width: auto;
+  aspect-ratio: 1/1.2;
+  z-index: 1;
+}
+
+.helmetImage {
+  height: 100%;
+  width: 100%;
+  object-fit: contain;
+  object-position: bottom right;
+  transition: filter 0.3s ease;
+}
+
+/* Grayscale Mode */
+.grayscaleMode .helmetImage {
+  filter: grayscale(100%) brightness(0.6) opacity(0.5);
+}
+
+/* Neon Mode */
+.neonMode .helmetImage {
+  filter: drop-shadow(0 0 30px rgba(204, 255, 0, 0.4)) contrast(1.1) saturate(1.2);
+}
+
+
+/* ----------------- CONTAINER & TYPOGRAPHY ----------------- */
+.container {
+  padding: 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  z-index: 2;
+  flex-grow: 1;
+  justify-content: center;
+}
+
+.statusBadgeWrapper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  width: fit-content;
+}
+
+.statusBadgeDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse 2s infinite cubic-bezier(0.65, 0.05, 0, 1);
+}
+
+@keyframes pulse {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.2); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.statusBadgeText {
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Grayscale Mode Badge */
+.grayscaleMode .statusBadgeWrapper {
+  background-color: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.grayscaleMode .statusBadgeDot {
+  background-color: rgba(255, 255, 255, 0.3);
+  box-shadow: none;
+}
+.grayscaleMode .statusBadgeText {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Neon Mode Badge */
+.neonMode .statusBadgeWrapper {
+  background-color: rgba(204, 255, 0, 0.05);
+  border: 1px solid rgba(204, 255, 0, 0.3);
+}
+.neonMode .statusBadgeDot {
+  background-color: #ccff00;
+  box-shadow: 0 0 8px #ccff00;
+}
+.neonMode .statusBadgeText {
+  color: #ccff00;
+}
+
+
+/* Headline */
+.headline {
+  font-family: var(--font-oswald), sans-serif;
+  font-size: clamp(4rem, 10vw, 8rem);
+  font-weight: 700;
+  line-height: 1;
+  margin: 0;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Grayscale Mode Headline */
+.grayscaleMode .headlineWord {
+  color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.15);
+}
+
+/* Neon Mode Headline */
+.neonMode .headlineWord {
+  color: #ccff00;
+  -webkit-text-stroke: 0;
+  text-shadow: 0 0 20px rgba(204, 255, 0, 0.3);
+}
+.neonMode .headlineWord:last-child {
+  color: #ffffff;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+
+/* Subheadline */
+.subheadline {
+  font-size: clamp(1.25rem, 3vw, 2rem);
+  max-width: 800px;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.grayscaleMode .subheadline {
+  color: rgba(255, 255, 255, 0.3);
+}
+.neonMode .subheadline {
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+}
+
+
+/* ----------------- TICKER MARQUEE ----------------- */
+.tickerContainer {
+  width: 100%;
+  overflow: hidden;
+  padding: 1.5rem 0;
+  transform: rotate(-2deg) scale(1.05);
+  margin-top: auto;
+  margin-bottom: 2rem;
+  z-index: 3;
+}
+
+.tickerTrack {
+  display: flex;
+  white-space: nowrap;
+  animation: marquee 30s linear infinite;
+  width: fit-content;
+}
+
+.tickerItem {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+}
+
+.tickerSeparator {
+  margin: 0 2rem;
+  opacity: 0.5;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Grayscale Mode Ticker */
+.grayscaleMode .tickerContainer {
+  background-color: transparent;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.2);
+}
+
+/* Neon Mode Ticker */
+.neonMode .tickerContainer {
+  background-color: #ccff00;
+  color: #0d0d0f;
+  box-shadow: 0 0 30px rgba(204, 255, 0, 0.2);
+}
+
+/* ══════════════════════════════════════════════════
+   M SPORT THEME HERO ADAPTATIONS
+   ══════════════════════════════════════════════════ */
+
+/* M Sport Dark Mode */
+:global([data-theme="msport"]) .neonMode .statusBadgeWrapper {
+  background-color: rgba(129, 196, 255, 0.08);
+  border: 1px solid rgba(129, 196, 255, 0.35);
+  border-radius: 4px;
+}
+:global([data-theme="msport"]) .neonMode .statusBadgeWrapper::before {
+  content: '';
+  display: inline-block;
+  width: 14px;
+  height: 9px;
+  background: linear-gradient(115deg, #81C4FF 0%, #81C4FF 33.3%, #16588E 33.3%, #16588E 66.6%, #E7222E 66.6%, #E7222E 100%);
+  transform: skewX(-20deg);
+  border-radius: 1px;
+  margin-right: 4px;
+}
+:global([data-theme="msport"]) .neonMode .statusBadgeDot {
+  background-color: #81C4FF;
+  box-shadow: 0 0 8px #81C4FF;
+}
+:global([data-theme="msport"]) .neonMode .statusBadgeText {
+  color: #81C4FF;
+  font-family: var(--font-mono, monospace);
+  letter-spacing: 0.12em;
+}
+
+:global([data-theme="msport"]) .neonMode .headlineWord {
+  color: #81C4FF;
+  text-shadow: 0 0 25px rgba(129, 196, 255, 0.35);
+}
+:global([data-theme="msport"]) .neonMode .headlineWord:last-child {
+  color: #f4f6fa;
+  text-shadow: 0 0 25px rgba(231, 34, 46, 0.35);
+}
+
+:global([data-theme="msport"]) .neonMode .helmetImage {
+  filter: drop-shadow(0 0 32px rgba(129, 196, 255, 0.35)) contrast(1.1) saturate(1.15);
+}
+
+:global([data-theme="msport"]) .neonMode .tickerContainer {
+  background: #101217;
+  color: #f4f6fa;
+  border-top: 2px solid #81C4FF;
+  border-bottom: 2px solid #E7222E;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.5);
+  position: relative;
+}
+:global([data-theme="msport"]) .neonMode .tickerContainer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #81C4FF 0%, #81C4FF 33.3%, #16588E 33.3%, #16588E 66.6%, #E7222E 66.6%, #E7222E 100%);
+}
+
+/* M Sport Light Mode */
+:global([data-theme="msport"][data-mode="light"]) .neonMode .statusBadgeWrapper,
+:global([data-theme-variant="msport-light"]) .neonMode .statusBadgeWrapper {
+  background-color: rgba(0, 102, 177, 0.08);
+  border: 1px solid rgba(0, 102, 177, 0.3);
+}
+:global([data-theme="msport"][data-mode="light"]) .neonMode .statusBadgeDot,
+:global([data-theme-variant="msport-light"]) .neonMode .statusBadgeDot {
+  background-color: #0066b1;
+  box-shadow: 0 0 8px rgba(0, 102, 177, 0.5);
+}
+:global([data-theme="msport"][data-mode="light"]) .neonMode .statusBadgeText,
+:global([data-theme-variant="msport-light"]) .neonMode .statusBadgeText {
+  color: #0066b1;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .neonMode .headlineWord,
+:global([data-theme-variant="msport-light"]) .neonMode .headlineWord {
+  color: #0066b1;
+  text-shadow: none;
+}
+:global([data-theme="msport"][data-mode="light"]) .neonMode .headlineWord:last-child,
+:global([data-theme-variant="msport-light"]) .neonMode .headlineWord:last-child {
+  color: #0a0e18;
+  text-shadow: none;
+}
+
+:global([data-theme="msport"][data-mode="light"]) .neonMode .tickerContainer,
+:global([data-theme-variant="msport-light"]) .neonMode .tickerContainer {
+  background: #ffffff;
+  color: #0a0e18;
+  border-top: 2px solid #008AC9;
+  border-bottom: 2px solid #E7222E;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding: 2rem;
+  }
+  .helmetImageWrapper {
+    right: -10%;
+    height: 60vh;
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   NOTHING THEME HERO ADAPTATIONS (CARL PEI / DOT-MATRIX)
+   ══════════════════════════════════════════════════ */
+
+/* Nothing Dark Mode */
+:global([data-theme="nothing"]) .neonMode .statusBadgeWrapper {
+  border-radius: 0px;
+  background-color: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  font-family: var(--font-mono, monospace);
+}
+
+:global([data-theme="nothing"]) .neonMode .statusBadgeDot {
+  background-color: #D71921;
+  box-shadow: 0 0 8px #D71921;
+  border-radius: 50%;
+  animation: nothingPulse 1.4s ease-in-out infinite alternate;
+}
+
+:global([data-theme="nothing"]) .neonMode .statusBadgeText {
+  color: #ffffff;
+  font-family: var(--font-mono, monospace);
+  letter-spacing: 0.16em;
+}
+
+:global([data-theme="nothing"]) .neonMode .headlineWord {
+  color: #ffffff;
+  text-shadow: none;
+}
+
+:global([data-theme="nothing"]) .neonMode .headlineWord:last-child {
+  color: #D71921;
+  text-shadow: 0 0 25px rgba(215, 25, 33, 0.4);
+}
+
+:global([data-theme="nothing"]) .neonMode .helmetImage {
+  filter: grayscale(100%) contrast(1.25) brightness(0.95);
+}
+
+:global([data-theme="nothing"]) .neonMode .tickerContainer {
+  background: #000000;
+  color: #ffffff;
+  border-top: 1px solid #D71921;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+}
+
+/* Nothing Light Mode */
+:global([data-theme="nothing"][data-mode="light"]) .neonMode .statusBadgeWrapper,
+:global([data-theme-variant="nothing-light"]) .neonMode .statusBadgeWrapper {
+  border-radius: 0px;
+  background-color: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.18);
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .neonMode .statusBadgeDot,
+:global([data-theme-variant="nothing-light"]) .neonMode .statusBadgeDot {
+  background-color: #D71921;
+  box-shadow: 0 0 8px rgba(215, 25, 33, 0.6);
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .neonMode .statusBadgeText,
+:global([data-theme-variant="nothing-light"]) .neonMode .statusBadgeText {
+  color: #000000;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .neonMode .headlineWord,
+:global([data-theme-variant="nothing-light"]) .neonMode .headlineWord {
+  color: #000000;
+  text-shadow: none;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .neonMode .headlineWord:last-child,
+:global([data-theme-variant="nothing-light"]) .neonMode .headlineWord:last-child {
+  color: #D71921;
+  text-shadow: none;
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .neonMode .helmetImage,
+:global([data-theme-variant="nothing-light"]) .neonMode .helmetImage {
+  filter: grayscale(100%) contrast(1.15) brightness(1.05);
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .neonMode .tickerContainer,
+:global([data-theme-variant="nothing-light"]) .neonMode .tickerContainer {
+  background: #ffffff;
+  color: #000000;
+  border-top: 1px solid #D71921;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* ══════════════════════════════════════════════════
+   NOTHING THEME SPECIFIC STRUCTURAL HERO ELEMENTS
+   (Abstract Geometric Shapes with Grain, Crosshairs, Single Red Pop, Circular Clock)
+   ══════════════════════════════════════════════════ */
+
+:global([data-theme="nothing"]) .headlineWord {
+  font-family: var(--font-dot-matrix, monospace) !important;
+  letter-spacing: 0.03em;
+}
+
+:global([data-theme="nothing"]) .statusBadgeWrapper {
+  border-radius: 0px !important;
+}
+
+.nothingAbstractMotif {
+  position: absolute;
+  top: 18%;
+  right: 10%;
+  width: 300px;
+  height: 340px;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* 1. Blocky Rectangular Module with Soft Noise/Grain Fill & Crosshairs */
+.nothingBlockModule {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 220px;
+  height: 150px;
+  background-color: rgba(18, 18, 18, 0.88);
+  background-image: var(--nothing-grain);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+:global([data-mode="light"]) .nothingBlockModule,
+:global([data-theme-variant$="-light"]) .nothingBlockModule {
+  background-color: rgba(245, 245, 245, 0.92);
+  background-image: var(--nothing-grain-light);
+  border-color: rgba(0, 0, 0, 0.2);
+}
+
+.nothingBlockLabel {
+  font-family: var(--font-dot-matrix, monospace) !important;
+  font-size: 0.65rem;
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.6);
+  text-transform: uppercase;
+}
+
+:global([data-mode="light"]) .nothingBlockLabel,
+:global([data-theme-variant$="-light"]) .nothingBlockLabel {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+/* Thin crosshair corner markers */
+.crosshairTL, .crosshairTR, .crosshairBL, .crosshairBR {
+  position: absolute;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.7rem;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.45);
+  user-select: none;
+}
+
+:global([data-mode="light"]) .crosshairTL,
+:global([data-mode="light"]) .crosshairTR,
+:global([data-mode="light"]) .crosshairBL,
+:global([data-mode="light"]) .crosshairBR {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+.crosshairTL { top: 3px; left: 4px; }
+.crosshairTR { top: 3px; right: 4px; }
+.crosshairBL { bottom: 3px; left: 4px; }
+.crosshairBR { bottom: 3px; right: 4px; }
+
+/* 2. Overlapping Grain Capsule Shape */
+.nothingCapsuleShape {
+  position: absolute;
+  bottom: 50px;
+  right: 100px;
+  width: 140px;
+  height: 50px;
+  border-radius: 9999px;
+  background-color: rgba(24, 24, 24, 0.85);
+  background-image: var(--nothing-grain);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+:global([data-mode="light"]) .nothingCapsuleShape,
+:global([data-theme-variant$="-light"]) .nothingCapsuleShape {
+  background-color: rgba(240, 240, 240, 0.9);
+  background-image: var(--nothing-grain-light);
+  border-color: rgba(0, 0, 0, 0.18);
+}
+
+.nothingCapsuleDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+:global([data-mode="light"]) .nothingCapsuleDot {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+/* 3. The Iconic Red Half-Circle Pop (Carl Pei signature visual anchor) */
+.nothingRedHalfCircle {
+  position: absolute;
+  bottom: 0;
+  right: 10px;
+  width: 110px;
+  height: 55px; /* Exact 2:1 ratio for semi-circle */
+  border-radius: 55px 55px 0 0;
+  background-color: #D71921;
+  background-image: var(--nothing-grain);
+  box-shadow: 0 4px 20px rgba(215, 25, 33, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: none;
+  overflow: hidden;
+  z-index: 2;
+}
+
+/* 4. The Nothing Circular Clock / Telemetry Widget */
+.nothingClockWidget {
+  position: absolute;
+  top: 2rem;
+  right: 4rem;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  background: rgba(12, 12, 12, 0.9);
+  background-image: var(--nothing-grain);
+  backdrop-filter: blur(12px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+  user-select: none;
+}
+
+:global([data-mode="light"]) .nothingClockWidget,
+:global([data-theme-variant$="-light"]) .nothingClockWidget {
+  background: rgba(255, 255, 255, 0.92);
+  background-image: var(--nothing-grain-light);
+  border-color: rgba(0, 0, 0, 0.22);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.nothingClockTime {
+  font-family: var(--font-dot-matrix, monospace) !important;
+  font-size: 1.12rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+  line-height: 1;
+}
+
+:global([data-mode="light"]) .nothingClockTime {
+  color: #000000;
+}
+
+.nothingClockDate {
+  font-family: var(--font-dot-matrix, monospace) !important;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.6);
+  margin-top: 0.35rem;
+  text-transform: uppercase;
+}
+
+:global([data-mode="light"]) .nothingClockDate {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.nothingClockPip {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #D71921;
+  box-shadow: 0 0 6px #D71921;
+  margin-top: 0.4rem;
+  animation: nothingPulse 1s steps(2) infinite alternate;
+}
+
+/* ══════════════════════════════════════════════════
+   BMW M SPORT SPECIFIC STRUCTURAL HERO ELEMENTS
+   (Recurring Three Diagonal Stripes, Tachometer LED Shift Lights, Angled Parallelograms)
+   ══════════════════════════════════════════════════ */
+
+:global([data-theme="msport"]) .headlineWord {
+  font-family: var(--font-rajdhani), 'Rajdhani', sans-serif !important;
+  font-style: italic;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+:global([data-theme="msport"]) .statusBadgeWrapper {
+  border-radius: 0px !important;
+  clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
+  transform: skewX(-10deg);
+}
+
+:global([data-theme="msport"]) .statusBadgeText {
+  transform: skewX(10deg);
+  font-family: var(--font-rajdhani), 'Rajdhani', sans-serif !important;
+  font-style: italic;
+  font-weight: 700;
+}
+
+.msportHeaderBar {
+  position: absolute;
+  top: 1.5rem;
+  left: 4rem;
+  right: 4rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 120px 24px 80px;
-  position: relative;
-  gap: 40px;
-}
-.canvasWrap {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
+  flex-wrap: wrap;
+  gap: 1rem;
+  z-index: 10;
   pointer-events: none;
-  overflow: hidden;
-}
-.content {
-  position: relative;
-  z-index: 2;
-  flex: 1;
-  max-width: 600px;
-}
-.greeting {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin-bottom: 16px;
-  letter-spacing: 0.05em;
-}
-.name {
-  margin-bottom: 20px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 12px;
-}
-.bold {
-  font-weight: 800;
-}
-.light {
-  font-weight: 300;
-  color: var(--text-secondary);
-}
-.tagline {
-  font-size: 1.05rem;
-  max-width: 460px;
-  margin-bottom: 36px;
-  line-height: 1.7;
-}
-.ctas {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  margin-bottom: 40px;
-}
-.socialRow {
-  display: flex;
-  gap: 12px;
-}
-.socialLink {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-secondary);
-  transition: all var(--transition-fast);
-}
-.socialLink:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-  transform: translateY(-2px);
-}
-.imageWrap {
-  position: relative;
-  z-index: 2;
-  flex-shrink: 0;
-}
-.image {
-  border-radius: var(--radius-xl);
-  object-fit: contain;
-  width: 320px;
-  height: auto;
-  filter: grayscale(0.8) contrast(1.1);
-  transition: filter var(--transition-medium);
-  position: relative;
-  z-index: 1;
-}
-.image:hover {
-  filter: grayscale(0) contrast(1);
-}
-.imageGlow {
-  position: absolute;
-  inset: -20px;
-  border-radius: var(--radius-xl);
-  background: radial-gradient(ellipse at center, rgba(255,255,255,0.04) 0%, transparent 70%);
-  z-index: 0;
-}
-.scrollIndicator {
-  position: absolute;
-  bottom: 40px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 20px;
-  height: 32px;
-  border: 1.5px solid var(--border);
-  border-radius: 12px;
-  display: flex;
-  justify-content: center;
-  padding-top: 6px;
-}
-.scrollDot {
-  width: 3px;
-  height: 6px;
-  background: var(--text-muted);
-  border-radius: 2px;
 }
 
-@media (max-width: 900px) {
-  .hero {
-    flex-direction: column-reverse;
-    text-align: center;
-    padding: 100px 20px 60px;
-  }
-  .content {
-    max-width: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  .name { justify-content: center; }
-  .tagline { text-align: center; }
-  .ctas { justify-content: center; }
-  .socialRow { justify-content: center; }
-  .image {
-    width: 200px;
-    height: auto;
-  }
-  .scrollIndicator { display: none; }
+.msportInsigniaGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
 }
+
+.msportStripeIcon {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 16px;
+}
+
+.msportStripeIcon span {
+  display: inline-block;
+  width: 5px;
+  height: 100%;
+  transform: skewX(-20deg);
+}
+
+.mBlue { background-color: #008AC9; }
+.mDarkBlue { background-color: #2B115A; }
+.mRed { background-color: #F11A22; }
+
+.msportTitleText {
+  font-family: var(--font-rajdhani), 'Rajdhani', sans-serif !important;
+  font-weight: 700;
+  font-style: italic;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  color: #81C4FF;
+  text-transform: uppercase;
+}
+
+:global([data-mode="light"]) .msportTitleText {
+  color: #008AC9;
+}
+
+/* Tachometer / Shift Light Bar */
+.msportTachometer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(10, 12, 16, 0.85);
+  border: 1px solid rgba(129, 196, 255, 0.25);
+  padding: 0.35rem 0.75rem;
+  clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
+  transform: skewX(-8deg);
+}
+
+:global([data-mode="light"]) .msportTachometer {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 138, 201, 0.25);
+}
+
+.msportTachoLabel {
+  font-family: var(--font-rajdhani), 'Rajdhani', sans-serif !important;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-style: italic;
+  color: #81C4FF;
+}
+
+:global([data-mode="light"]) .msportTachoLabel {
+  color: #008AC9;
+}
+
+.msportTachoLeds {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.tachoLed {
+  width: 4px;
+  height: 10px;
+  border-radius: 1px;
+}
+
+.ledGreen { background: #10b981; box-shadow: 0 0 6px #10b981; }
+.ledYellow { background: #f59e0b; box-shadow: 0 0 6px #f59e0b; }
+.ledRed { background: #F11A22; box-shadow: 0 0 6px #F11A22; }
+.ledBlue { background: #008AC9; box-shadow: 0 0 6px #008AC9; }
+
+.msportTachoValue {
+  font-family: var(--font-rajdhani), 'Rajdhani', sans-serif !important;
+  font-size: 0.85rem;
+  font-weight: 800;
+  font-style: italic;
+  color: #ffffff;
+}
+
+:global([data-mode="light"]) .msportTachoValue {
+  color: #000000;
+}
+
+/* Mobile responsive for new Hero structural elements */
+@media (max-width: 900px) {
+  .nothingAbstractMotif {
+    display: none;
+  }
+  .nothingClockWidget {
+    top: 1rem;
+    right: 1rem;
+    width: 95px;
+    height: 95px;
+  }
+  .nothingClockTime {
+    font-size: 0.85rem;
+  }
+  .msportHeaderBar {
+    left: 1rem;
+    right: 1rem;
+    top: 1rem;
+  }
+}
+
+
+

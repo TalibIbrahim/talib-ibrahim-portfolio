@@ -1,5 +1,5 @@
 "use client";
-import { personalInfo, skills, certifications } from "@/data/portfolio";
+import { personalInfo, skills, certifications } from "@/data/minimalPortfolio";
 import ScrollReveal from "./ScrollReveal";
 import styles from "./About.module.css";
 

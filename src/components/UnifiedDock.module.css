@@ -1,0 +1,502 @@
+/* ═════════════════════════════════════════════════════════════════
+   UNIFIED FLOATING DOCK — CSS MODULE
+   Bottom-centered macOS magnification dock across all routes
+   5 Theme Variants: Apple, Neon, M Sport, Nothing, Minimal
+   ═════════════════════════════════════════════════════════════════ */
+
+.dockFixedWrapper {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  max-width: calc(100vw - 2rem);
+}
+
+.dockNav {
+  pointer-events: auto;
+  position: relative;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ── Inner Dock Container ── */
+.dockContainer {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  height: 64px;
+  position: relative;
+  user-select: none;
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ═════════════════════════════════════════════════════════════════
+   THEME VARIANT 1: APPLE (Frosted Glass Capsule)
+   ═════════════════════════════════════════════════════════════════ */
+.variantApple {
+  border-radius: 9999px;
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+}
+
+.variantApple[data-mode="light"],
+:global([data-mode="light"]) .variantApple {
+  background: rgba(255, 255, 255, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.12),
+              inset 0 1px 1px rgba(255, 255, 255, 0.9),
+              0 1px 2px rgba(0, 0, 0, 0.05);
+  color: #1d1d1f;
+}
+
+.variantApple[data-mode="dark"],
+:global([data-mode="dark"]) .variantApple {
+  background: rgba(28, 28, 32, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45),
+              inset 0 1px 1px rgba(255, 255, 255, 0.18),
+              0 0 0 1px rgba(0, 0, 0, 0.2);
+  color: #f5f5f7;
+}
+
+.variantApple .activeBackdrop {
+  background: rgba(0, 113, 227, 0.15);
+  border: 1px solid rgba(0, 113, 227, 0.3);
+}
+
+.variantApple[data-mode="dark"] .activeBackdrop,
+:global([data-mode="dark"]) .variantApple .activeBackdrop {
+  background: rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.variantApple .activePip {
+  background: #0071e3;
+  box-shadow: 0 0 6px rgba(0, 113, 227, 0.6);
+}
+
+.variantApple[data-mode="dark"] .activePip,
+:global([data-mode="dark"]) .variantApple .activePip {
+  background: #f5f5f7;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.6);
+}
+
+/* ═════════════════════════════════════════════════════════════════
+   THEME VARIANT 2: NEON (Cyberpunk Fluid Glow)
+   ═════════════════════════════════════════════════════════════════ */
+.variantNeon {
+  border-radius: 14px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.variantNeon[data-mode="dark"],
+:global([data-mode="dark"]) .variantNeon {
+  background: rgba(10, 10, 14, 0.92);
+  border: 1px solid rgba(204, 255, 0, 0.35);
+  box-shadow: 0 0 24px rgba(204, 255, 0, 0.2),
+              inset 0 0 14px rgba(204, 255, 0, 0.06),
+              0 10px 30px rgba(0, 0, 0, 0.6);
+  color: #f4f4ed;
+}
+
+.variantNeon[data-mode="light"],
+:global([data-mode="light"]) .variantNeon {
+  background: rgba(245, 248, 242, 0.92);
+  border: 1px solid rgba(160, 210, 0, 0.5);
+  box-shadow: 0 8px 24px rgba(160, 210, 0, 0.18),
+              inset 0 0 10px rgba(160, 210, 0, 0.06);
+  color: #0c0e12;
+}
+
+.variantNeon .activeBackdrop {
+  background: rgba(204, 255, 0, 0.12);
+  border: 1px solid rgba(204, 255, 0, 0.4);
+}
+
+.variantNeon .activePip {
+  background: #ccff00;
+  box-shadow: 0 0 8px #ccff00, 0 0 16px rgba(204, 255, 0, 0.6);
+}
+
+/* ═════════════════════════════════════════════════════════════════
+   THEME VARIANT 3: M SPORT (BMW Motorsport Canted Silhouette & Carbon)
+   ═════════════════════════════════════════════════════════════════ */
+.variantMsport {
+  border-radius: 8px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  position: relative;
+  overflow: visible;
+}
+
+.variantMsport[data-mode="dark"],
+:global([data-mode="dark"]) .variantMsport {
+  background: linear-gradient(135deg, #121318 0%, #0a0a0d 100%);
+  border: 1px solid rgba(129, 196, 255, 0.25);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6),
+              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  color: #e6e6e6;
+}
+
+.variantMsport[data-mode="light"],
+:global([data-mode="light"]) .variantMsport {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f2f5 100%);
+  border: 1px solid rgba(0, 138, 201, 0.35);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12),
+              inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  color: #0b0c10;
+}
+
+/* Top Tri-Color BMW M Accent Bar */
+.msportStripeHeader {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  display: flex;
+  overflow: hidden;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+
+.msportStripeLightBlue {
+  flex: 1;
+  background: #008AC9;
+}
+
+.msportStripeDarkBlue {
+  flex: 1;
+  background: #2B115A;
+}
+
+.msportStripeRed {
+  flex: 1;
+  background: #F11A22;
+}
+
+.variantMsport .activeBackdrop {
+  background: rgba(0, 138, 201, 0.12);
+  border: 1px solid rgba(0, 138, 201, 0.35);
+  transform: skewX(-8deg);
+}
+
+.variantMsport .activePip {
+  background: #F11A22;
+  box-shadow: 0 0 6px #F11A22;
+  width: 14px;
+  border-radius: 2px;
+}
+
+/* ═════════════════════════════════════════════════════════════════
+   THEME VARIANT 4: NOTHING (Carl Pei Dot-Matrix & Surgical Red)
+   ═════════════════════════════════════════════════════════════════ */
+.variantNothing {
+  border-radius: 9999px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+.variantNothing[data-mode="light"],
+:global([data-mode="light"]) .variantNothing {
+  background: rgba(245, 245, 247, 0.92);
+  border: 1px dashed rgba(10, 10, 12, 0.3);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+  color: #0A0A0C;
+}
+
+.variantNothing[data-mode="dark"],
+:global([data-mode="dark"]) .variantNothing {
+  background: rgba(14, 14, 18, 0.92);
+  border: 1px dashed rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5);
+  color: #F0F0F2;
+}
+
+.variantNothing .activeBackdrop {
+  background: rgba(215, 25, 33, 0.08);
+  border: 1px solid rgba(215, 25, 33, 0.3);
+  border-radius: 50%;
+}
+
+.variantNothing .activePip {
+  background: #D71921;
+  box-shadow: 0 0 8px rgba(215, 25, 33, 0.8);
+  width: 6px;
+  height: 6px;
+}
+
+/* ═════════════════════════════════════════════════════════════════
+   THEME VARIANT 5: MINIMAL (Utilitarian Monochrome Slate)
+   ═════════════════════════════════════════════════════════════════ */
+.variantMinimal {
+  border-radius: 9999px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.variantMinimal[data-mode="dark"],
+:global([data-mode="dark"]) .variantMinimal {
+  background: rgba(18, 18, 18, 0.9);
+  border: 1px solid #333333;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  color: #f0f0f0;
+}
+
+.variantMinimal[data-mode="light"],
+:global([data-mode="light"]) .variantMinimal {
+  background: rgba(250, 250, 250, 0.9);
+  border: 1px solid #dcdcdc;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  color: #111111;
+}
+
+.variantMinimal .activeBackdrop {
+  background: rgba(128, 128, 128, 0.15);
+  border: 1px solid rgba(128, 128, 128, 0.25);
+}
+
+.variantMinimal[data-mode="dark"] .activePip,
+:global([data-mode="dark"]) .variantMinimal .activePip {
+  background: #ffffff;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+}
+
+.variantMinimal[data-mode="light"] .activePip,
+:global([data-mode="light"]) .variantMinimal .activePip {
+  background: #000000;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+}
+
+/* ═════════════════════════════════════════════════════════════════
+   DOCK ITEM & MAC OS MAGNIFICATION PHYSICS WRAPPER
+   ═════════════════════════════════════════════════════════════════ */
+.dockItemWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dockItemLink {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 50%;
+  cursor: pointer;
+  outline: none;
+}
+
+.dockItemLink:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+/* Center icon scaling container */
+.iconCenter {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center;
+  transition: color 0.15s ease;
+}
+
+/* Active Sliding Backdrop Pill */
+.activeBackdrop {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  z-index: 1;
+}
+
+/* Active Dot/Pip Indicator under icon */
+.activePip {
+  position: absolute;
+  bottom: 3px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  z-index: 3;
+}
+
+/* Subtle monospace shortcut badge chip */
+.shortcutChip {
+  position: absolute;
+  top: 1px;
+  right: 1px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.52rem;
+  font-weight: 700;
+  line-height: 1;
+  padding: 1px 3px;
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.12);
+  color: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  pointer-events: none;
+  z-index: 4;
+  letter-spacing: -0.02em;
+}
+
+[data-mode="light"] .shortcutChip,
+:global([data-mode="light"]) .shortcutChip {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.18);
+  color: #111111;
+}
+
+.variantNeon .shortcutChip {
+  background: rgba(204, 255, 0, 0.15);
+  border-color: rgba(204, 255, 0, 0.35);
+  color: #ccff00;
+}
+
+/* ── Dock Divider Line ── */
+.dockDivider {
+  width: 1px;
+  height: 24px;
+  align-self: center;
+  margin: 0 0.15rem;
+  opacity: 0.25;
+  background: currentColor;
+}
+
+/* ── Mode Toggle Button ── */
+.modeToggleButton {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  position: relative;
+  outline: none;
+}
+
+.modeToggleButton:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+/* ── Tooltip Bubble ── */
+.tooltip {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 100;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+
+.variantApple .tooltip,
+.variantMinimal .tooltip {
+  background: rgba(18, 18, 22, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #ffffff;
+}
+
+[data-mode="light"] .variantApple .tooltip,
+[data-mode="light"] .variantMinimal .tooltip {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #111111;
+}
+
+.variantNeon .tooltip {
+  background: rgba(12, 12, 16, 0.95);
+  border: 1px solid rgba(204, 255, 0, 0.4);
+  color: #ccff00;
+  box-shadow: 0 0 16px rgba(204, 255, 0, 0.2);
+}
+
+.variantMsport .tooltip {
+  background: rgba(14, 15, 20, 0.95);
+  border-top: 2px solid #008AC9;
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.variantNothing .tooltip {
+  background: rgba(14, 14, 18, 0.95);
+  border: 1px dashed rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+}
+
+[data-mode="light"] .variantNothing .tooltip {
+  background: rgba(245, 245, 247, 0.95);
+  border: 1px dashed rgba(0, 0, 0, 0.25);
+  color: #0A0A0C;
+}
+
+.tooltipTitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1.1;
+}
+
+.tooltipSubtitle {
+  font-family: var(--font-inter), sans-serif;
+  font-size: 0.62rem;
+  opacity: 0.75;
+  letter-spacing: 0.02em;
+}
+
+/* ── Responsive Adaptations ── */
+@media (hover: none), (max-width: 600px) {
+  .tooltip {
+    display: none !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .dockFixedWrapper {
+    bottom: 1rem;
+    max-width: calc(100vw - 1rem);
+  }
+
+  .dockContainer {
+    gap: 0.25rem;
+    padding: 0.4rem 0.5rem;
+    height: 56px;
+  }
+}
+
+@media (max-width: 400px) {
+  .dockContainer {
+    gap: 0.15rem;
+    padding: 0.3rem 0.35rem;
+  }
+}

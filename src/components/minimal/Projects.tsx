@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import { projects } from "@/data/portfolio";
+import { projects } from "@/data/minimalPortfolio";
 import ScrollReveal from "./ScrollReveal";
 import styles from "./Projects.module.css";
 

@@ -1,0 +1,31 @@
+.wrapper {
+  display: inline-block;
+  position: relative;
+  font-family: inherit;
+  white-space: pre-wrap;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.revealed {
+  color: inherit;
+}
+
+.encrypted {
+  color: #ccff00;
+  font-family: var(--font-mono, 'JetBrains Mono', 'Courier New', monospace);
+  font-weight: 600;
+  text-shadow: 0 0 8px rgba(204, 255, 0, 0.75), 0 0 16px rgba(204, 255, 0, 0.35);
+  font-variant-numeric: tabular-nums;
+  display: inline-block;
+}

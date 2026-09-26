@@ -1,0 +1,995 @@
+/* ═════════════════════════════════════════════════════════════════
+   BMW M SPORT DEDICATED THEME (STRUCTURAL MOTORSPORT IDENTITY)
+   Tri-Color: #008AC9 (Light Blue), #2B115A (Violet), #F11A22 (Red)
+   115° Canted Angles, Chamfered Corners, High-Density Telemetry
+   ═════════════════════════════════════════════════════════════════ */
+
+.msportPage {
+  min-height: 100vh;
+  background-color: #0c0d0e;
+  color: #f0f2f5;
+  font-family: var(--font-rajdhani), 'Rajdhani', sans-serif;
+  overflow-x: hidden;
+  position: relative;
+  background-image: 
+    linear-gradient(rgba(12, 13, 14, 0.94), rgba(12, 13, 14, 0.96)),
+    repeating-linear-gradient(115deg, rgba(255, 255, 255, 0.015) 0px, rgba(255, 255, 255, 0.015) 1px, transparent 1px, transparent 40px);
+}
+
+.msportPage main,
+.msportPage footer {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Persistent Top Accent Bar: Official BMW M Tri-Color ── */
+.mStripeBar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(115deg, #008ac9 0%, #008ac9 33.33%, #2b115a 33.33%, #2b115a 66.66%, #f11a22 66.66%, #f11a22 100%);
+  z-index: 999;
+}
+
+/* ── Navigation ── */
+.navContainer {
+  position: sticky;
+  top: 4px;
+  z-index: 900;
+  background: rgba(12, 13, 14, 0.88);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.navInner {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brandCluster {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.mInsignia {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  transform: skewX(-14deg);
+}
+
+.stripeBlue {
+  width: 5px;
+  height: 20px;
+  background: #008ac9;
+}
+
+.stripeViolet {
+  width: 5px;
+  height: 20px;
+  background: #2b115a;
+}
+
+.stripeRed {
+  width: 5px;
+  height: 20px;
+  background: #f11a22;
+}
+
+.mLetter {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.05em;
+  color: #ffffff;
+  margin-left: 2px;
+  line-height: 1;
+}
+
+.brandLabel {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.brandSub {
+  font-size: 0.65rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: #8e95a5;
+  letter-spacing: 0.08em;
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.navLink {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8e95a5;
+  text-decoration: none;
+  transition: color 0.15s ease;
+  position: relative;
+}
+
+.navLink:hover {
+  color: #ffffff;
+}
+
+.navLinkActive {
+  color: #008ac9;
+}
+
+.navPaddockBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: #16181b;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.navPaddockBtn:hover {
+  background: #f11a22;
+  border-color: #f11a22;
+  color: #ffffff;
+}
+
+/* ── Hero Section ── */
+.heroSection {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem 5rem;
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.heroContent {
+  display: flex;
+  flex-direction: column;
+}
+
+.telemetryTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.35rem 0.85rem;
+  background: rgba(22, 24, 27, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  width: fit-content;
+  margin-bottom: 1.5rem;
+}
+
+.telemetryDot {
+  width: 6px;
+  height: 6px;
+  background: #008ac9;
+  border-radius: 50%;
+  animation: pulseDot 1.5s infinite;
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.3); }
+}
+
+.telemetryText {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #8e95a5;
+  text-transform: uppercase;
+}
+
+.heroTitle {
+  font-size: clamp(2.5rem, 5vw, 4.5rem);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin-bottom: 1rem;
+}
+
+.heroTitleHighlight {
+  background: linear-gradient(115deg, #ffffff 0%, #008ac9 60%, #f11a22 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.heroSubhead {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #a0a6b5;
+  line-height: 1.4;
+  margin-bottom: 2rem;
+  max-width: 600px;
+}
+
+.heroActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.btnPrimary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.75rem;
+  background: #f11a22;
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), background 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.btnPrimary:hover {
+  background: #d0141b;
+  transform: translateY(-2px);
+}
+
+.btnSecondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1.75rem;
+  background: #16181b;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #ffffff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  transition: transform 0.15s cubic-bezier(0.2, 0, 0, 1), border-color 0.15s ease;
+}
+
+.btnSecondary:hover {
+  border-color: #008ac9;
+  transform: translateY(-2px);
+}
+
+/* ── Telemetry Stat Blocks (0-60 Style) ── */
+.telemetryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 1.5rem;
+}
+
+.statBlock {
+  background: #111316;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 0.85rem 1rem;
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+  position: relative;
+}
+
+.statBlock::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 3px;
+  height: 100%;
+  background: #008ac9;
+}
+
+.statValue {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1;
+  margin-bottom: 0.25rem;
+}
+
+.statLabel {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8e95a5;
+}
+
+/* ── Hero Instrument Cluster (Right Column) ── */
+.clusterCard {
+  background: #121417;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  padding: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.clusterHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.clusterTitle {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.clusterStatus {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  color: #008ac9;
+}
+
+.clusterPhotoWrapper {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  aspect-ratio: 4 / 5;
+  margin: 0 auto 1.5rem;
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  background: #16181b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.clusterPhotoImage {
+  object-fit: cover;
+  object-position: top center;
+  filter: contrast(1.08) grayscale(0.15);
+}
+
+.clusterCrosshair {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 80%;
+  height: 80%;
+  pointer-events: none;
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+}
+
+.clusterFooterTelemetry {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  color: #8e95a5;
+  display: flex;
+  justify-content: space-between;
+  line-height: 1.6;
+}
+
+.clusterFooterTelemetry > div:last-child {
+  text-align: right;
+}
+
+/* ── Section Dividers with 115° Canted Accent ── */
+.sectionDivider {
+  max-width: 1280px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.dividerLine {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dividerStripe {
+  width: 60px;
+  height: 4px;
+  background: linear-gradient(115deg, #008ac9 0%, #008ac9 33.33%, #2b115a 33.33%, #2b115a 66.66%, #f11a22 66.66%, #f11a22 100%);
+  transform: skewX(-14deg);
+}
+
+/* ── Projects Section ── */
+.projectsSection {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 6rem;
+}
+
+.sectionHeader {
+  margin-bottom: 3rem;
+}
+
+.sectionTag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: #008ac9;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+.sectionTitle {
+  font-size: clamp(2rem, 3.5vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: #ffffff;
+  line-height: 1;
+}
+
+/* ── Flagship Project: BYTERS (#1) ── */
+.flagshipCard {
+  background: #111316;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  clip-path: polygon(0 0, calc(100% - 24px) 0, 100% 24px, 100% 100%, 24px 100%, 0 calc(100% - 24px));
+  margin-bottom: 3rem;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+}
+
+.flagshipStripeAccent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 6px;
+  background: linear-gradient(180deg, #008ac9 0%, #2b115a 50%, #f11a22 100%);
+}
+
+.flagshipBody {
+  padding: 3rem 2.5rem 3rem 3rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.flagshipRankBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  background: rgba(241, 26, 34, 0.12);
+  border: 1px solid rgba(241, 26, 34, 0.3);
+  color: #f11a22;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  clip-path: polygon(0 0, calc(100% - 6px) 0, 100% 6px, 100% 100%, 6px 100%, 0 calc(100% - 6px));
+  width: fit-content;
+  margin-bottom: 1rem;
+}
+
+.flagshipTitle {
+  font-size: 2.5rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin-bottom: 0.5rem;
+}
+
+.flagshipSubtitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #8e95a5;
+  margin-bottom: 1.5rem;
+}
+
+.flagshipFeatureList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 1.25rem 0;
+}
+
+.flagshipFeatureItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  font-size: 0.88rem;
+  color: #d1d5db;
+  line-height: 1.4;
+}
+
+.featureDot {
+  width: 6px;
+  height: 6px;
+  background: #008ac9;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.flagshipTelemetryGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.specPill {
+  background: #16181b;
+  padding: 0.6rem 0.85rem;
+  border-left: 2px solid #008ac9;
+}
+
+.specPillLabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: #8e95a5;
+  text-transform: uppercase;
+  margin-bottom: 0.15rem;
+}
+
+.specPillVal {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.flagshipActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: auto;
+}
+
+.flagshipMediaCol {
+  background: #0e1012;
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+.flagshipScreenshotCard {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+}
+
+.flagshipImage {
+  object-fit: cover;
+  transition: transform 0.4s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.flagshipScreenshotCard:hover .flagshipImage {
+  transform: scale(1.04);
+}
+
+/* ── Secondary Projects Grid (#2 QuickDrop & #3 GitChat) ── */
+.secondaryProjectsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
+}
+
+.secondaryCard {
+  background: #111316;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 18px 100%, 0 calc(100% - 18px));
+  padding: 2.25rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: border-color 0.2s ease;
+}
+
+.secondaryCard:hover {
+  border-color: rgba(0, 138, 201, 0.4);
+}
+
+.secondaryCardHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.rankBadgeSmall {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #008ac9;
+  letter-spacing: 0.1em;
+}
+
+.secondaryTitle {
+  font-size: 1.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #ffffff;
+  margin-bottom: 0.35rem;
+}
+
+.secondaryDesc {
+  font-size: 0.92rem;
+  color: #8e95a5;
+  line-height: 1.5;
+  margin-bottom: 1.5rem;
+}
+
+.telemetryBadgeList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.telemetryChip {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  padding: 0.25rem 0.6rem;
+  background: #16181b;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #cfd4dc;
+}
+
+.secondaryActions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: auto;
+}
+
+/* ── Benchmarks & RPM Skills Section ── */
+.benchmarksSection {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem 6rem;
+}
+
+.rpmGaugesGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.gaugeCard {
+  background: #111316;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
+  padding: 1.5rem;
+}
+
+.gaugeHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.75rem;
+}
+
+.gaugeSkillName {
+  font-size: 1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+.gaugeValue {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #f11a22;
+}
+
+.gaugeTrack {
+  width: 100%;
+  height: 8px;
+  background: #1c1f24;
+  clip-path: polygon(0 0, calc(100% - 4px) 0, 100% 4px, 100% 100%, 4px 100%, 0 calc(100% - 4px));
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.gaugeFill {
+  height: 100%;
+  background: linear-gradient(90deg, #008ac9 0%, #2b115a 60%, #f11a22 100%);
+  transition: width 1s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.gaugeNote {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: #8e95a5;
+  text-transform: uppercase;
+}
+
+/* ── Paddock Contact Section ── */
+.paddockSection {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 6rem;
+}
+
+.paddockCard {
+  background: #111316;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  padding: 3rem;
+  position: relative;
+}
+
+.paddockStripe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(115deg, #008ac9 0%, #008ac9 33.33%, #2b115a 33.33%, #2b115a 66.66%, #f11a22 66.66%, #f11a22 100%);
+}
+
+.paddockForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.fieldGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.fieldLabel {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8e95a5;
+}
+
+.fieldInput,
+.fieldSelect,
+.fieldTextarea {
+  background: #16181b;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  padding: 0.85rem 1rem;
+  font-family: var(--font-rajdhani), 'Rajdhani', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
+  transition: border-color 0.15s ease;
+}
+
+.fieldInput:focus,
+.fieldSelect:focus,
+.fieldTextarea:focus {
+  outline: none;
+  border-color: #008ac9;
+  background: #1a1d22;
+}
+
+.fieldTextarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.submitBtn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 2.25rem;
+  background: #f11a22;
+  border: none;
+  color: #ffffff;
+  font-family: var(--font-rajdhani), 'Rajdhani', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.2, 0, 0, 1);
+}
+
+.submitBtn:hover {
+  background: #d0141b;
+  transform: translateY(-2px);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.statusMessage {
+  padding: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+  border-left: 3px solid #008ac9;
+  background: rgba(0, 138, 201, 0.1);
+  color: #ffffff;
+}
+
+/* ── Footer ── */
+.paddockFooter {
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 3rem 1.5rem;
+  background: #090a0b;
+}
+
+.footerInner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+}
+
+.footerCopy {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: #8e95a5;
+}
+
+.footerLinks {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.footerLink {
+  color: #8e95a5;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.footerLink:hover {
+  color: #008ac9;
+}
+
+/* ── Mobile Responsive ── */
+@media (max-width: 900px) {
+  .heroSection {
+    grid-template-columns: 1fr;
+    padding: 3rem 1.5rem;
+  }
+
+  .flagshipCard {
+    grid-template-columns: 1fr;
+  }
+
+  .flagshipMediaCol {
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 1.5rem;
+  }
+
+  .flagshipBody {
+    padding: 2rem 1.5rem;
+  }
+
+  .secondaryProjectsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .rpmGaugesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .telemetryGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+
+  .navLinks {
+    display: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .heroTitle {
+    font-size: clamp(2rem, 8.5vw, 2.5rem);
+  }
+
+  .flagshipTelemetryGrid {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .flagshipActions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .flagshipActions .btnPrimary,
+  .flagshipActions .btnSecondary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .cockpitCluster,
+  .clusterCard {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .telemetryGrid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .clusterFooterTelemetry {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .clusterFooterTelemetry > div:last-child {
+    text-align: left;
+  }
+}

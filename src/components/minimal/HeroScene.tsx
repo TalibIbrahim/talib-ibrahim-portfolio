@@ -1,6 +1,6 @@
 "use client";
 import { useRef, useMemo } from "react";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 
 function FloatingIcosahedron() {
@@ -39,9 +39,10 @@ function Particles() {
   const positions = useMemo(() => {
     const arr = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
-      arr[i * 3] = (Math.random() - 0.5) * 10;
-      arr[i * 3 + 1] = (Math.random() - 0.5) * 10;
-      arr[i * 3 + 2] = (Math.random() - 0.5) * 10;
+      // Deterministic pseudo-random generation to avoid impure Math.random during render
+      arr[i * 3] = ((Math.sin(i * 12.9898) * 43758.5453) % 1) * 10;
+      arr[i * 3 + 1] = ((Math.cos(i * 78.233) * 43758.5453) % 1) * 10;
+      arr[i * 3 + 2] = ((Math.sin(i * 45.164) * 43758.5453) % 1) * 10;
     }
     return arr;
   }, []);

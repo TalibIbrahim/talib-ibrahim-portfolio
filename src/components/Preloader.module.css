@@ -1,0 +1,319 @@
+.preloaderOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background-color: #060608;
+  background-image: 
+    radial-gradient(ellipse at 50% 50%, rgba(204, 255, 0, 0.04) 0%, transparent 70%),
+    linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+  background-size: 100% 100%, 32px 32px, 32px 32px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  box-sizing: border-box;
+  overflow: hidden;
+  user-select: none;
+  pointer-events: all;
+}
+
+/* Ambient scanline sweep */
+.preloaderOverlay::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, rgba(204, 255, 0, 0.6), transparent);
+  box-shadow: 0 0 16px rgba(204, 255, 0, 0.8);
+  opacity: 0.7;
+  animation: scanline 2.2s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes scanline {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+/* Top HUD bar */
+.hudTop {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono, monospace, monospace);
+  font-size: clamp(0.75rem, 1.2vw, 0.875rem);
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.6);
+  z-index: 2;
+}
+
+.hudBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: rgba(204, 255, 0, 0.06);
+  border: 1px solid rgba(204, 255, 0, 0.25);
+  padding: 0.4rem 0.85rem;
+  border-radius: 4px;
+  color: #ccff00;
+  text-transform: uppercase;
+}
+
+.hudDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: #ccff00;
+  box-shadow: 0 0 8px #ccff00;
+  animation: pulseDot 1s ease-in-out infinite alternate;
+}
+
+@keyframes pulseDot {
+  0% { opacity: 0.3; transform: scale(0.85); }
+  100% { opacity: 1; transform: scale(1.15); }
+}
+
+.hudCoords {
+  font-family: var(--font-mono, monospace);
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.skipBtn {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  color: var(--accent, #ccff00);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border, rgba(204, 255, 0, 0.3));
+  border-radius: 4px;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.skipBtn:hover {
+  background: var(--accent, #ccff00);
+  color: #0a0b0e;
+  box-shadow: 0 0 12px rgba(var(--accent-rgb, 204, 255, 0), 0.5);
+}
+
+
+/* Center Stage */
+.centerStage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 640px;
+  padding: 2rem 0;
+  z-index: 2;
+}
+
+.counterWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.counterValue {
+  font-family: var(--font-oswald, var(--font-sans, system-ui));
+  font-size: clamp(4.5rem, 15vw, 9.5rem);
+  font-weight: 700;
+  line-height: 0.95;
+  color: #ffffff;
+  letter-spacing: -0.04em;
+  display: flex;
+  align-items: baseline;
+  text-shadow: 0 0 35px rgba(204, 255, 0, 0.3);
+}
+
+.percentSymbol {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 500;
+  color: #ccff00;
+  margin-left: 0.3rem;
+  opacity: 0.9;
+}
+
+/* Progress bar styled like an F1 telemetry rev meter */
+.progressBarWrapper {
+  width: 100%;
+  max-width: 440px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 2px;
+  margin: 1.75rem 0 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.progressBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #99dd00, #ccff00);
+  box-shadow: 0 0 16px rgba(204, 255, 0, 0.85);
+  border-radius: 2px;
+  transition: width 0.06s linear;
+}
+
+/* Terminal Status Log line */
+.statusLogLine {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono, monospace);
+  font-size: clamp(0.7rem, 1.2vw, 0.825rem);
+  letter-spacing: 0.12em;
+  color: #ccff00;
+  background: rgba(204, 255, 0, 0.05);
+  border: 1px solid rgba(204, 255, 0, 0.15);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  max-width: 90%;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statusLogPrompt {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.statusLogText {
+  color: #f4f4ed;
+}
+
+.cursorBlink {
+  color: #ccff00;
+  animation: blink 0.7s steps(2, start) infinite;
+}
+
+@keyframes blink {
+  to { visibility: hidden; }
+}
+
+/* Bracket corners */
+.bracketLeft,
+.bracketRight {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 120px;
+  border-color: rgba(204, 255, 0, 0.35);
+  pointer-events: none;
+}
+
+.bracketLeft {
+  left: 0;
+  border-left: 2px solid rgba(204, 255, 0, 0.4);
+  border-top: 2px solid rgba(204, 255, 0, 0.4);
+  border-bottom: 2px solid rgba(204, 255, 0, 0.4);
+}
+
+.bracketRight {
+  right: 0;
+  border-right: 2px solid rgba(204, 255, 0, 0.4);
+  border-top: 2px solid rgba(204, 255, 0, 0.4);
+  border-bottom: 2px solid rgba(204, 255, 0, 0.4);
+}
+
+/* Bottom HUD bar */
+.hudBottom {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-mono, monospace);
+  font-size: clamp(0.65rem, 1vw, 0.75rem);
+  letter-spacing: 0.15em;
+  color: rgba(255, 255, 255, 0.35);
+  z-index: 2;
+}
+
+.telemetryTag {
+  display: inline-block;
+}
+
+/* ══════════════════════════════════════════════════
+   NOTHING THEME PRELOADER ADAPTATIONS
+   ══════════════════════════════════════════════════ */
+
+:global([data-theme="nothing"]) .preloaderOverlay {
+  background: #000000;
+}
+
+:global([data-theme="nothing"]) .hudDot {
+  background: #D71921;
+  box-shadow: 0 0 10px #D71921;
+}
+
+:global([data-theme="nothing"]) .skipBtn {
+  border-radius: 0px !important;
+  color: #D71921;
+  border-color: rgba(215, 25, 33, 0.4);
+}
+
+:global([data-theme="nothing"]) .skipBtn:hover {
+  background: #D71921;
+  color: #ffffff;
+  box-shadow: 0 0 14px rgba(215, 25, 33, 0.5);
+}
+
+:global([data-theme="nothing"]) .counterValue {
+  text-shadow: 0 0 35px rgba(215, 25, 33, 0.35);
+}
+
+:global([data-theme="nothing"]) .percentSymbol {
+  color: #D71921;
+}
+
+:global([data-theme="nothing"]) .progressBarWrapper {
+  border-radius: 0px !important;
+}
+
+:global([data-theme="nothing"]) .progressBarFill {
+  background: #D71921;
+  box-shadow: 0 0 16px rgba(215, 25, 33, 0.6);
+  border-radius: 0px !important;
+}
+
+:global([data-theme="nothing"]) .statusLogLine {
+  border-radius: 0px !important;
+  color: #D71921;
+  border-color: rgba(215, 25, 33, 0.3);
+  background: rgba(215, 25, 33, 0.08);
+}
+
+:global([data-theme="nothing"]) .cursorBlink {
+  color: #D71921;
+}
+
+:global([data-theme="nothing"]) .bracketLeft,
+:global([data-theme="nothing"]) .bracketRight {
+  border-color: rgba(215, 25, 33, 0.4);
+}
+
+@media (max-width: 768px) {
+  .hudBottom {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  .bracketLeft,
+  .bracketRight {
+    display: none;
+  }
+  .statusLogLine {
+    white-space: normal;
+  }
+}

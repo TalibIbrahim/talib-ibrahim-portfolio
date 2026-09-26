@@ -1,5 +1,5 @@
 "use client";
-import { socials } from "@/data/portfolio";
+import { socials } from "@/data/minimalPortfolio";
 import styles from "./Footer.module.css";
 
 export default function Footer() {

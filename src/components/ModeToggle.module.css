@@ -1,0 +1,230 @@
+.fixedWrapper {
+  position: fixed;
+  top: 1.5rem;
+  right: 8.5rem;
+  z-index: 800;
+  pointer-events: auto;
+}
+
+.magnetInner {
+  display: inline-flex;
+}
+
+/* Base button */
+.toggleBtn {
+  appearance: none;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.45rem 0.85rem 0.45rem 0.75rem;
+  font-family: var(--font-sans);
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition:
+    background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    box-shadow 0.2s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toggleBtn:focus-visible {
+  outline: 2px solid #ccff00;
+  outline-offset: 3px;
+}
+
+/* Hyper Mode Style: Sleek dark pill with neon accents */
+.hyperBtn {
+  background: rgba(13, 13, 16, 0.88);
+  border: 1px solid rgba(204, 255, 0, 0.28);
+  border-radius: 9999px;
+  color: #f5f5f5;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.6),
+    inset 0 0 12px rgba(204, 255, 0, 0.04);
+}
+
+.hyperBtn:hover {
+  border-color: rgba(204, 255, 0, 0.7);
+  box-shadow:
+    0 4px 24px rgba(204, 255, 0, 0.22),
+    inset 0 0 16px rgba(204, 255, 0, 0.08);
+}
+
+/* Pulsing Neon Dot */
+.pulsingDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #ccff00;
+  box-shadow: 0 0 8px #ccff00;
+  flex-shrink: 0;
+  animation: pulseNeon 1.8s infinite ease-in-out;
+}
+
+@keyframes pulseNeon {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.6;
+    box-shadow: 0 0 4px #ccff00;
+  }
+  50% {
+    transform: scale(1.25);
+    opacity: 1;
+    box-shadow: 0 0 12px #ccff00;
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0.6;
+    box-shadow: 0 0 4px #ccff00;
+  }
+}
+
+/* Hyper Mode Label */
+.hyperLabel {
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #ffffff;
+}
+
+/* Hyper Sub-Badge */
+.hyperBadge {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: #ccff00;
+  background: rgba(204, 255, 0, 0.12);
+  border: 1px solid rgba(204, 255, 0, 0.35);
+  border-radius: 4px;
+  padding: 0.15rem 0.45rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* Boring Mode Style: Brutalist monospace gray/white pill */
+.boringBtn {
+  background: #f4f4f5;
+  border: 2px solid #000000;
+  border-radius: 9999px;
+  color: #000000;
+  box-shadow: 3px 3px 0px #000000;
+}
+
+.boringBtn:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px #000000;
+  background: #ffffff;
+}
+
+.boringBtn:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px #000000;
+}
+
+/* Boring Square Indicator */
+.boringSquare {
+  width: 7px;
+  height: 7px;
+  background: #000000;
+  flex-shrink: 0;
+}
+
+/* Boring Mode Label */
+.boringLabel {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #000000;
+}
+
+/* Boring Sub-Badge */
+.boringBadge {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #ffffff;
+  background: #000000;
+  border: 1px solid #000000;
+  border-radius: 2px;
+  padding: 0.15rem 0.45rem;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+/* ══════════════════════════════════════════════════
+   NOTHING THEME MODE TOGGLE ADAPTATIONS
+   ══════════════════════════════════════════════════ */
+
+:global([data-theme="nothing"]) .hyperBtn {
+  border-radius: 0px !important;
+  background: rgba(12, 12, 12, 0.95);
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+:global([data-theme="nothing"]) .hyperBtn:hover {
+  border-color: #D71921;
+  box-shadow: 0 0 16px rgba(215, 25, 33, 0.25);
+}
+
+:global([data-theme="nothing"]) .neonDot {
+  background: #D71921;
+  box-shadow: 0 0 8px #D71921;
+}
+
+:global([data-theme="nothing"]) .hyperBadge {
+  border-radius: 0px !important;
+  color: #D71921;
+  background: rgba(215, 25, 33, 0.12);
+  border-color: rgba(215, 25, 33, 0.35);
+}
+
+/* Light Mode Nothing Theme Mode Toggle */
+:global([data-theme="nothing"][data-mode="light"]) .hyperBtn,
+:global([data-theme-variant="nothing-light"]) .hyperBtn {
+  background: rgba(255, 255, 255, 0.95);
+  border-color: rgba(0, 0, 0, 0.16);
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .hyperBtn:hover,
+:global([data-theme-variant="nothing-light"]) .hyperBtn:hover {
+  border-color: #D71921;
+  box-shadow: 0 2px 14px rgba(215, 25, 33, 0.18);
+}
+
+:global([data-theme="nothing"][data-mode="light"]) .hyperLabel,
+:global([data-theme-variant="nothing-light"]) .hyperLabel {
+  color: #000000;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .fixedWrapper {
+    top: 1rem;
+    right: 5.8rem;
+  }
+
+  .toggleBtn {
+    padding: 0.35rem 0.65rem 0.35rem 0.55rem;
+    gap: 0.45rem;
+  }
+
+  .hyperLabel,
+  .boringLabel {
+    font-size: 0.72rem;
+  }
+
+  .hyperBadge,
+  .boringBadge {
+    font-size: 0.62rem;
+    padding: 0.1rem 0.35rem;
+  }
+}

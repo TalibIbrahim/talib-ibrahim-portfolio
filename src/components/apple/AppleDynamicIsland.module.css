@@ -1,0 +1,378 @@
+/* ═════════════════════════════════════════════════════════════════
+   APPLE DYNAMIC ISLAND — CSS MODULE
+   Obsidian black fluid capsule with spring physics & interactive state
+   ═════════════════════════════════════════════════════════════════ */
+
+.islandContainer {
+  position: fixed;
+  top: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1002;
+  user-select: none;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", var(--font-inter), sans-serif;
+  color: #f5f5f7;
+}
+
+.islandPill {
+  background: #000000;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6),
+              inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.islandPill:hover {
+  border-color: rgba(255, 255, 255, 0.22);
+  box-shadow: 0 14px 40px rgba(0, 0, 0, 0.8),
+              inset 0 1px 1px rgba(255, 255, 255, 0.25);
+}
+
+.islandPillExpanded {
+  cursor: default;
+  border-color: rgba(255, 255, 255, 0.16);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.9),
+              0 0 0 1px rgba(255, 255, 255, 0.08),
+              inset 0 1px 1px rgba(255, 255, 255, 0.2);
+}
+
+/* ══════════════════════════════════════════════════
+   COMPACT RESTING STATE (~140px x 36px)
+   ══════════════════════════════════════════════════ */
+.compactRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  padding: 0 10px;
+}
+
+.compactLeft {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.cameraAperture {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #08080a;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: inset 0 0 3px rgba(0, 113, 227, 0.35);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cameraLensReflection {
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(120, 180, 255, 0.7);
+  box-shadow: 0 0 2px rgba(120, 180, 255, 0.9);
+}
+
+.compactTitle {
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.compactRight {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.liveDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #30D158;
+  box-shadow: 0 0 8px rgba(48, 209, 88, 0.8);
+  animation: liveDotPulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes liveDotPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+    box-shadow: 0 0 8px rgba(48, 209, 88, 0.8);
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+    box-shadow: 0 0 12px rgba(48, 209, 88, 1);
+  }
+}
+
+/* 4-Bar Equalizer Waveform */
+.equalizer {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 12px;
+}
+
+.eqBar {
+  width: 2px;
+  background: #30D158;
+  border-radius: 1px;
+}
+
+.eqBar1 {
+  height: 6px;
+  animation: eqBounce1 0.85s ease-in-out infinite alternate;
+}
+
+.eqBar2 {
+  height: 11px;
+  animation: eqBounce2 0.7s ease-in-out infinite alternate;
+}
+
+.eqBar3 {
+  height: 8px;
+  animation: eqBounce3 0.95s ease-in-out infinite alternate;
+}
+
+.eqBar4 {
+  height: 12px;
+  animation: eqBounce4 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes eqBounce1 {
+  0% { height: 4px; }
+  100% { height: 11px; }
+}
+
+@keyframes eqBounce2 {
+  0% { height: 12px; }
+  100% { height: 5px; }
+}
+
+@keyframes eqBounce3 {
+  0% { height: 5px; }
+  100% { height: 12px; }
+}
+
+@keyframes eqBounce4 {
+  0% { height: 11px; }
+  100% { height: 6px; }
+}
+
+/* ══════════════════════════════════════════════════
+   EXPANDED INTERACTIVE STATE (~380px x 168px)
+   ══════════════════════════════════════════════════ */
+.expandedContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  padding: 14px 18px 14px;
+}
+
+/* Header Row */
+.expandedHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.trueDepthCutout {
+  width: 44px;
+  height: 11px;
+  border-radius: 999px;
+  background: #09090b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 4px;
+}
+
+.trueDepthDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #0f172a;
+  border: 1px solid rgba(0, 113, 227, 0.4);
+}
+
+.statusHireBadge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: #30D158;
+  background: rgba(48, 209, 88, 0.12);
+  border: 1px solid rgba(48, 209, 88, 0.3);
+  border-radius: 999px;
+  padding: 2px 8px;
+  text-transform: uppercase;
+}
+
+.devLiveTag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  color: #86868b;
+  letter-spacing: 0.06em;
+}
+
+/* Center Content Row */
+.expandedCenter {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 4px 0;
+}
+
+.expandedEqWrapper {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.expandedEqWrapper .equalizer {
+  height: 16px;
+  gap: 2.5px;
+}
+
+.expandedEqWrapper .eqBar {
+  width: 2.5px;
+  background: #30D158;
+}
+
+.expandedInfo {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.expandedTitle {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #f5f5f7;
+  letter-spacing: -0.015em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.expandedSubtitle {
+  font-size: 0.73rem;
+  color: #86868b;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Action Footer Row */
+.expandedFooter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.actionBtn {
+  flex: 1;
+  padding: 6px 10px;
+  border-radius: 9999px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  font-size: 0.68rem;
+  font-weight: 600;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.10);
+  color: #f5f5f7;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.actionBtn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.28);
+  transform: translateY(-0.5px);
+}
+
+.actionBtn:focus-visible {
+  outline: 2px solid #0071e3;
+  outline-offset: 1px;
+}
+
+.actionBtnCopied {
+  background: rgba(48, 209, 88, 0.2) !important;
+  border-color: rgba(48, 209, 88, 0.4) !important;
+  color: #30D158 !important;
+}
+
+.actionBtnPrimary {
+  background: rgba(0, 113, 227, 0.35);
+  border-color: rgba(0, 113, 227, 0.6);
+  color: #ffffff;
+}
+
+.actionBtnPrimary:hover {
+  background: rgba(0, 113, 227, 0.55);
+}
+
+.actionBtnSecondary {
+  /* secondary action button style */
+}
+
+/* ── Responsive Adaptations ── */
+@media (max-width: 480px) {
+  .expandedContainer {
+    padding: 12px 14px 12px;
+  }
+
+  .expandedFooter {
+    gap: 5px;
+  }
+
+  .actionBtn {
+    padding: 5px 6px;
+    font-size: 0.64rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .expandedActions,
+  .expandedFooter {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    justify-content: center;
+  }
+
+  .actionBtn,
+  .actionBtnPrimary,
+  .actionBtnSecondary {
+    flex: 1 1 calc(50% - 0.4rem);
+    min-width: 100px;
+    font-size: 0.68rem;
+    padding: 0.4rem 0.5rem;
+  }
+}

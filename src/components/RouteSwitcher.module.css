@@ -1,0 +1,248 @@
+.switcherWrapper {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 9999;
+  font-family: var(--font-sans);
+  pointer-events: auto;
+}
+
+@supports (bottom: max(0px)) {
+  .switcherWrapper {
+    bottom: max(1.5rem, env(safe-area-inset-bottom, 1.5rem));
+    right: max(1.5rem, env(safe-area-inset-right, 1.5rem));
+  }
+}
+
+.capsuleContainer {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+/* Expanded Drawer */
+.drawer {
+  position: absolute;
+  bottom: calc(100% + 0.6rem);
+  right: 0;
+  width: 250px;
+  background: rgba(14, 15, 18, 0.94);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.15));
+  border-radius: 14px;
+  padding: 0.65rem;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  user-select: none;
+}
+
+:global([data-mode="light"]) .drawer {
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.06);
+}
+
+.drawerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.35rem 0.5rem 0.55rem;
+  border-bottom: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  margin-bottom: 0.4rem;
+}
+
+.drawerTitle {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: var(--text-muted, #888);
+}
+
+.drawerMeta {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: var(--accent, #ccff00);
+  background: rgba(var(--accent-rgb, 204, 255, 0), 0.12);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
+.routeGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.routeItem {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 8px;
+  text-decoration: none;
+  color: var(--text-secondary, #aaa);
+  transition: all 0.18s ease;
+  background: transparent;
+}
+
+.routeItem:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-primary, #fff);
+}
+
+:global([data-mode="light"]) .routeItem:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: #000;
+}
+
+.routeItemActive {
+  background: rgba(var(--accent-rgb, 204, 255, 0), 0.12) !important;
+  color: var(--text-primary, #fff) !important;
+  border: 1px solid var(--accent, #ccff00);
+}
+
+:global([data-mode="light"]) .routeItemActive {
+  color: #000 !important;
+}
+
+.routeIconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.05);
+  flex-shrink: 0;
+}
+
+:global([data-mode="light"]) .routeIconWrapper {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.routeItemActive .routeIconWrapper {
+  background: var(--accent, #ccff00);
+  color: #000;
+}
+
+.routeInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex-grow: 1;
+  min-width: 0;
+}
+
+.routeTopLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.routeName {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary, #fff);
+}
+
+:global([data-mode="light"]) .routeName {
+  color: #000;
+}
+
+.routeDesc {
+  font-size: 0.66rem;
+  color: var(--text-muted, #777);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.activePip {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--accent, #ccff00);
+  box-shadow: 0 0 6px var(--accent, #ccff00);
+}
+
+/* Persistent Trigger Pill */
+.triggerPill {
+  appearance: none;
+  background: rgba(14, 15, 18, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.16));
+  border-radius: 9999px;
+  padding: 0.35rem 0.75rem 0.35rem 0.65rem;
+  cursor: pointer;
+  outline: none;
+  color: var(--text-primary, #fff);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+:global([data-mode="light"]) .triggerPill {
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  color: #000;
+}
+
+.triggerPill:hover {
+  border-color: var(--accent, #ccff00);
+  transform: translateY(-1px);
+}
+
+.triggerPillOpen {
+  border-color: var(--accent, #ccff00);
+  background: rgba(22, 24, 30, 0.96);
+}
+
+.triggerInner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.currentIcon {
+  color: var(--accent, #ccff00);
+}
+
+.currentName {
+  letter-spacing: -0.01em;
+}
+
+.triggerBadge {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-muted, #777);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 0.1rem 0.3rem;
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+}
+
+:global([data-mode="light"]) .triggerBadge {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+.chevron {
+  color: var(--text-muted, #888);
+  transition: transform 0.2s ease;
+}
+
+.chevronRotated {
+  transform: rotate(180deg);
+}
+
+@media (max-width: 640px) {
+  .switcherWrapper {
+    bottom: 1rem;
+    right: 1rem;
+  }
+}

@@ -1,0 +1,74 @@
+/* ═════════════════════════════════════════════════════════════════
+   NOTHING PHONE TRANSPARENT BACK PANEL — VECTOR BACKGROUND
+   High-Fidelity Carl Pei Industrial Aesthetic
+   Light Substrate (#F5F5F7), Pure Vector SVG, Non-scaling Strokes
+   ═════════════════════════════════════════════════════════════════ */
+
+.backgroundWrapper {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  opacity: 0.85;
+  transition: opacity 0.4s ease;
+}
+
+.svgChassis {
+  width: 100%;
+  height: 100%;
+  max-width: 980px;
+  max-height: 98vh;
+  user-select: none;
+}
+
+/* ── Surgical Red Tally Pulse ── */
+@keyframes tallyPulse {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 6px rgba(215, 25, 33, 0.85)) drop-shadow(0 0 14px rgba(215, 25, 33, 0.4));
+  }
+  50% {
+    opacity: 0.35;
+    filter: drop-shadow(0 0 2px rgba(215, 25, 33, 0.3));
+  }
+}
+
+.redTallyDot {
+  animation: tallyPulse 1.8s ease-in-out infinite;
+}
+
+/* ── Glyph Diffuser Breathing ── */
+@keyframes glyphGlow {
+  0%, 100% {
+    opacity: 0.95;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+.glyphStrip {
+  animation: glyphGlow 4.5s ease-in-out infinite;
+}
+
+/* ── Responsive Adaptations ── */
+@media (max-width: 768px) {
+  .backgroundWrapper {
+    opacity: 0.72;
+  }
+
+  .svgChassis {
+    max-width: 100vw;
+    max-height: 100vh;
+  }
+}
+
+@media (min-width: 1440px) {
+  .svgChassis {
+    max-width: 1080px;
+  }
+}
