@@ -1,0 +1,191 @@
+/* ============================================================
+   TIMELINE (experience + education)
+   Stack ends on paper; this section is the ink that strikes through it. The section itself is
+   paper (continuing Stack) and the dark [data-sheet] is wiped in over it, led by an accent band.
+   Base (no JS, reduced motion): the sheet is fully visible and covers the paper, plain flow.
+   GSAP animates [data-sheet] / [data-wipe-ink] (clip-path), [data-depth] (y),
+   [data-entry] / [data-cert] (x, y, opacity, clip-path). None of them carry a CSS transform.
+   ============================================================ */
+
+.section {
+  position: relative;
+  z-index: 2; /* above Contact, which waits underneath */
+  isolation: isolate;
+  background: var(--c-fg); /* the paper the strike crosses */
+}
+
+.ink {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: var(--c-accent);
+  pointer-events: none;
+}
+:global(html.motion) .ink { display: block; }
+
+.sheet {
+  position: relative;
+  z-index: 1;
+  background: var(--c-bg);
+  color: var(--c-fg);
+  padding: calc(var(--u) * 14) var(--gutter) calc(var(--u) * 11);
+}
+
+/* ---------- heading ---------- */
+.head {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  column-gap: var(--gutter);
+  padding-bottom: calc(var(--u) * 8);
+}
+.title {
+  grid-column: 1 / span 9;
+  font-family: var(--f-display);
+  font-size: var(--t-xl);
+  letter-spacing: var(--track-xl);
+  line-height: 0.92;
+}
+
+/* ---------- layers ---------- */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  column-gap: var(--gutter);
+  row-gap: calc(var(--u) * 10);
+  align-items: start;
+}
+.layer { min-width: 0; }
+.layerA { grid-column: 1 / span 7; grid-row: 1; }
+.layerB { grid-column: 9 / span 4; grid-row: 1; margin-top: calc(var(--u) * 14); }
+.layerC { grid-column: 5 / span 8; grid-row: 2; margin-top: calc(var(--u) * 10); }
+
+.label {
+  font-size: var(--t-xs);
+  letter-spacing: 0.04em;
+  font-family: var(--f-mono);
+  text-transform: uppercase;
+  color: var(--c-muted);
+  padding-bottom: calc(var(--u) * 1.5);
+}
+
+.entries {
+  list-style: none;
+  padding: 0;
+  display: grid;
+}
+.entry {
+  padding-block: calc(var(--u) * 3) calc(var(--u) * 4);
+  border-top: 1px solid var(--c-line);
+}
+.entry:last-child { padding-bottom: 0; }
+
+.dates {
+  display: flex;
+  gap: 1.25em;
+  align-items: baseline;
+  font-size: var(--t-s);
+  font-variant-numeric: tabular-nums;
+  color: var(--c-muted);
+}
+.index {
+  color: var(--c-accent-text);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+
+.role {
+  margin-top: calc(var(--u) * 1.5);
+  font-family: var(--f-display);
+  font-size: var(--t-l);
+  letter-spacing: var(--track-l);
+  line-height: 0.95;
+}
+.org {
+  margin-top: calc(var(--u) * 1.25);
+  font-size: var(--t-body);
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 1em;
+}
+.place { color: var(--c-muted); }
+
+.points {
+  margin-top: calc(var(--u) * 2);
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: calc(var(--u) * 1);
+  max-width: 58ch;
+  color: color-mix(in oklab, var(--c-fg) 88%, var(--c-bg));
+}
+.points li {
+  position: relative;
+  padding-left: 1.4em;
+}
+.points li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.78em;
+  width: 0.45em;
+  height: 1px;
+  background: currentColor;
+}
+
+/* Education */
+.edu .role { font-size: var(--t-l); }
+.gpa {
+  margin-top: calc(var(--u) * 3);
+  display: flex;
+  align-items: baseline;
+  gap: 1em;
+  padding-top: calc(var(--u) * 1.5);
+  border-top: 1px solid var(--c-line);
+}
+.gpaLabel {
+  font-size: var(--t-xs);
+  letter-spacing: 0.04em;
+  font-family: var(--f-mono);
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.gpaValue {
+  font-family: var(--f-display);
+  font-size: var(--t-xl);
+  letter-spacing: var(--track-xl);
+  line-height: 0.9;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Certifications: compact list */
+.certs {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  border-top: 1px solid var(--c-line);
+}
+.cert {
+  display: flex;
+  gap: 1.25em;
+  align-items: baseline;
+  padding-block: calc(var(--u) * 1.5);
+  border-bottom: 1px solid var(--c-line);
+  font-size: var(--t-s);
+}
+
+/* ---------- phones: one column, document order ---------- */
+@media (max-width: 767px) {
+  .sheet { padding-block: calc(var(--u) * 12) calc(var(--u) * 10); }
+  .title { grid-column: 1 / -1; }
+  .head { padding-bottom: calc(var(--u) * 6); }
+  .grid { row-gap: calc(var(--u) * 8); }
+  .layerA, .layerB, .layerC { grid-column: 1 / -1; grid-row: auto; margin-top: 0; }
+  .certs { grid-template-columns: 1fr; }
+}
+@media (min-width: 768px) and (max-width: 1099px) {
+  .layerA { grid-column: 1 / span 7; }
+  .layerB { grid-column: 8 / span 5; }
+  .layerC { grid-column: 1 / -1; }
+}

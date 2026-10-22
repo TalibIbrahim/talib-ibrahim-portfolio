@@ -1,0 +1,33 @@
+.roll {
+  position: relative;
+  display: inline-block;
+  overflow: clip;
+  vertical-align: bottom;
+  line-height: 1.2;
+}
+.line {
+  display: block;
+  white-space: nowrap;
+}
+.copy {
+  position: absolute;
+  inset: 0;
+  translate: 0 100%;
+}
+.ch {
+  display: inline-block;
+  transition: translate 0.6s var(--ease-out);
+  transition-delay: calc(var(--i) * 18ms);
+}
+.copy .ch { translate: 0 0; }
+
+:is(a, button):hover .roll .ch,
+:is(a, button):focus-visible .roll .ch {
+  translate: 0 -100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .copy { display: none; }
+  :is(a, button):hover .roll .ch,
+  :is(a, button):focus-visible .roll .ch { translate: none; }
+}

@@ -1,0 +1,98 @@
+/* 404: a page that was never signed. The stroke draws on load (CSS only), stops short, and the
+   dotted guide shows the rest. Reduced motion: the global rule settles it at its end state. */
+.page {
+  min-height: 100svh;
+  display: grid;
+  align-content: center;
+  gap: calc(var(--u) * 4);
+  padding: calc(var(--header-h) + var(--u) * 2) var(--gutter) calc(var(--u) * 6);
+}
+
+.sign { width: min(100%, 36rem); }
+.svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ink {
+  stroke: var(--c-fg);
+  stroke-width: 3.5;
+  stroke-dasharray: 57 200;
+  stroke-dashoffset: 0;
+  animation: draw 1.8s var(--ease-out) 0.35s both;
+}
+.guide {
+  stroke: var(--c-muted);
+  stroke-width: 1.5;
+  stroke-dasharray: 0.6 1.6;
+  opacity: 0.7;
+  animation: appear 1.2s var(--ease-soft) 1.4s both;
+}
+.line {
+  stroke: var(--c-line);
+  stroke-width: 1;
+  stroke-dasharray: 100 100;
+  animation: rule 1.2s var(--ease-wipe) 0s both;
+}
+.cross {
+  stroke: var(--c-accent);
+  stroke-width: 2;
+  animation: appear 0.6s var(--ease-soft) 0.1s both;
+}
+
+@keyframes draw { from { stroke-dashoffset: 57; } to { stroke-dashoffset: 0; } }
+@keyframes rule { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+@keyframes appear { from { opacity: 0; } }
+
+.copy {
+  display: grid;
+  justify-items: start;
+  gap: calc(var(--u) * 2.5);
+  max-width: 60rem;
+}
+.code {
+  font-size: var(--t-xs);
+  letter-spacing: 0.04em;
+  color: var(--c-accent-text);
+  font-variant-numeric: tabular-nums;
+}
+.title {
+  font-family: var(--f-display);
+  font-size: var(--t-xl);
+  letter-spacing: var(--track-xl);
+  line-height: 0.92;
+  max-width: 14ch;
+}
+.title :global(.split-line) {
+  padding-block: 0.04em 0.12em;
+  margin-block: -0.04em -0.12em;
+}
+.text {
+  max-width: 46ch;
+  color: rgb(236 232 223 / 0.82);
+}
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  min-height: 3.25rem;
+  padding: 0.5em 0;
+  border-bottom: 1px solid var(--c-fg);
+  font-family: var(--f-display);
+  font-size: var(--t-m);
+  letter-spacing: -0.015em;
+}
+.arrow {
+  width: 1em;
+  height: 1em;
+  color: var(--c-accent);
+  transition: translate 0.45s var(--ease-soft);
+}
+.cta:focus-visible .arrow { translate: 0.15em -0.15em; }
+@media (hover: hover) and (pointer: fine) {
+  .cta:hover .arrow { translate: 0.15em -0.15em; }
+}
+.cta:active { scale: 0.985; }
+

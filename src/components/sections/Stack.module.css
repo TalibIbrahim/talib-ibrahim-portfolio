@@ -1,0 +1,166 @@
+/* ============================================================
+   STACK: a paper page that turns in over the desk.
+   Base (no JS, reduced motion): desktop = 2x2 grid of groups; phones = scroll-snap row.
+   [data-pan] (desktop + motion, set by Stack.tsx): one pinned horizontal type strip.
+   GSAP-animated elements (.turn, .strip, [data-arrive], .chip, .bar) carry no CSS transform.
+   ============================================================ */
+.section {
+  --paper-muted: #57534c; /* 6.2:1 on paper */
+  position: relative;
+  z-index: 2; /* the turning page passes over the end of the showreel */
+}
+.turn {
+  position: relative;
+  background: var(--c-fg);
+  color: var(--c-bg);
+  overflow: clip;
+}
+.turn ::selection { background: var(--c-bg); color: var(--c-fg); }
+
+.strip {
+  display: grid;
+  gap: calc(var(--u) * 8);
+  padding: calc(var(--u) * 14) var(--gutter) calc(var(--u) * 14);
+}
+.intro {
+  display: grid;
+  gap: calc(var(--u) * 2);
+  align-content: end;
+}
+.title {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: var(--t-mega);
+  line-height: 0.86;
+  letter-spacing: var(--track-mega);
+  margin-left: -0.04em;
+}
+.count,
+.index {
+  font-size: var(--t-xs);
+  letter-spacing: 0.04em;
+  font-family: var(--f-mono);
+  text-transform: uppercase;
+  color: var(--paper-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.groups {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: calc(var(--u) * 8) var(--gutter);
+}
+.groups:focus-visible { outline: 2px solid var(--c-accent); outline-offset: -4px; } /* inset: the strip clips anything outside it */
+.arrive {
+  display: grid;
+  gap: calc(var(--u) * 1.75);
+  align-content: start;
+}
+.name {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: var(--t-xl);
+  line-height: 0.9;
+  letter-spacing: var(--track-xl);
+  text-wrap: nowrap;
+}
+.chips {
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.chip {
+  font-size: var(--t-s);
+  line-height: 1.2;
+  padding: 0.5em 0.85em;
+  border: 1px solid rgb(11 11 12 / 0.28);
+  white-space: nowrap;
+}
+.progress { display: none; }
+
+/* ---------- desktop + motion: the pinned type strip ---------- */
+.section[data-pan] .turn { height: 100svh; }
+.section[data-pan] .strip {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: calc(var(--u) * 14);
+  width: max-content;
+  height: 100%;
+  padding: calc(var(--header-h) + var(--u) * 4) calc(var(--gutter) * 3) calc(var(--u) * 8) var(--gutter);
+}
+.section[data-pan] .intro {
+  width: 44vw;
+  flex: none;
+  align-content: center;
+}
+.section[data-pan] .groups {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: calc(var(--u) * 14);
+}
+.section[data-pan] .group {
+  flex: none;
+  display: flex;
+}
+/* Each group sits at its own height on the strip, so the line reads like set type, not cards. */
+.section[data-pan] .group:nth-child(4n + 1) { align-items: flex-end; }
+.section[data-pan] .group:nth-child(4n + 2) { align-items: flex-start; }
+.section[data-pan] .group:nth-child(4n + 3) { align-items: center; }
+.section[data-pan] .group:nth-child(4n + 4) { align-items: flex-end; padding-bottom: 8svh; }
+.section[data-pan] .arrive {
+  width: min-content; /* chips wrap to the width of the name (or 26rem) */
+}
+.section[data-pan] .name { font-size: clamp(5rem, 1.5rem + 8vw, 11rem); }
+.section[data-pan] .chips { min-width: 26rem; }
+.section[data-pan] .progress {
+  display: block;
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: calc(var(--u) * 4);
+  height: 1px;
+  background: rgb(11 11 12 / 0.14);
+}
+.bar {
+  position: absolute;
+  inset: 0;
+  background: var(--c-bg);
+  transform-origin: 0 50%;
+}
+
+/* ---------- phones: native scroll-snap row ---------- */
+@media (max-width: 767px) {
+  .strip {
+    gap: calc(var(--u) * 6);
+    padding-inline: 0;
+    padding-block: calc(var(--u) * 12);
+  }
+  .intro { padding-inline: var(--gutter); }
+  .groups {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--gutter);
+    padding-inline: var(--gutter);
+    padding-bottom: calc(var(--u) * 2);
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+  }
+  .group {
+    flex: 0 0 84%;
+    scroll-snap-align: start;
+    padding: calc(var(--u) * 3) calc(var(--u) * 2.5);
+    border: 1px solid rgb(11 11 12 / 0.2);
+  }
+  .name {
+    font-size: clamp(2.4rem, 11vw, 3.25rem);
+    text-wrap: balance;
+  }
+  .chip { font-size: var(--t-xs); }
+}
