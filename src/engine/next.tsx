@@ -11,6 +11,7 @@ export function Engine({ setup }: { setup?: () => void }) {
   const pathname = usePathname();
   const mode = useRef<'idle' | 'push' | 'pop'>('idle');
   const first = useRef(true);
+  const hash = useRef(''); // the target's #anchor, known at click time (the URL updates later)
 
   useEffect(() => {
     boot(setup);
@@ -29,6 +30,7 @@ export function Engine({ setup }: { setup?: () => void }) {
       mode.current = 'push';
       setTransitionOrigin(e.clientX, e.clientY);
       const href = url.pathname + url.search + url.hash;
+      hash.current = url.hash;
       router.prefetch(href);
       await leave();
       cleanup();
@@ -53,7 +55,8 @@ export function Engine({ setup }: { setup?: () => void }) {
     }
     const pop = mode.current === 'pop';
     mode.current = 'idle';
-    enter({ transition: !pop, scrollTop: !pop });
+    enter({ transition: !pop, scrollTop: !pop, hash: pop ? '' : hash.current });
+    hash.current = '';
   }, [pathname]);
 
   return null;

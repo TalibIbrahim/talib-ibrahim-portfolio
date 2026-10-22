@@ -1,9 +1,10 @@
 /* ============================================================
-   CONTACT (finale + footer)
-   The finale is paper again: the dark Timeline sheet slides off it.
-   Base (no JS, reduced motion): plain flow under the Timeline, everything visible.
-   GSAP animates [data-under] (y, scale), [data-dim] (opacity) and [data-char] (yPercent).
-   None of them carry a CSS transform. The hover roll moves .ca / .cb with `translate`.
+   CONTACT (finale + sign-off footer)
+   The finale is paper again: the dark Timeline sheet slides off it, and you can write on it.
+   Base (no JS, reduced motion): plain flow under the Timeline, everything visible, the signature
+   fully drawn, no ink layer and no pad.
+   GSAP animates [data-under] (y, scale), [data-dim] (opacity), [data-char] (yPercent) and the
+   signature paths / nib. None of them carry a CSS transform. Hovers use `translate` / clip-path.
    ============================================================ */
 
 .section {
@@ -13,6 +14,7 @@
   --p-muted: color-mix(in oklab, var(--c-bg) 62%, var(--c-fg)); /* ~6:1 on paper */
   --p-line: rgb(11 11 12 / 0.16);
   --p-accent: color-mix(in oklab, var(--c-accent) 72%, var(--c-bg)); /* small text on paper */
+  --p-ink: color-mix(in oklab, var(--c-accent) 80%, var(--c-bg)); /* fountain-pen ink on paper */
 
   position: relative;
   z-index: 1; /* under the Timeline sheet */
@@ -29,11 +31,64 @@
   display: none;
   position: absolute;
   inset: 0;
+  z-index: 3;
   background: var(--c-bg);
   opacity: 0;
   pointer-events: none;
 }
 :global(html.motion) .dim { display: block; }
+
+/* Content sits above the ink */
+.lead,
+.pad,
+.write,
+.foot {
+  position: relative;
+  z-index: 1;
+}
+
+/* ---------- the ink layer (InkPad) ---------- */
+.inkLayer {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.section[data-ink] .inkLayer { display: block; }
+.inkCanvas {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100lvh;
+}
+
+/* Pointer hint: only when the pad is live, gone after the first real stroke */
+.hint {
+  display: none;
+  position: absolute;
+  top: calc(var(--header-h) + var(--u) * 2);
+  left: var(--gutter);
+  align-items: center;
+  gap: 0.75em;
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--p-muted);
+  transition: opacity 0.8s var(--ease-soft);
+}
+.hint svg { color: var(--p-ink); }
+.hintSep {
+  width: 2rem;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.5;
+}
+.section[data-ink='pointer'] .hintPointer { display: flex; }
+.section[data-inked] .hint,
+.section[data-inked] .padHint,
+.section[data-inked] .padSub { opacity: 0; }
 
 /* ---------- lead: the first screen uncovered ---------- */
 .lead {
@@ -41,7 +96,7 @@
   display: grid;
   align-content: end;
   gap: calc(var(--u) * 5);
-  padding: calc(var(--header-h) + var(--u) * 4) var(--gutter) calc(var(--u) * 8);
+  padding: calc(var(--header-h) + var(--u) * 7) var(--gutter) calc(var(--u) * 7);
 }
 
 .heading {
@@ -52,6 +107,7 @@
   font-weight: 600;
 }
 .mail {
+  position: relative;
   display: inline-block;
   color: var(--p-fg);
 }
@@ -60,7 +116,7 @@
   display: inline-block;
   white-space: nowrap;
 }
-/* One mask per character: the reveal (GSAP) moves .cr, the hover roll moves .ca / .cb */
+/* One mask per character: the reveal (GSAP) moves .cr, the hover lifts .cl and fills .cb */
 .cm {
   display: inline-block;
   overflow: clip;
@@ -72,28 +128,40 @@
   position: relative;
   display: inline-block;
 }
-.ca,
-.cb {
+.cl {
+  position: relative;
   display: block;
-  transition: translate 0.75s var(--ease-out);
-  transition-delay: calc(var(--i) * 24ms);
+  transition: translate 0.8s var(--ease-out);
+  transition-delay: calc(var(--i) * 28ms);
 }
+.ca {
+  display: block;
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 0.7s var(--ease-wipe);
+  transition-delay: calc(var(--i) * 28ms);
+}
+/* The letter fills with pen-blue ink from the bottom, like a nib drawing up ink */
 .cb {
   position: absolute;
   inset: 0;
-  translate: 0 130%;
-  color: var(--c-accent);
+  color: var(--p-ink);
+  clip-path: inset(100% 0 0 0);
+  transition: clip-path 0.7s var(--ease-wipe);
+  transition-delay: calc(var(--i) * 28ms);
 }
-.mail:hover .ca,
-.mail:focus-visible .ca { translate: 0 -130%; }
+.mail:hover .cl,
+.mail:focus-visible .cl { translate: 0 -0.07em; }
 .mail:hover .cb,
-.mail:focus-visible .cb { translate: 0 0; }
+.mail:focus-visible .cb { clip-path: inset(0 0 0 0); }
+/* the dry letter recedes as the ink rises, so no dark fringe shows at the glyph edges */
+.mail:hover .ca,
+.mail:focus-visible .ca { clip-path: inset(0 0 100% 0); }
 
 .arrowMask { margin-left: 0.04em; }
 .arrow {
   width: 0.42em;
   height: 0.42em;
-  color: var(--c-accent);
+  color: var(--p-ink);
   transition: translate 0.75s var(--ease-out);
   vertical-align: top;
   margin-top: 0.08em;
@@ -101,34 +169,181 @@
 .mail:hover .arrow,
 .mail:focus-visible .arrow { translate: 0.06em -0.06em; }
 
+/* The pen underline draws beneath (clip-path wipe), and is wiped back off */
+.pen {
+  position: absolute;
+  left: 0;
+  right: 0.5em;
+  bottom: -0.06em;
+  width: calc(100% - 0.5em);
+  height: 0.14em;
+  overflow: visible;
+  fill: none;
+  stroke: var(--p-ink);
+  stroke-width: 4;
+  stroke-linecap: round;
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.9s var(--ease-wipe);
+}
+.pen path { vector-effect: non-scaling-stroke; }
+.mail:hover .pen,
+.mail:focus-visible .pen {
+  clip-path: inset(-50% -2% -50% 0);
+  transition-delay: 0.12s;
+}
+
+/* ---------- lead row: the note + the details ledger ---------- */
 .leadRow {
   display: grid;
   grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
   column-gap: var(--gutter);
-  row-gap: calc(var(--u) * 3);
+  row-gap: calc(var(--u) * 4);
   align-items: end;
 }
 .body {
-  grid-column: 1 / span 6;
-  max-width: 52ch;
+  grid-column: 1 / span 5;
+  max-width: 46ch;
   font-size: var(--t-body);
 }
-.address {
-  grid-column: 9 / span 4;
+.details {
+  grid-column: 7 / span 6;
   display: grid;
-  gap: 0.3em;
-  font-size: var(--t-s);
+  border-bottom: 1px solid var(--p-line);
 }
-.addressLabel {
-  font-size: var(--t-xs);
-  letter-spacing: 0.04em;
+.detail {
+  display: grid;
+  grid-template-columns: 8rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0 var(--gutter);
+  min-height: 3.5rem;
+  padding-block: 0.35rem;
+  border-top: 1px solid var(--p-line);
+}
+.dt {
   font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--p-muted);
 }
-.addressValue {
-  overflow-wrap: anywhere;
-  user-select: all;
+.dd {
+  min-width: 0;
+  font-size: var(--t-body);
+}
+.ddLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 calc(var(--u) * 3);
+}
+
+/* email + copy */
+.email {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.75rem;
+}
+.emailLink { min-width: 0; }
+.emailLink .linkText { overflow-wrap: anywhere; }
+.copyBtn {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 2.75rem;
+  height: 2.75rem;
+  border: 1px solid var(--p-line);
+  color: var(--p-fg);
+  transition: background-color 0.4s var(--ease-soft), color 0.4s var(--ease-soft), border-color 0.4s var(--ease-soft);
+}
+.copyBtn:hover,
+.copyBtn:focus-visible {
+  background: var(--p-fg);
+  border-color: var(--p-fg);
+  color: var(--p-bg);
+}
+.copyBtn:active { scale: 0.94; }
+.email[data-state='copied'] .copyBtn {
+  background: var(--c-accent);
+  border-color: var(--c-accent);
+  color: #fff;
+}
+.copyNote {
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--p-accent);
+}
+.copyNote:empty { display: none; }
+
+/* local clock */
+.clock {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2rem 0.75rem;
+}
+.clockTime {
+  font-family: var(--f-display);
+  font-size: var(--t-m);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  opacity: 0;
+  transition: opacity 0.6s var(--ease-soft);
+}
+.clockTime[data-ready] { opacity: 1; }
+.clockZone {
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--p-muted);
+}
+
+/* ---------- the touch pad ---------- */
+.pad {
+  display: none;
+  place-content: center;
+  justify-items: center;
+  gap: 0.5rem;
+  height: clamp(15rem, 44svh, 24rem);
+  margin: 0 var(--gutter) calc(var(--u) * 6);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.section[data-ink='touch'] .pad { display: grid; }
+/* crop marks, so the drawable area reads as a card without boxing the ink in */
+.padCorner {
+  position: absolute;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: 0 solid var(--p-fg);
+  opacity: 0.55;
+}
+.padCorner:nth-child(1) { top: 0; left: 0; border-top-width: 1px; border-left-width: 1px; }
+.padCorner:nth-child(2) { top: 0; right: 0; border-top-width: 1px; border-right-width: 1px; }
+.padCorner:nth-child(3) { bottom: 0; left: 0; border-bottom-width: 1px; border-left-width: 1px; }
+.padCorner:nth-child(4) { bottom: 0; right: 0; border-bottom-width: 1px; border-right-width: 1px; }
+.padHint {
+  display: flex;
+  align-items: center;
+  gap: 0.6em;
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--p-fg);
+  transition: opacity 0.8s var(--ease-soft);
+}
+.padHint svg { color: var(--p-ink); }
+.padSub {
+  font-size: var(--t-s);
+  color: var(--p-muted);
+  transition: opacity 0.8s var(--ease-soft);
 }
 
 /* ---------- form ---------- */
@@ -137,7 +352,7 @@
   grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
   column-gap: var(--gutter);
   row-gap: calc(var(--u) * 4);
-  padding: calc(var(--u) * 10) var(--gutter) calc(var(--u) * 14);
+  padding: calc(var(--u) * 10) var(--gutter) calc(var(--u) * 12);
   border-top: 1px solid var(--p-line);
 }
 .writeHead { grid-column: 1 / span 4; }
@@ -155,8 +370,43 @@
 }
 .formCol { grid-column: 5 / span 8; min-width: 0; }
 
-/* ---------- footer row ---------- */
-.foot {
+/* ---------- sign-off ---------- */
+.foot { border-top: 1px solid var(--p-line); }
+.signoff {
+  padding: calc(var(--u) * 6) var(--gutter) calc(var(--u) * 3);
+}
+.signLabel {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.5rem 2rem;
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--p-muted);
+}
+.signNote { text-transform: none; letter-spacing: 0; font-family: var(--f-body); font-size: var(--t-s); }
+.sign {
+  width: 100%;
+  height: auto;
+  margin-top: calc(var(--u) * 2);
+  overflow: visible;
+}
+.signStroke {
+  fill: none;
+  stroke: var(--p-ink);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.signDot { fill: var(--p-ink); }
+.signNib {
+  fill: var(--c-accent);
+  opacity: 0; /* only GSAP shows the nib, while it writes */
+}
+
+.footRow {
   display: grid;
   grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
   column-gap: var(--gutter);
@@ -164,23 +414,35 @@
   align-items: center;
   border-top: 1px solid var(--p-line);
   /* keep the fixed "Recruiter mode" button's corner clear at the page end */
-  padding: calc(var(--u) * 3) var(--gutter) calc(var(--gutter) + 2.75rem + var(--u) * 3);
+  padding: calc(var(--u) * 2.5) var(--gutter) calc(var(--gutter) + 2.75rem + var(--u) * 3);
   font-size: var(--t-s);
 }
-.copy { grid-column: 1 / span 4; color: var(--p-muted); }
+.copy { grid-column: 1 / span 3; color: var(--p-muted); }
 .links {
-  grid-column: 5 / span 4;
+  grid-column: 4 / span 4;
   list-style: none;
   padding: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 0 calc(var(--u) * 2.5);
 }
+.topCol { grid-column: 8 / span 2; }
 .colophon {
-  grid-column: 9 / span 4;
+  grid-column: 10 / span 3;
   color: var(--p-muted);
   font-size: var(--t-xs);
 }
+
+.top {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  min-height: 2.75rem;
+  font-size: var(--t-s);
+}
+.topIcon { transition: translate 0.6s var(--ease-out); }
+.top:hover .topIcon,
+.top:focus-visible .topIcon { translate: 0 -3px; }
 
 /* Utility links: the underline draws */
 .link {
@@ -217,22 +479,29 @@
 /* ---------- phones ---------- */
 @media (max-width: 767px) {
   .lead { min-height: 92svh; gap: calc(var(--u) * 4); }
-  .body, .address, .writeHead, .formCol, .copy, .links, .colophon { grid-column: 1 / -1; }
+  .body, .details, .writeHead, .formCol, .copy, .links, .topCol, .colophon { grid-column: 1 / -1; }
+  .detail { grid-template-columns: 5.75rem minmax(0, 1fr); gap: 0 1rem; }
   .write { padding-block: calc(var(--u) * 8) calc(var(--u) * 10); }
-  /* the toggle sits bottom-centre here */
-  .foot { padding-bottom: calc(var(--gutter) + 2.75rem + var(--u) * 5); }
+  .signoff { padding-top: calc(var(--u) * 8); }
+  .sign { margin-top: calc(var(--u) * 4); }
+  .signStroke { stroke-width: 3; }
+  /* the toggle is a 44px icon in the bottom-right corner here */
+  .footRow { padding-bottom: calc(var(--gutter) + 2.75rem + var(--u) * 5); }
 }
 @media (min-width: 768px) and (max-width: 1099px) {
-  .body { grid-column: 1 / span 7; }
-  .address { grid-column: 9 / span 4; }
+  .body { grid-column: 1 / span 12; }
+  .details { grid-column: 1 / span 12; }
   .writeHead { grid-column: 1 / -1; }
   .formCol { grid-column: 1 / -1; }
+  .copy { grid-column: 1 / span 6; }
+  .links { grid-column: 7 / span 6; }
+  .topCol { grid-column: 1 / span 6; }
+  .colophon { grid-column: 7 / span 6; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .cb { display: none; }
-  .mail:hover .ca,
-  .mail:focus-visible .ca { translate: none; color: var(--c-accent); }
+  .mail:hover .cl,
+  .mail:focus-visible .cl,
   .mail:hover .arrow,
   .mail:focus-visible .arrow { translate: none; }
 }

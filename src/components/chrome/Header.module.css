@@ -2,54 +2,101 @@
   position: fixed;
   inset: 0 0 auto 0;
   z-index: var(--z-header);
-  height: var(--header-h);
-  padding: 0 var(--gutter);
+  padding: calc(var(--u) * 1.25) var(--gutter) 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: var(--t-s);
-  letter-spacing: 0.01em;
-  color: #fff;
-  mix-blend-mode: difference; /* legible over ink, reels and the bleed */
+  pointer-events: none; /* only the chips catch the pointer */
   transition: translate 0.6s var(--ease-hard);
 }
-:global(html.frame-away) .header { translate: 0 -110%; }
+:global(html.frame-away) .header { translate: 0 -140%; }
 .header:focus-within { translate: 0 0 !important; }
+
+/* Frosted chip: legible on the dark desk, the paper sections and over the reels alike. */
+.chip {
+  pointer-events: auto;
+  background: rgb(18 18 20 / 0.66);
+  -webkit-backdrop-filter: blur(14px) saturate(140%);
+  backdrop-filter: blur(14px) saturate(140%);
+  border: 1px solid rgb(236 232 223 / 0.14);
+  border-radius: 999px;
+  box-shadow: 0 8px 24px -12px rgb(0 0 0 / 0.5);
+  color: var(--c-fg);
+}
 
 .name {
   display: inline-flex;
   align-items: center;
   min-height: 2.75rem;
+  padding: 0 1.15rem;
   font-family: var(--f-display);
-  font-size: var(--t-m);
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  font-size: 1.0625rem;
+  letter-spacing: -0.01em;
   line-height: 1;
 }
 
+.track { position: relative; } /* links measure their offsetLeft from here */
 .nav {
   list-style: none;
-  padding: 0;
+  margin: 0;
+  padding: 0.25rem;
   display: flex;
-  gap: calc(var(--u) * 2.5);
+  gap: 0.125rem;
 }
 .link {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
-  min-height: 2.75rem;
-  position: relative;
+  gap: 0.45rem;
+  min-height: 2.25rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  letter-spacing: 0.005em;
+  color: rgb(236 232 223 / 0.86);
+  transition: color 0.35s var(--ease-soft);
 }
-.link[aria-current]::after {
-  content: '';
+.link:hover,
+.link:focus-visible,
+.link[aria-current] { color: var(--c-fg); }
+.link:focus-visible { outline-offset: 1px; }
+
+/* The gliding highlight: one pill, moved under the hovered/focused link. */
+.pill {
   position: absolute;
+  top: 0.25rem;
+  bottom: 0.25rem;
   left: 0;
-  right: 0;
-  bottom: 0.7rem;
-  height: 1px;
-  background: currentColor;
+  width: var(--w, 0);
+  translate: var(--x, 0) 0;
+  border-radius: 999px;
+  background: rgb(236 232 223 / 0.14);
+  opacity: 0;
+  transition: translate 0.45s var(--ease-out), width 0.45s var(--ease-out), opacity 0.25s var(--ease-soft);
+  pointer-events: none;
 }
 
+/* Section in view: a pen-blue dot grows in front of the label. */
+.dot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: var(--c-accent);
+  scale: 0;
+  margin-right: -0.85rem; /* takes no space until it shows */
+  transition: scale 0.4s var(--ease-out), margin-right 0.4s var(--ease-out);
+}
+.link[aria-current] .dot { scale: 1; margin-right: 0; }
+
 @media (max-width: 767px) {
-  .nav { gap: 1rem; }
-  .name { font-size: 1.05rem; }
-  .link { font-size: 0.8125rem; }
+  .header { padding-top: calc(var(--u) * 1.5); }
+  .name { padding: 0 0.9rem; font-size: 0.9375rem; min-height: 2.5rem; }
+  .nav { padding: 0.2rem; }
+  .link { padding: 0 0.7rem; font-size: 0.8125rem; min-height: 2.25rem; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .pill { transition: none; }
 }

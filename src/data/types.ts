@@ -81,6 +81,25 @@ export type Site = {
     heading: string;
     body: string;
     subjects: { value: string; label: string }[];
+    finale: {
+      inkLabel: string;
+      inkHintPointer: string;
+      inkHintTouch: string;
+      detailsTitle: string;
+      emailLabel: string;
+      elsewhereLabel: string;
+      basedLabel: string;
+      timeLabel: string;
+      timeZone: string; // IANA zone for the live clock
+      timeZoneLabel: string;
+      writeTitle: string;
+      writeNote: string;
+      signoffLabel: string;
+      signoffNote: string;
+      backToTop: string;
+      colophon: string;
+      copy: { label: string; copied: string; failed: string };
+    };
   };
   recruiter: {
     toggle: string; // the persistent button on the full site

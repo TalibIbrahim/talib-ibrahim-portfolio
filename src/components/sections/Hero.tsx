@@ -6,7 +6,6 @@ import { useRef } from 'react';
 import Image from 'next/image';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { SplitText } from 'gsap/SplitText';
 import { ArrowDown } from 'lucide-react';
 import { site } from '@/data/site';
 import { usePage } from '@/engine/next';
@@ -26,20 +25,11 @@ export function Hero() {
   const given = useRef<HTMLSpanElement>(null);
   const meta = useRef<HTMLDivElement>(null);
 
-  usePage(({ intro }) => {
+  // The intro (card opens, photo rises, name settles) is pure CSS (Hero.module.css): it starts on
+  // the first paint, so the name never waits for JavaScript. GSAP only adds the scroll story.
+  usePage(() => {
     if (prefersReducedMotion() || !hero.current) return;
     const mobile = isMobile();
-    const splits = [first.current!, last.current!].map((el) => SplitText.create(el, { type: 'chars', mask: 'chars' }));
-    gsap.set([first.current, last.current, given.current], { visibility: 'visible' });
-
-    // Intro: the card opens upward, the photo rises into it, the name settles from both sides.
-    intro
-      .fromTo(card.current, { clipPath: 'inset(100% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.2, ease: ease.wipe }, 0)
-      .from(photo.current, { yPercent: 18, autoAlpha: 0, duration: 1.4, ease: ease.out }, 0.25)
-      .from(splits[0].chars, { yPercent: 110, duration: 1, ease: ease.out, stagger: 0.04 }, 0.35)
-      .from(splits[1].chars, { yPercent: -110, duration: 1, ease: ease.out, stagger: { each: 0.04, from: 'end' } }, 0.45)
-      .from(given.current, { autoAlpha: 0, y: 12, duration: 0.8, ease: ease.soft }, 0.8)
-      .from(meta.current, { autoAlpha: 0, duration: 0.8, ease: ease.soft }, 0.9);
 
     // Scroll: the name pulls apart, the card collapses into the ink dot.
     const tl = gsap.timeline({
@@ -48,9 +38,9 @@ export function Hero() {
     });
     tl.to(first.current, { xPercent: mobile ? -110 : -125, ease: ease.inOut, duration: 0.6 }, 0)
       .to(last.current, { xPercent: mobile ? 110 : 125, ease: ease.inOut, duration: 0.6 }, 0)
-      .to([given.current, meta.current], { autoAlpha: 0, duration: 0.2 }, 0)
-      .to(photo.current, { scale: 0.7, yPercent: 10, autoAlpha: 0, duration: 0.42, ease: ease.inOut }, 0.05)
-      .to(card.current, { clipPath: 'inset(46% 46% 46% 46% round 50%)', duration: 0.55, ease: ease.inOut }, 0.15)
+      .fromTo([given.current, meta.current], { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.2 }, 0)
+      .fromTo(photo.current, { scale: 1, yPercent: 0, autoAlpha: 1 }, { scale: 0.7, yPercent: 10, autoAlpha: 0, duration: 0.42, ease: ease.inOut }, 0.05)
+      .fromTo(card.current, { clipPath: 'inset(0% 0% 0% 0% round 0%)' }, { clipPath: 'inset(46% 46% 46% 46% round 50%)', duration: 0.55, ease: ease.inOut }, 0.15)
       .fromTo(dot.current, { scale: 0, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 0.2, ease: ease.out }, 0.55)
       .to(card.current, { autoAlpha: 0, duration: 0.15 }, 0.62)
       .to({}, { duration: 0.23 }); // hold on the dot so the handoff reads
@@ -78,10 +68,7 @@ export function Hero() {
       off = () => removeEventListener('pointermove', move);
     }
 
-    return () => {
-      off();
-      splits.forEach((s) => s.revert());
-    };
+    return () => off();
   });
 
   return (
@@ -89,8 +76,8 @@ export function Hero() {
       <div ref={stage} className={styles.stage}>
         <h1 id="hero-name" className={styles.name}>
           <span ref={given} className={styles.given}>Muhammad</span>{' '}
-          <span ref={first} className={`${styles.word} ${styles.first}`}>Talib</span>{' '}
-          <span ref={last} className={`${styles.word} ${styles.last}`}>Ibrahim</span>
+          <span ref={first} className={`${styles.word} ${styles.first}`}><span className={styles.rise}>Talib</span></span>{' '}
+          <span ref={last} className={`${styles.word} ${styles.last}`}><span className={styles.drop}>Ibrahim</span></span>
         </h1>
 
         <div className={styles.portrait} data-drop>

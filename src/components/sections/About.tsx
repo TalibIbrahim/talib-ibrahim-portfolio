@@ -7,6 +7,7 @@
 //                its "o" fills with desk black and the word scales around that counter until the
 //                dark disc covers the viewport, so the visitor falls through the letter into the
 //                showreel (which then lands its own frame .56 -> 1).
+//   Portrait     a halftone of pen-blue ink dots (HalftonePortrait, lazy OGL) beside the text.
 // Reduced motion / no JS / Recruiter Mode: a calm paper section, no sticky stage, no disc.
 import { useRef } from 'react';
 import { gsap } from 'gsap';
@@ -15,6 +16,7 @@ import { SplitText } from 'gsap/SplitText';
 import { site } from '@/data/site';
 import { usePage } from '@/engine/next';
 import { ease } from '@/engine';
+import { HalftonePortrait } from './HalftonePortrait';
 import styles from './About.module.css';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
@@ -210,6 +212,7 @@ export function About() {
         <p className={styles.lead} data-ink data-drop>
           {lead}
         </p>
+        <HalftonePortrait />
         {rest.map((p) => (
           <p key={p.slice(0, 24)} className={styles.body} data-ink data-drop>
             {p}
