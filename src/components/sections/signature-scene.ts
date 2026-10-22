@@ -37,15 +37,39 @@ function smooth(pts: Pt[], radius: number, passes: number) {
   return a;
 }
 
-/** Sample a live <path> every `step` svg units. */
-export function samplePath(path: SVGPathElement, step = 2): Pt[] {
-  const len = path.getTotalLength();
-  const n = Math.max(2, Math.ceil(len / step));
-  const out: Pt[] = [];
-  for (let i = 0; i <= n; i++) {
-    const p = path.getPointAtLength((i / n) * len);
-    out.push({ x: p.x, y: p.y });
+/** Resample an "M x y C ..." path (the signature only uses cubic Beziers) every `step` svg units.
+ *  Pure maths: SVGPathElement.getPointAtLength is O(path) per call and cost ~1.6 s of main thread
+ *  for a few thousand samples, so it is not used here. */
+export function samplePathD(d: string, step = 2): Pt[] {
+  const n = d.match(/-?\d*\.?\d+/g)!.map(Number);
+  // Flatten each cubic finely, then walk the polyline at a constant arc length.
+  const fine: Pt[] = [{ x: n[0], y: n[1] }];
+  for (let i = 2; i + 5 < n.length; i += 6) {
+    const p0 = fine[fine.length - 1];
+    const [x1, y1, x2, y2, x3, y3] = n.slice(i, i + 6);
+    for (let k = 1; k <= 24; k++) {
+      const t = k / 24, u = 1 - t;
+      fine.push({
+        x: u * u * u * p0.x + 3 * u * u * t * x1 + 3 * u * t * t * x2 + t * t * t * x3,
+        y: u * u * u * p0.y + 3 * u * u * t * y1 + 3 * u * t * t * y2 + t * t * t * y3,
+      });
+    }
   }
+  const out: Pt[] = [fine[0]];
+  let carry = 0;
+  for (let i = 1; i < fine.length; i++) {
+    const a0 = fine[i - 1], a1 = fine[i];
+    const seg = Math.hypot(a1.x - a0.x, a1.y - a0.y);
+    let pos = step - carry;
+    while (pos <= seg) {
+      const t = pos / seg;
+      out.push({ x: a0.x + (a1.x - a0.x) * t, y: a0.y + (a1.y - a0.y) * t });
+      pos += step;
+    }
+    carry = seg - (pos - step);
+  }
+  const last = fine[fine.length - 1];
+  if (out[out.length - 1] !== last) out.push(last);
   return out;
 }
 
