@@ -1,0 +1,178 @@
+/* InkBreakout: the finale's game block. Lives on paper (the Contact section's --p-* tokens).
+   The outer .game carries data-drop (Recruiter Mode's gravity drop): never transformed here.
+   Animated: only opacity / transform on .win (CSS, off under reduced motion). The canvas is
+   drawn on the GSAP ticker by the component. */
+
+.game {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: calc(var(--u) * 3);
+  padding: calc(var(--u) * 8) var(--gutter) calc(var(--u) * 6);
+  border-top: 1px solid var(--p-line);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: calc(var(--u) * 2) calc(var(--u) * 4);
+}
+.headText {
+  display: grid;
+  gap: calc(var(--u) * 1.25);
+  min-width: 0;
+  max-width: 40rem;
+}
+.label {
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--p-muted);
+}
+.invite {
+  font-family: var(--f-display);
+  font-size: var(--t-m);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+  color: var(--p-fg);
+}
+
+/* The one real control: Play / Pause / Resume / Try again / Play again */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  min-width: 8.5rem;
+  min-height: 2.75rem;
+  padding: 0 1.1rem;
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--p-bg);
+  background: var(--p-fg);
+  border: 1px solid var(--p-fg);
+  transition: background-color 0.4s var(--ease-soft), color 0.4s var(--ease-soft), border-color 0.4s var(--ease-soft);
+}
+.btn:hover {
+  background: var(--c-accent);
+  border-color: var(--c-accent);
+  color: #fff;
+}
+.btn[data-playing] {
+  color: var(--p-fg);
+  background: transparent;
+  border-color: var(--p-line);
+}
+.btn[data-playing]:hover { border-color: var(--p-fg); background: transparent; color: var(--p-fg); }
+.btn:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.btn:disabled:hover { background: var(--p-fg); border-color: var(--p-fg); color: var(--p-bg); }
+
+/* The board */
+.stage {
+  position: relative;
+  height: clamp(30rem, 66svh, 40rem);
+  overflow: hidden;
+  border: 1px solid var(--p-line);
+  background: var(--p-bg);
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}
+.stage:focus { outline: none; }
+.stage:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
+
+.canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: pointer;
+  /* idle: the page scrolls over the board as usual */
+  touch-action: auto;
+}
+/* only a live game owns touch gestures on the board */
+.stage[data-phase='aim'] .canvas,
+.stage[data-phase='play'] .canvas {
+  touch-action: none;
+  cursor: default;
+}
+.stage[data-phase='won'] .canvas { cursor: default; }
+
+.msg {
+  position: absolute;
+  left: 50%;
+  top: 64%;
+  translate: -50% 0;
+  width: max-content;
+  max-width: calc(100% - 2rem);
+  padding: 0.6rem 0.9rem;
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.05em;
+  line-height: 1.5;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--p-fg);
+  background: var(--p-bg);
+  border: 1px solid var(--p-line);
+  pointer-events: none;
+}
+.forTouch { display: none; }
+@media (hover: none), (pointer: coarse) {
+  .forPointer { display: none; }
+  .forTouch { display: inline; }
+}
+
+.win {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  padding: var(--gutter);
+  text-align: center;
+  background: color-mix(in srgb, var(--p-bg) 84%, transparent);
+  color: var(--p-fg);
+  animation: winIn 0.9s var(--ease-out) both;
+}
+.winText {
+  font-family: var(--f-display);
+  font-size: var(--t-l);
+  font-weight: 600;
+  letter-spacing: var(--track-l);
+  line-height: 1.05;
+  max-width: 16em;
+  text-wrap: balance;
+}
+.winLink {
+  color: var(--p-ink, var(--c-accent));
+  text-decoration: underline;
+  text-decoration-thickness: 0.06em;
+  text-underline-offset: 0.12em;
+}
+.winLink:hover { text-decoration-thickness: 0.1em; }
+.winLink:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 4px; }
+
+@keyframes winIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (max-width: 767px) {
+  .game { padding-block: calc(var(--u) * 8) calc(var(--u) * 5); }
+  .head { align-items: start; flex-direction: column; }
+  .stage { height: clamp(30rem, 68svh, 36rem); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .win { animation: none; }
+  .btn { transition: none; }
+}

@@ -1,10 +1,10 @@
 /* ============================================================
-   CONTACT (finale + sign-off footer)
+   CONTACT (finale, the Ink breakout game, footer)
    The finale is paper again: the dark Timeline sheet slides off it, and you can write on it.
-   Base (no JS, reduced motion): plain flow under the Timeline, everything visible, the signature
-   fully drawn, no ink layer and no pad.
-   GSAP animates [data-under] (y, scale), [data-dim] (opacity), [data-char] (yPercent) and the
-   signature paths / nib. None of them carry a CSS transform. Hovers use `translate` / clip-path.
+   Base (no JS, reduced motion): plain flow under the Timeline, everything visible, no ink layer
+   and no pad. The game block has its own module (contact/InkBreakout.module.css).
+   GSAP animates [data-under] (y, scale), [data-dim] (opacity) and [data-char] (yPercent).
+   None of them carry a CSS transform. Hovers use `translate` / clip-path.
    ============================================================ */
 
 .section {
@@ -370,41 +370,8 @@
 }
 .formCol { grid-column: 5 / span 8; min-width: 0; }
 
-/* ---------- sign-off ---------- */
+/* ---------- footer ---------- */
 .foot { border-top: 1px solid var(--p-line); }
-.signoff {
-  padding: calc(var(--u) * 6) var(--gutter) calc(var(--u) * 3);
-}
-.signLabel {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 0.5rem 2rem;
-  font-family: var(--f-mono);
-  font-size: var(--t-xs);
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: var(--p-muted);
-}
-.signNote { text-transform: none; letter-spacing: 0; font-family: var(--f-body); font-size: var(--t-s); }
-.sign {
-  width: 100%;
-  height: auto;
-  margin-top: calc(var(--u) * 2);
-  overflow: visible;
-}
-.signStroke {
-  fill: none;
-  stroke: var(--p-ink);
-  stroke-width: 2.4;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-.signDot { fill: var(--p-ink); }
-.signNib {
-  fill: var(--c-accent);
-  opacity: 0; /* only GSAP shows the nib, while it writes */
-}
 
 .footRow {
   display: grid;
@@ -412,7 +379,6 @@
   column-gap: var(--gutter);
   row-gap: calc(var(--u) * 2);
   align-items: center;
-  border-top: 1px solid var(--p-line);
   /* keep the fixed "Recruiter mode" button's corner clear at the page end */
   padding: calc(var(--u) * 2.5) var(--gutter) calc(var(--gutter) + 2.75rem + var(--u) * 3);
   font-size: var(--t-s);
@@ -482,9 +448,6 @@
   .body, .details, .writeHead, .formCol, .copy, .links, .topCol, .colophon { grid-column: 1 / -1; }
   .detail { grid-template-columns: 5.75rem minmax(0, 1fr); gap: 0 1rem; }
   .write { padding-block: calc(var(--u) * 8) calc(var(--u) * 10); }
-  .signoff { padding-top: calc(var(--u) * 8); }
-  .sign { margin-top: calc(var(--u) * 4); }
-  .signStroke { stroke-width: 3; }
   /* the toggle is a 44px icon in the bottom-right corner here */
   .footRow { padding-bottom: calc(var(--gutter) + 2.75rem + var(--u) * 5); }
 }
