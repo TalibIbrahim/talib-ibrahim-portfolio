@@ -1,17 +1,15 @@
 'use client';
-// Recruiter Mode (home): the same facts as the full site, in the site's own type and palette, with
-// no scroll theatre. A slider at the bottom sets how hard the page sells, after getcoleman.com:
+// /recruiter: the same facts as the full site, in the site's own type and palette, with no scroll
+// theatre. A separate route, so the main site never ships it. A slider at the bottom sets how hard the page sells, after getcoleman.com:
 //   3 Hard sell (default): everything     2 Firm: projects + roles, no bullet points
 //   1 Soft: short bio, a few projects     0 Barely selling: one paragraph and an email address
-// Server render = hard sell, so crawlers and no-JS visitors get every fact. The heading is a
-// role="heading" div so the document keeps a single <h1> element (the full site's).
+// Server render = hard sell, so crawlers and no-JS visitors get every fact.
 import Link from 'next/link';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowUpRight, Mail } from 'lucide-react';
+import { ArrowUpRight, Mail, Sparkles } from 'lucide-react';
 import { site } from '@/data/site';
 import { getProjects } from '@/data/projects';
 import { useSell } from '@/lib/mode';
-import { BackToFun } from './BackToFun';
 import { SellSlider } from './SellSlider';
 import styles from './Recruiter.module.css';
 
@@ -43,13 +41,11 @@ export function RecruiterHome() {
   const edu = site.education;
 
   return (
-    <div className={`${styles.page} recruiter-only`} data-recruiter-root>
+    <div className={styles.page}>
       <header className={styles.top}>
         <div>
           <p className={styles.kicker}>{site.recruiter.toggle}</p>
-          <div role="heading" aria-level={1} tabIndex={-1} className={styles.name} data-recruiter-focus>
-            {site.name}
-          </div>
+          <h1 className={styles.name}>{site.name}</h1>
           <p className={styles.role}>
             {site.role}, {site.location}
           </p>
@@ -72,7 +68,10 @@ export function RecruiterHome() {
               ))}
           </ul>
         </div>
-        <BackToFun />
+        <Link href="/" className={`${styles.pill} ${styles.back}`}>
+          <Sparkles aria-hidden="true" size={16} strokeWidth={1.5} />
+          {site.recruiter.back}
+        </Link>
       </header>
 
       <AnimatePresence initial={false}>
@@ -99,7 +98,7 @@ export function RecruiterHome() {
               <article key={p.slug} className={styles.item}>
                 <div className={styles.itemHead}>
                   <h3 className={styles.itemTitle}>
-                    <Link href={`/work/${p.slug}`} data-no-transition>
+                    <Link href={`/work/${p.slug}`}>
                       {p.title}
                     </Link>
                   </h3>

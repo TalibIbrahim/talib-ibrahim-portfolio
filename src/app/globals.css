@@ -120,12 +120,26 @@ html.lenis, html.lenis body { height: auto; }
 [data-split] > *, [data-split] > * > * { text-indent: 0; }
 [data-split] > :first-child, [data-split] > :first-child > :first-child { text-indent: inherit; }
 
-/* Curtain: an ink wash in the accent */
+/* Curtain: an ink brush stroke (src/components/chrome/Curtain.tsx, src/engine/transition.ts) */
 #curtain {
   position: fixed; inset: 0; z-index: var(--z-curtain);
   pointer-events: none; visibility: hidden; overflow: hidden;
 }
-.curtain__panel { position: absolute; inset: 0; background: var(--c-curtain); }
+.curtain__svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.curtain__brush { filter: url(#curtain-brush); }
+.curtain__svg path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  vector-effect: none;
+}
+.curtain__body { stroke: var(--c-curtain); stroke-width: 200; }
+.curtain__bristle { stroke-width: 1.4; opacity: 0.55; }
+.curtain__bristle--a { stroke: #7d93ff; }
+.curtain__bristle--b { stroke: #3048d6; stroke-width: 2.2; }
+.curtain__bristle--c { stroke: #93a5ff; stroke-width: 0.9; }
+@media (max-width: 767px) { .curtain__brush { filter: none; } }
 
 /* Cursor follower: decorative, never replaces the native cursor */
 #cursor {
@@ -161,13 +175,6 @@ html.lenis, html.lenis body { height: auto; }
 #cursor[data-state='text'] .cursor__dot { width: 2px; height: 1.6rem; border-radius: 1px; }
 #cursor.is-pressed .cursor__dot { scale: 0.8 1.1; }
 @media (hover: none), (pointer: coarse) { #cursor { display: none; } }
-
-/* ============================================================
-   MODE SWITCH (full site / Recruiter Mode). Both trees are server-rendered; CSS shows one.
-   Recruiter Mode keeps the site's palette and type; only the scroll theatre goes.
-   ============================================================ */
-html[data-mode='recruiter'] .fun-only { display: none !important; }
-html:not([data-mode='recruiter']) .recruiter-only { display: none !important; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

@@ -1,32 +1,44 @@
 'use client';
-// The persistent "Recruiter mode" button on the full site. One click: the page falls away and the
-// recruiter view takes over (motion/recruiter.ts).
+// The persistent "Recruiter mode" button on the full site. The page falls away (motion/recruiter.ts),
+// then /recruiter loads. It's a real link, so it also works without JS and can be opened in a new tab.
 import { useState } from 'react';
+import Link from 'next/link';
+import { usePathname, useRouter } from 'next/navigation';
 import { Briefcase } from 'lucide-react';
 import { site } from '@/data/site';
-import { toRecruiter } from '@/motion/recruiter';
+import { dropAway } from '@/motion/recruiter';
 import { RollText } from './RollText';
 import styles from './RecruiterToggle.module.css';
 
 export function RecruiterToggle() {
+  const router = useRouter();
+  const pathname = usePathname();
   const [busy, setBusy] = useState(false);
-
-  async function go() {
-    setBusy(true);
-    await toRecruiter();
-    setBusy(false);
-    // Land keyboard users at the top of the recruiter view.
-    document.querySelector<HTMLElement>('.recruiter-only[data-recruiter-root] [data-recruiter-focus]')?.focus();
-  }
+  if (pathname.startsWith('/recruiter')) return null;
 
   return (
-    <div className="fun-only">
-      <button type="button" className={styles.toggle} onClick={go} disabled={busy} data-drop>
-        <Briefcase aria-hidden="true" size={16} strokeWidth={1.5} />
-        <span className={styles.label}>
-          <RollText>{site.recruiter.toggle}</RollText>
-        </span>
-      </button>
-    </div>
+    <Link
+      href="/recruiter"
+      className={styles.toggle}
+      data-no-transition
+      data-drop
+      aria-disabled={busy || undefined}
+      onMouseEnter={() => router.prefetch('/recruiter')}
+      onClick={async (e) => {
+        if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return; // new tab etc.
+        e.preventDefault();
+        if (busy) return;
+        setBusy(true);
+        router.prefetch('/recruiter');
+        await dropAway();
+        router.push('/recruiter');
+        setBusy(false);
+      }}
+    >
+      <Briefcase aria-hidden="true" size={16} strokeWidth={1.5} />
+      <span className={styles.label}>
+        <RollText>{site.recruiter.toggle}</RollText>
+      </span>
+    </Link>
   );
 }

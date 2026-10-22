@@ -20,6 +20,7 @@
   column-gap: var(--gutter);
   row-gap: calc(var(--u) * 6);
   padding: calc(var(--u) * 16) var(--gutter) calc(var(--u) * 18);
+  overflow-x: clip; /* the portrait canvas overhangs its frame */
 }
 .label {
   grid-column: 1 / span 4;
@@ -42,27 +43,64 @@
   color: var(--paper-muted);
 }
 .lead {
-  grid-column: 1 / span 9;
+  grid-column: 1 / span 8;
   grid-row: 2;
   font-family: var(--f-display);
   font-size: var(--t-l);
   font-weight: 600;
   line-height: 1.08;
   letter-spacing: var(--track-l);
-  text-indent: calc((100% + var(--gutter)) / 9 * 4); /* first line hangs from col 5 */
+  text-indent: calc((100% + var(--gutter)) / 8 * 4); /* first line hangs from col 5 */
 }
 /* Split lines: only the first line keeps the hang (words are inline-blocks, never indented). */
 .lead * { text-indent: 0; }
 .lead > :first-child,
 .lead > :first-child > :first-child { text-indent: inherit; }
 .body {
-  grid-column: 5 / span 7;
+  grid-column: 5 / span 4;
   grid-row: 3;
   max-width: 62ch;
   font-size: var(--t-body);
   line-height: 1.6;
   color: var(--c-bg);
 }
+
+/* ---------- halftone portrait ----------
+   Desktop: cols 9-12 beside the lead and body, hanging under the meta (col 9).
+   Base: the <img> as a screen print (grayscale, multiplied onto the paper, fine dot mask).
+   .gl: the OGL dot canvas has taken over; the <img> stays in the DOM for alt / SEO. */
+.portrait {
+  grid-column: 9 / span 4;
+  grid-row: 2 / span 2;
+  align-self: start;
+  position: relative;
+  margin: 0;
+  aspect-ratio: 476 / 820;
+  width: min(100%, 26rem);
+  justify-self: end;
+  touch-action: pan-y; /* sideways drags push dots; vertical drags still scroll */
+}
+.print {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: grayscale(1) contrast(1.15) brightness(1.05);
+  mix-blend-mode: multiply;
+  -webkit-mask-image: radial-gradient(circle, #000 0.95px, transparent 1.45px);
+  mask-image: radial-gradient(circle, #000 0.95px, transparent 1.45px);
+  -webkit-mask-size: 3px 3px;
+  mask-size: 3px 3px;
+  transition: opacity 0.6s var(--ease-soft);
+}
+.dots {
+  position: absolute;
+  inset: -8%; /* overhang (PAD in HalftonePortrait) so pushed dots are not clipped */
+  pointer-events: none;
+  opacity: 0;
+}
+.dots :global(canvas) { display: block; width: 100%; height: 100%; }
+.gl .print { opacity: 0; }
 
 /* Word ink-fill (motion only, set once the text is split). */
 .inking :global(.about-word) {
@@ -118,6 +156,11 @@
   pointer-events: none;
 }
 
+@media (min-width: 768px) and (max-width: 1199px) {
+  .lead { grid-column: 1 / span 8; }
+  .body { grid-column: 1 / span 7; }
+}
+
 @media (max-width: 767px) {
   .text {
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -127,7 +170,13 @@
   .label { grid-column: 1 / span 2; }
   .meta { grid-column: 3 / span 2; }
   .lead { grid-column: 1 / -1; text-indent: calc((100% + var(--gutter)) / 4 * 1); }
-  .body { grid-column: 2 / -1; }
+  .body { grid-column: 2 / -1; grid-row: 4; }
+  .portrait {
+    grid-column: 2 / -1;
+    grid-row: 3;
+    justify-self: stretch;
+    width: 100%;
+  }
   :global(html.motion) .zoom { height: 140svh; } /* ~40svh of fall */
   .word { font-size: clamp(6rem, 34vw, 9rem); }
 }

@@ -129,8 +129,21 @@
 
 /* ---------- Motion on ---------- */
 :global(html.motion) .hero { height: 230svh; }
-:global(html.motion) .word,
-:global(html.motion) .given { visibility: hidden; }
+/* Intro: pure CSS, plays on first paint (no JS wait). fill-mode "backwards" so that once done,
+   GSAP's scroll styles (inline) are the only thing left in control. */
+.word { overflow: clip; padding-bottom: 0.06em; }
+.rise, .drop { display: inline-block; }
+:global(html.motion) .rise { animation: heroRise 1.1s var(--ease-out) 0.25s backwards; }
+:global(html.motion) .drop { animation: heroDrop 1.1s var(--ease-out) 0.38s backwards; }
+:global(html.motion) .card { animation: heroCard 1.15s var(--ease-wipe) 0s backwards; }
+:global(html.motion) .photo { animation: heroPhoto 1.3s var(--ease-out) 0.18s backwards; }
+:global(html.motion) .given,
+:global(html.motion) .meta { animation: heroFade 0.9s var(--ease-soft) 0.75s backwards; }
+@keyframes heroRise { from { translate: 0 105%; } }
+@keyframes heroDrop { from { translate: 0 -105%; } }
+@keyframes heroCard { from { clip-path: inset(100% 0% 0% 0%); } }
+@keyframes heroPhoto { from { translate: 0 14%; opacity: 0; } }
+@keyframes heroFade { from { opacity: 0; } }
 
 @media (max-width: 767px) {
   .word { font-size: 23vw; }

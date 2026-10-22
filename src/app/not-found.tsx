@@ -2,8 +2,6 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import { RollText } from '@/components/chrome/RollText';
-import { BackToFun } from '@/components/recruiter/BackToFun';
-import rec from '@/components/recruiter/Recruiter.module.css';
 import styles from './not-found.module.css';
 
 export const metadata: Metadata = {
@@ -20,7 +18,7 @@ const STROKE =
 export default function NotFound() {
   return (
     <>
-      <div className="fun-only" data-fun-root data-stage>
+      <div data-fun-root data-stage>
         <section className={styles.page} aria-labelledby="nf-title">
           <div className={styles.sign} data-drop aria-hidden="true">
             <svg className={styles.svg} viewBox="0 0 616 190" fill="none">
@@ -49,25 +47,6 @@ export default function NotFound() {
         </section>
       </div>
 
-      <div className={`${rec.page} recruiter-only`} data-recruiter-root>
-        <header className={rec.top}>
-          <div>
-            <p className={rec.kicker}>404</p>
-            <div role="heading" aria-level={1} tabIndex={-1} className={rec.name} data-recruiter-focus>
-              Page not found
-            </div>
-            <p className={rec.role}>This address doesn&apos;t exist.</p>
-            <ul className={rec.contacts}>
-              <li>
-                <Link href="/" className={`${rec.pill} ${rec.pillAccent}`} data-no-transition>
-                  Back to the home page
-                </Link>
-              </li>
-            </ul>
-          </div>
-          <BackToFun />
-        </header>
-      </div>
     </>
   );
 }

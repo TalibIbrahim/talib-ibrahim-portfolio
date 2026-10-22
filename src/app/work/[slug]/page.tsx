@@ -1,7 +1,6 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { CaseStudy } from '@/components/case/CaseStudy';
-import { RecruiterCase } from '@/components/recruiter/RecruiterCase';
 import { getNext, getProject, getProjects } from '@/data/projects';
 import { site } from '@/data/site';
 import { loadCaseStudy } from '@/lib/mdx';
@@ -50,7 +49,6 @@ export default async function WorkPage(props: PageProps<'/work/[slug]'>) {
   return (
     <>
       <CaseStudy project={p} next={next} Body={Body} />
-      <RecruiterCase project={p} next={next} Body={Body} />
     </>
   );
 }
