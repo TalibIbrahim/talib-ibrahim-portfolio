@@ -6,6 +6,8 @@ import { useId, useRef, useState, type FormEvent } from 'react';
 import { AlertCircle, Check, ChevronDown, LoaderCircle, Send } from 'lucide-react';
 import { site } from '@/data/site';
 import { RollText } from '@/components/chrome/RollText';
+import { MessageField, type MessageFieldApi } from './MessageField';
+import { hasBlanks } from './blanks';
 import styles from './ContactForm.module.css';
 
 type Status = 'idle' | 'sending' | 'sent' | 'error';
@@ -52,6 +54,7 @@ export function ContactForm() {
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const messageRef = useRef<HTMLTextAreaElement>(null);
+  const messageApi = useRef<MessageFieldApi>(null);
 
   const errors = validate(values);
   const shown = (f: Field) => (submitted || touched[f] ? errors[f] : undefined);
@@ -63,6 +66,7 @@ export function ContactForm() {
       setNote('');
     }
   };
+  const setMessage = (message: string) => set('message')({ target: { value: message } });
   const blur = (f: Field) => () => setTouched((t) => ({ ...t, [f]: true }));
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
@@ -109,6 +113,7 @@ export function ContactForm() {
   const fid = (f: string) => `${id}-${f}`;
   const describe = (f: Field, extra?: string) =>
     [shown(f) ? fid(`${f}-error`) : null, extra].filter(Boolean).join(' ') || undefined;
+  const pending = status !== 'sending' && hasBlanks(values.message);
   const Icon = status === 'sending' ? LoaderCircle : status === 'sent' ? Check : status === 'error' ? AlertCircle : Send;
 
   return (
@@ -180,7 +185,10 @@ export function ContactForm() {
             name="subject"
             className={`${styles.input} ${styles.select}`}
             value={values.subject}
-            onChange={set('subject')}
+            onChange={(e) => {
+              set('subject')(e);
+              messageApi.current?.pick(e.target.value);
+            }}
           >
             {site.contact.subjects.map((s) => (
               <option key={s.value} value={s.value}>
@@ -196,20 +204,16 @@ export function ContactForm() {
         <label className={styles.label} htmlFor={fid('message')}>
           Message
         </label>
-        <textarea
-          ref={messageRef}
+        <MessageField
+          api={messageApi}
+          textareaRef={messageRef}
           id={fid('message')}
-          name="message"
-          className={`${styles.input} ${styles.textarea}`}
-          rows={6}
-          maxLength={MAX}
-          required
           value={values.message}
-          onChange={set('message')}
+          onValue={setMessage}
           onBlur={blur('message')}
-          aria-invalid={shown('message') ? true : undefined}
-          aria-describedby={describe('message', fid('message-count'))}
-          data-cursor="text"
+          max={MAX}
+          invalid={!!shown('message')}
+          describedBy={describe('message', fid('message-count'))}
         />
         <div className={styles.under}>
           <FieldError id={fid('message-error')} message={shown('message')} />
@@ -239,11 +243,17 @@ export function ContactForm() {
           type="submit"
           className={styles.submit}
           aria-disabled={status === 'sending' ? true : undefined}
+          aria-describedby={pending ? fid('pending') : undefined}
           data-state={status}
         >
           <RollText key={status}>{BUTTON[status]}</RollText>
           <Icon className={styles.icon} size={18} strokeWidth={1.5} aria-hidden="true" />
         </button>
+        {pending && (
+          <p id={fid('pending')} className={styles.pending}>
+            {site.contact.templateUi.pending}
+          </p>
+        )}
         <p className={styles.status} role="status" aria-live="polite" data-state={status}>
           {status === 'idle' && submitted && !Object.keys(errors).length ? '' : note}
         </p>

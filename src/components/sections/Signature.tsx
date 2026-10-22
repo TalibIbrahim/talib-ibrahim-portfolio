@@ -100,10 +100,11 @@ export function Signature() {
     });
 
     // Build the 3D pipe a beat after load (keeps the landing's first paint and LCP clean).
-    const boot = gsap.delayedCall(0.6, async () => {
+    // After the page transition has drained (0.8 s), so building the pipe never stutters it.
+    const boot = gsap.delayedCall(1.3, async () => {
       const mod = await import('./signature-scene').catch(() => null);
       if (disposed || !mod || !mod.webglOK() || !host.current) return;
-      const strokes = base.map((el) => mod.samplePath(el, 1.2));
+      const strokes = STROKES.map((st) => mod.samplePathD(st.d, 1.2));
       const css = getComputedStyle(document.documentElement);
       scene = mod.createSignatureScene(host.current, strokes, DOTS.map(([x, y]) => ({ x, y })), {
         mobile,
