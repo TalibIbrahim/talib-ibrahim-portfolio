@@ -1,0 +1,46 @@
+.toggle {
+  position: fixed;
+  right: var(--gutter);
+  bottom: var(--gutter);
+  z-index: var(--z-toggle);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  min-height: 2.75rem;
+  padding: 0 1.1em;
+  border: 1px solid var(--c-line);
+  background: rgb(11 11 12 / 0.72);
+  backdrop-filter: blur(8px);
+  color: var(--c-fg);
+  font-size: var(--t-s);
+  letter-spacing: 0.01em;
+  transition: background-color 0.4s var(--ease-soft), color 0.4s var(--ease-soft), border-color 0.4s var(--ease-soft);
+}
+.toggle:hover,
+.toggle:focus-visible {
+  background: var(--c-fg);
+  color: var(--c-bg);
+  border-color: var(--c-fg);
+}
+.toggle:active { scale: 0.97; }
+.toggle:disabled { opacity: 0.5; cursor: progress; }
+.toggle svg { flex: none; transition: rotate 0.6s var(--ease-out); }
+.toggle:hover svg { rotate: -14deg; }
+
+/* Phones: a 44px icon button that steps aside while scrolling down (returns on scroll up), so it
+   never sits on top of content. The label stays in the accessible name. */
+@media (max-width: 767px) {
+  .toggle {
+    width: 2.75rem;
+    padding: 0;
+    justify-content: center;
+    border-radius: 50%;
+    transition: translate 0.5s var(--ease-hard), background-color 0.4s var(--ease-soft), color 0.4s var(--ease-soft);
+  }
+  .toggle svg { width: 18px; height: 18px; }
+  .label {
+    position: absolute; width: 1px; height: 1px; overflow: hidden;
+    clip: rect(0 0 0 0); white-space: nowrap;
+  }
+  :global(html.frame-away) .toggle:not(:focus-visible) { translate: 0 calc(100% + var(--gutter) + 8px); }
+}

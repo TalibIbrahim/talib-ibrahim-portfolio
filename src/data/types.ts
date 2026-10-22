@@ -1,131 +1,93 @@
-export interface HeroData {
-  readonly headline: string;
-  readonly subheadline: string;
-  readonly currentStatusBadge: string;
-  readonly tickerStrings: readonly string[];
-  readonly imageUrl: string;
-}
+// Shared content contract. Components only ever read these shapes; copy lives in site.ts / projects.ts.
 
-export interface Project {
-  readonly id: string;
-  readonly title: string;
-  readonly description: string;
-  readonly thumbnailUrl: string;
-  readonly techTags: readonly string[];
-  readonly githubLink?: string;
-  readonly liveLink?: string;
-  readonly architectureHighlights: readonly string[];
-}
+export type Img = {
+  src: string; // absolute URL or /public path
+  alt: string; // describes content and purpose, never "image of"
+  width: number;
+  height: number;
+};
 
-export interface Experience {
-  readonly id: string;
-  readonly role: string;
-  readonly company: string;
-  readonly duration: string;
-  readonly achievements: readonly string[];
-}
+/** A reel is either a looping muted video, or a still that the showreel animates. */
+export type Media =
+  | { kind: 'video'; src: string; poster: Img }
+  | { kind: 'poster'; poster: Img; motion?: 'pan' | 'zoom' | 'drift' };
 
-export interface TechCompetencies {
-  readonly languages: readonly string[];
-  readonly frameworks: readonly string[];
-  readonly backendDevOps: readonly string[];
-  readonly databases: readonly string[];
-}
+export type ProjectLinks = {
+  live?: string;
+  repo?: string;
+};
 
-export interface SocialLink {
-  readonly platform: string;
-  readonly url: string;
-  readonly iconIdentifier?: string;
-}
+export type Project = {
+  slug: string; // URL segment: /work/<slug>; also the MDX filename
+  title: string;
+  tagline: string; // one line under the title in the reel
+  summary: string; // one or two sentences for the case-study lede and meta description
+  kind: string; // short category, e.g. "P2P file sharing"
+  role: string | null; // null = not stated yet; never invent
+  year: number | null; // null = not stated yet; never invent
+  stack: string[];
+  highlights: string[]; // factual bullet points
+  links: ProjectLinks;
+  media: Media;
+  /** Optional tint for the reel's timecode and hover; defaults to the site accent. */
+  accent?: string;
+  /** Lower comes first. Projects without an order follow in array order. */
+  order?: number;
+  /** false hides the project from the showreel (still gets a case page and Recruiter Mode entry). */
+  featured?: boolean;
+};
 
-export interface PortfolioData {
-  readonly hero: HeroData;
-  readonly projects: readonly Project[];
-  readonly experience: readonly Experience[];
-  readonly competencies: TechCompetencies;
-  readonly socials: readonly SocialLink[];
-}
+export type Link = { label: string; href: string };
 
-export interface ContactFormData {
-  readonly name: string;
-  readonly email: string;
-  readonly subject: string;
-  readonly message: string;
-}
+export type Experience = {
+  role: string;
+  org: string;
+  place: string;
+  start: string; // display string, e.g. "Nov 2024"
+  end: string; // display string or "Present"
+  points: string[];
+};
 
-export interface ContactApiResponse {
-  readonly success: boolean;
-  readonly message: string;
-  readonly error?: string;
-}
+export type Education = {
+  school: string;
+  degree: string;
+  start: string;
+  end: string; // display string, e.g. "July 2027 (expected)"
+  gpa?: string;
+};
 
-export type PortfolioMode = 'hyper' | 'boring';
+export type StackGroup = {
+  name: string;
+  items: string[];
+};
 
-export interface ModeContextType {
-  readonly mode: PortfolioMode;
-  readonly isTransitioning: boolean;
-  readonly toggleMode: () => void;
-  readonly setMode: (mode: PortfolioMode) => void;
-}
-
-export interface SoundSettings {
-  readonly isMuted: boolean;
-}
-
-export interface AudioSynthController {
-  readonly toggleMute: () => boolean;
-  readonly getMuted: () => boolean;
-  readonly setMuted: (muted: boolean) => void;
-  readonly playHoverBeep: () => void;
-  readonly playClickChime: () => void;
-  readonly playModeSwitchSound: (toBoring: boolean) => void;
-  readonly playOverdriveChime: () => void;
-}
-
-export type IntensityStage = 1 | 2 | 3 | 4;
-
-export interface IntensityStageConfig {
-  readonly stage: IntensityStage;
-  readonly label: string;
-  readonly shortName: string;
-  readonly description: string;
-}
-
-export interface IntensityContextType {
-  readonly stage: IntensityStage;
-  readonly setStage: (stage: IntensityStage) => void;
-  readonly isTransitioning: boolean;
-  readonly stageConfigs: Record<IntensityStage, IntensityStageConfig>;
-}
-
-export type ColorMode = 'dark' | 'light';
-
-export interface DockRouteItem {
-  readonly path: string;
-  readonly name: string;
-  readonly shortName: string;
-  readonly iconIdentifier: string;
-  readonly description: string;
-  readonly accentColor: string;
-  readonly shortcutKey?: string;
-}
-
-export interface UseColorModeReturn {
-  readonly mode: ColorMode;
-  readonly toggleMode: () => void;
-  readonly setMode: (mode: ColorMode) => void;
-}
-
-export interface UseDockRoutesReturn {
-  readonly routes: readonly DockRouteItem[];
-  readonly activeRoute: DockRouteItem;
-  readonly isActive: (path: string) => boolean;
-}
-
-export interface UseAssistantPromptReturn {
-  readonly isVisible: boolean;
-  readonly dismiss: () => void;
-  readonly isRecruiterPage: boolean;
-}
-
-
+export type Site = {
+  name: string;
+  shortName: string;
+  role: string;
+  url: string; // production URL, no trailing slash
+  description: string; // 120 to 160 chars, meta description
+  location: string;
+  email: string;
+  phone?: string;
+  tagline: string;
+  about: string[]; // paragraphs, first person
+  links: { github: Link; linkedin: Link; site: Link };
+  education: Education[];
+  experience: Experience[];
+  certifications: string[];
+  stack: StackGroup[];
+  contact: {
+    heading: string;
+    body: string;
+    subjects: { value: string; label: string }[];
+  };
+  recruiter: {
+    toggle: string; // the persistent button on the full site
+    back: string; // returns to the full site
+    less: string; // slider end labels
+    more: string;
+    levels: [string, string, string, string]; // 0 = least sell … 3 = hard sell (default)
+    brief: string; // the whole pitch at the lowest level
+  };
+};

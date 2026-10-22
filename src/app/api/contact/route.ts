@@ -1,90 +1,124 @@
-import { NextResponse } from "next/server";
-import nodemailer from "nodemailer";
-import type { ContactFormData, ContactApiResponse } from "@/data/types";
+import { NextResponse } from 'next/server';
+import nodemailer from 'nodemailer';
+
+export const runtime = 'nodejs';
+
+type ContactBody = {
+  name?: unknown;
+  email?: unknown;
+  subject?: unknown;
+  message?: unknown;
+  /** Honeypot: hidden from people, filled by bots. */
+  company?: unknown;
+};
+
+type ContactResponse = {
+  success: boolean;
+  message: string;
+  error?: string;
+};
+
+const MAX_MESSAGE = 5000;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+// Palette mirrors DESIGN.md.
+const C = {
+  bg: '#0B0B0C',
+  panel: '#131315',
+  fg: '#ECE8DF',
+  muted: '#8F8A80',
+  line: '#2A2926',
+  accent: '#4D6BFF',
+  accentText: '#8094FF',
+};
 
 function escapeHtml(str: string): string {
   return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
 }
 
-export async function POST(request: Request): Promise<NextResponse<ContactApiResponse>> {
+function fail(status: number, message: string, error: string) {
+  return NextResponse.json<ContactResponse>({ success: false, message, error }, { status });
+}
+
+export async function POST(request: Request): Promise<NextResponse<ContactResponse>> {
   try {
-    let body: Partial<ContactFormData>;
+    let body: ContactBody;
     try {
-      body = (await request.json()) as Partial<ContactFormData>;
+      body = (await request.json()) as ContactBody;
     } catch {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Malformed request payload: Body must be valid JSON.",
-          error: "Invalid JSON format",
-        },
-        { status: 400 }
+      return fail(400, 'Malformed request payload: Body must be valid JSON.', 'Invalid JSON format');
+    }
+    if (!body || typeof body !== 'object') {
+      return fail(400, 'Malformed request payload: Body must be a JSON object.', 'Invalid JSON format');
+    }
+
+    const { name, email, subject, message, company } = body;
+
+    // Honeypot filled: pretend it worked and send nothing.
+    if (typeof company === 'string' && company.trim().length > 0) {
+      return NextResponse.json<ContactResponse>(
+        { success: true, message: 'Email sent successfully!' },
+        { status: 200 },
       );
     }
 
-    const { name, email, subject, message } = body;
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email || typeof email !== "string" || !emailRegex.test(email.trim())) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Validation failed: A valid email address is required.",
-          error: "Invalid or missing email address.",
-        },
-        { status: 400 }
-      );
+    if (typeof email !== 'string' || !EMAIL_RE.test(email.trim())) {
+      return fail(400, 'Validation failed: A valid email address is required.', 'Invalid or missing email address.');
     }
 
-    if (!message || typeof message !== "string" || message.trim().length === 0) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Validation failed: Message cannot be empty.",
-          error: "Missing or empty message.",
-        },
-        { status: 400 }
+    if (typeof message !== 'string' || message.trim().length === 0) {
+      return fail(400, 'Validation failed: Message cannot be empty.', 'Missing or empty message.');
+    }
+
+    if (message.trim().length > MAX_MESSAGE) {
+      return fail(
+        400,
+        `Validation failed: Message must be ${MAX_MESSAGE} characters or fewer.`,
+        'Message too long.',
       );
     }
 
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Server configuration missing: Please add EMAIL_USER and EMAIL_PASS to .env.local",
-          error: "Missing email server credentials.",
-        },
-        { status: 500 }
+      return fail(
+        500,
+        'Server configuration missing: Please add EMAIL_USER and EMAIL_PASS to .env.local',
+        'Missing email server credentials.',
       );
     }
 
-    const trimmedName = typeof name === "string" ? name.trim() : "";
+    const trimmedName = typeof name === 'string' ? name.trim() : '';
     const trimmedEmail = email.trim();
-    const trimmedSubject = typeof subject === "string" ? subject.trim() : "";
+    const trimmedSubject = typeof subject === 'string' ? subject.trim() : '';
     const trimmedMessage = message.trim();
+    const subjectText = trimmedSubject || 'General Inquiry';
 
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      service: 'gmail',
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,
       },
     });
 
-    const recipient = process.env.EMAIL_USER || "talibibrahim04@gmail.com";
-    const subjectLine = `Portfolio Contact: [${trimmedSubject || "General Inquiry"}] from ${trimmedName || trimmedEmail}`;
+    const recipient = process.env.EMAIL_USER;
+    const subjectLine = `Portfolio Contact: [${subjectText}] from ${trimmedName || trimmedEmail}`;
 
-    const textBody = `Name: ${trimmedName || "N/A"}
+    const textBody = `Name: ${trimmedName || 'N/A'}
 Email: ${trimmedEmail}
-Subject: ${trimmedSubject || "General Inquiry"}
+Subject: ${subjectText}
 
 Message:
 ${trimmedMessage}`;
+
+    const mono = "ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace";
+    const serif = "Georgia, 'Times New Roman', serif";
+    const label = `padding: 6px 0; width: 90px; font-size: 11px; color: ${C.muted}; text-transform: uppercase; letter-spacing: 0.06em; font-family: ${mono}; vertical-align: top;`;
+    const value = `padding: 6px 0; font-size: 14px; color: ${C.fg}; font-family: ${mono};`;
 
     const htmlBody = `
 <!DOCTYPE html>
@@ -92,64 +126,55 @@ ${trimmedMessage}`;
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="dark">
   <title>${escapeHtml(subjectLine)}</title>
 </head>
-<body style="margin: 0; padding: 0; background-color: #0a0a0a; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; color: #ededed;">
-  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #0a0a0a; padding: 40px 16px;">
+<body style="margin: 0; padding: 0; background-color: ${C.bg}; color: ${C.fg}; font-family: ${mono};">
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: ${C.bg}; padding: 40px 16px;">
     <tr>
       <td align="center">
-        <table role="presentation" width="100%" style="max-width: 600px; background-color: #121212; border: 1px solid #262626; border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.5); text-align: left;">
-          <!-- Header Banner -->
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 600px; background-color: ${C.panel}; border: 1px solid ${C.line}; text-align: left;">
           <tr>
-            <td style="background-color: #181818; border-bottom: 2px solid #ccff00; padding: 24px 32px;">
-              <p style="margin: 0; font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #ccff00; font-family: ui-monospace, SFMono-Regular, Consolas, monospace;">
-                Transmission Protocol // Portfolio Contact
+            <td style="padding: 28px 32px 20px 32px; border-bottom: 2px solid ${C.accent};">
+              <p style="margin: 0; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: ${C.accentText}; font-family: ${mono};">
+                New message from muhammad-talib.dev
               </p>
-              <h1 style="margin: 8px 0 0 0; font-size: 20px; font-weight: 600; color: #ffffff; line-height: 1.3;">
-                ${escapeHtml(trimmedSubject || "General Inquiry")}
+              <h1 style="margin: 10px 0 0 0; font-size: 26px; font-weight: 400; color: ${C.fg}; line-height: 1.15; font-family: ${serif};">
+                ${escapeHtml(subjectText)}
               </h1>
             </td>
           </tr>
-          <!-- Sender Details -->
           <tr>
-            <td style="padding: 24px 32px 16px 32px;">
+            <td style="padding: 20px 32px 12px 32px;">
               <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
                 <tr>
-                  <td style="padding: 6px 0; width: 90px; font-size: 12px; font-weight: 600; color: #888888; text-transform: uppercase; letter-spacing: 0.08em; font-family: ui-monospace, SFMono-Regular, Consolas, monospace;">Sender:</td>
-                  <td style="padding: 6px 0; font-size: 14px; color: #ffffff; font-weight: 500;">${escapeHtml(trimmedName || "N/A")}</td>
+                  <td style="${label}">Name</td>
+                  <td style="${value}">${escapeHtml(trimmedName || 'N/A')}</td>
                 </tr>
                 <tr>
-                  <td style="padding: 6px 0; font-size: 12px; font-weight: 600; color: #888888; text-transform: uppercase; letter-spacing: 0.08em; font-family: ui-monospace, SFMono-Regular, Consolas, monospace;">Email:</td>
-                  <td style="padding: 6px 0; font-size: 14px; color: #ccff00;">
-                    <a href="mailto:${escapeHtml(trimmedEmail)}" style="color: #ccff00; text-decoration: none; font-weight: 500;">${escapeHtml(trimmedEmail)}</a>
+                  <td style="${label}">Email</td>
+                  <td style="${value}">
+                    <a href="mailto:${escapeHtml(trimmedEmail)}" style="color: ${C.accentText}; text-decoration: underline;">${escapeHtml(trimmedEmail)}</a>
                   </td>
                 </tr>
                 <tr>
-                  <td style="padding: 6px 0; font-size: 12px; font-weight: 600; color: #888888; text-transform: uppercase; letter-spacing: 0.08em; font-family: ui-monospace, SFMono-Regular, Consolas, monospace;">Subject:</td>
-                  <td style="padding: 6px 0; font-size: 14px; color: #ffffff;">${escapeHtml(trimmedSubject || "General Inquiry")}</td>
+                  <td style="${label}">Subject</td>
+                  <td style="${value}">${escapeHtml(subjectText)}</td>
                 </tr>
               </table>
             </td>
           </tr>
-          <!-- Divider -->
           <tr>
-            <td style="padding: 0 32px;">
-              <hr style="border: none; border-top: 1px solid #222222; margin: 8px 0;" />
-            </td>
-          </tr>
-          <!-- Message Body -->
-          <tr>
-            <td style="padding: 16px 32px 28px 32px;">
-              <p style="margin: 0 0 10px 0; font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: #888888; font-family: ui-monospace, SFMono-Regular, Consolas, monospace;">
-                Message Content:
+            <td style="padding: 8px 32px 32px 32px;">
+              <p style="margin: 0 0 10px 0; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: ${C.muted}; font-family: ${mono};">
+                Message
               </p>
-              <div style="background-color: #080808; border: 1px solid #1f1f1f; border-left: 3px solid #ccff00; border-radius: 4px; padding: 16px 20px; font-size: 14px; line-height: 1.6; color: #e5e5e5; white-space: pre-wrap; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">${escapeHtml(trimmedMessage)}</div>
+              <div style="border-left: 2px solid ${C.accent}; padding: 4px 0 4px 18px; font-size: 15px; line-height: 1.6; color: ${C.fg}; white-space: pre-wrap; font-family: ${mono};">${escapeHtml(trimmedMessage)}</div>
             </td>
           </tr>
-          <!-- Footer -->
           <tr>
-            <td style="padding: 16px 32px; background-color: #0f0f0f; border-top: 1px solid #1a1a1a; font-size: 11px; color: #555555; text-align: center;">
-              Dispatched securely via portfolio contact API endpoint
+            <td style="padding: 14px 32px; border-top: 1px solid ${C.line}; font-size: 11px; color: ${C.muted}; font-family: ${mono};">
+              Reply to this email to answer ${escapeHtml(trimmedName || trimmedEmail)} directly.
             </td>
           </tr>
         </table>
@@ -159,33 +184,25 @@ ${trimmedMessage}`;
 </body>
 </html>`.trim();
 
-    const mailOptions = {
+    await transporter.sendMail({
       from: process.env.EMAIL_USER,
       to: recipient,
       replyTo: trimmedEmail,
       subject: subjectLine,
       text: textBody,
       html: htmlBody,
-    };
+    });
 
-    await transporter.sendMail(mailOptions);
-
-    return NextResponse.json(
-      {
-        success: true,
-        message: "Email sent successfully!",
-      },
-      { status: 200 }
+    return NextResponse.json<ContactResponse>(
+      { success: true, message: 'Email sent successfully!' },
+      { status: 200 },
     );
   } catch (error) {
-    console.error("Error sending email:", error);
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Failed to send email",
-        error: error instanceof Error ? error.message : "Internal server error",
-      },
-      { status: 500 }
+    console.error('Error sending email:', error);
+    return fail(
+      500,
+      'Failed to send email',
+      error instanceof Error ? error.message : 'Internal server error',
     );
   }
 }
