@@ -1,0 +1,143 @@
+/* Contact form. Real labels above fields, 48px fields, 2px accent focus ring (global :focus-visible). */
+.form {
+  /* The form sits on paper (Contact). Tones derived from the tokens; the error red is not in the
+     palette yet: promote it to globals.css if it is reused. */
+  --f-fg: var(--c-bg);
+  --f-muted: color-mix(in oklab, var(--c-bg) 62%, var(--c-fg)); /* ~6:1 on paper */
+  --f-rule: rgb(11 11 12 / 0.34);
+  --f-accent: color-mix(in oklab, var(--c-accent) 72%, var(--c-bg)); /* small text on paper */
+  --c-error: #b42318; /* ~5.6:1 on paper */
+  display: grid;
+  gap: calc(var(--u) * 3);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: calc(var(--u) * 3) var(--gutter);
+}
+
+.field {
+  display: grid;
+  gap: calc(var(--u) * 0.75);
+  min-width: 0;
+}
+.label {
+  font-size: var(--t-s);
+  color: var(--f-muted);
+  width: fit-content;
+}
+.field:focus-within .label { color: var(--f-fg); }
+
+.input {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.65em 0;
+  border: 0;
+  border-bottom: 1px solid var(--f-rule);
+  border-radius: 0;
+  background: transparent;
+  color: var(--f-fg);
+  font-size: var(--t-body);
+  line-height: 1.4;
+  transition: border-color 0.4s var(--ease-soft);
+}
+.input:hover { border-bottom-color: var(--f-muted); }
+.input:focus { border-bottom-color: var(--c-accent); }
+.input:focus-visible { outline-offset: 4px; }
+.field[data-invalid] .input { border-bottom-color: var(--c-error); }
+
+.textarea {
+  min-height: 9.5rem;
+  resize: vertical;
+}
+
+.selectWrap { position: relative; }
+.select {
+  appearance: none;
+  padding-right: 2rem;
+  cursor: pointer;
+}
+.select option { background: var(--c-fg); color: var(--c-bg); }
+.chevron {
+  position: absolute;
+  right: 0.25rem;
+  top: 50%;
+  margin-top: -9px;
+  pointer-events: none;
+  color: var(--f-muted);
+}
+
+.under {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 1em;
+}
+.count {
+  margin-left: auto;
+  font-size: var(--t-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--f-muted);
+  white-space: nowrap;
+}
+.error {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  font-size: var(--t-s);
+  color: var(--c-error);
+}
+.error svg { flex: none; }
+
+/* Honeypot: off-screen, never display:none (some bots skip hidden fields) */
+.hp {
+  position: absolute;
+  left: -10000px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: calc(var(--u) * 1.5) calc(var(--u) * 3);
+  padding-top: calc(var(--u) * 1);
+}
+.submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75em;
+  min-height: 3rem;
+  padding: 0 1.5em;
+  background: var(--c-bg);
+  color: var(--c-fg);
+  font-size: var(--t-s);
+  letter-spacing: 0.01em;
+  transition: background-color 0.4s var(--ease-soft), color 0.4s var(--ease-soft);
+}
+.submit:hover,
+.submit:focus-visible { background: var(--c-accent); color: #fff; }
+.submit:active { scale: 0.98; }
+.submit[aria-disabled='true'] { cursor: progress; background: var(--f-muted); color: var(--c-fg); }
+.submit[data-state='sent'] { background: var(--c-accent); color: #fff; }
+.icon { flex: none; transition: translate 0.6s var(--ease-out); }
+.submit[data-state='idle']:hover .icon { translate: 3px -3px; }
+.submit[data-state='sending'] .icon { animation: spin 0.9s linear infinite; }
+@keyframes spin { to { rotate: 360deg; } }
+
+.status {
+  font-size: var(--t-s);
+  color: var(--f-muted);
+  max-width: 48ch;
+}
+.status[data-state='sent'] { color: var(--f-accent); }
+.status[data-state='error'] { color: var(--c-error); }
+
+@media (max-width: 767px) {
+  .row { grid-template-columns: 1fr; }
+  .submit { width: 100%; justify-content: center; }
+}

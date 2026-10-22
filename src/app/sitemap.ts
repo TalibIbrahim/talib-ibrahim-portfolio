@@ -1,12 +1,14 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from 'next';
+import { getProjects } from '@/data/projects';
+import { site } from '@/data/site';
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
-    {
-      url: "https://muhammad-talib.dev",
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 1,
-    },
+    { url: `${site.url}/`, changeFrequency: 'monthly', priority: 1 },
+    ...getProjects().map((p) => ({
+      url: `${site.url}/work/${p.slug}`,
+      changeFrequency: 'yearly' as const,
+      priority: 0.7,
+    })),
   ];
 }

@@ -1,0 +1,114 @@
+/* Base (no JS, reduced motion): the finished signature and the statement. */
+.section {
+  position: relative;
+  z-index: 0; /* under the landing's stage, so the handoff on the ink dot is seamless */
+  background: var(--c-bg);
+}
+.stage {
+  position: relative;
+  min-height: 100svh;
+  overflow: clip;
+  display: grid;
+  align-content: center;
+  padding: calc(var(--header-h) + var(--u) * 4) var(--gutter) calc(var(--u) * 8);
+}
+.host,
+.paper {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.host :global(canvas) { width: 100%; height: 100%; display: block; }
+.paper {
+  background: var(--c-fg);
+  visibility: hidden;
+}
+
+.flat {
+  position: relative;
+  width: min(80vw, 1100px);
+  margin: 0 auto;
+}
+.sig { width: 100%; height: auto; overflow: visible; }
+.stroke {
+  fill: none;
+  stroke: var(--c-accent);
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+.dot { fill: var(--c-accent); }
+
+.copy {
+  position: relative;
+  margin-top: calc(var(--u) * 6);
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gutter);
+  align-items: end;
+  color: #fff;
+  mix-blend-mode: difference; /* legible on the desk and on the paper as the ink passes under it */
+}
+.statement {
+  grid-column: 1 / span 8;
+  font-family: var(--f-display);
+  font-weight: 500;
+  font-size: var(--t-l);
+  line-height: 1.02;
+  letter-spacing: var(--track-l);
+  max-width: 22ch;
+}
+.counter {
+  grid-column: 10 / span 3;
+  justify-self: start;
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #a39e95;
+}
+.count { font-variant-numeric: tabular-nums; color: #fff; }
+
+/* ---------- Motion on: a sticky stage that starts under the landing's last screen ---------- */
+:global(html.motion) .section {
+  height: 300svh;
+  margin-top: -100svh;
+}
+:global(html.motion) .stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: block;
+  padding: 0;
+}
+:global(html.motion) .flat {
+  position: absolute;
+  left: 50%;
+  top: 40%;
+  translate: -50% -50%;
+  margin: 0;
+}
+:global(html.motion) .stroke { stroke-dashoffset: 1; }
+:global(html.motion) .dot { r: 0; }
+:global(html.motion) .copy {
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: calc(var(--u) * 7);
+  margin: 0;
+}
+:global(html.motion) .statement { visibility: hidden; }
+/* With the 3D pipe running, the flat SVG steps aside (it stays in the DOM for assistive tech). */
+.gl .flat { opacity: 0; }
+
+@media (max-width: 767px) {
+  .flat { width: 92vw; }
+  .copy { grid-template-columns: repeat(4, minmax(0, 1fr)); row-gap: calc(var(--u) * 1.5); }
+  .statement { grid-column: 1 / -1; }
+  .counter { grid-column: 1 / -1; }
+  :global(html.motion) .section { height: 220svh; }
+  :global(html.motion) .flat { top: 36%; }
+  :global(html.motion) .copy { bottom: calc(var(--u) * 9 + 3rem); }
+}
