@@ -79,7 +79,7 @@ export function CaseStudy({ project: p, next, Body }: Props) {
   const hasLinks = Boolean(p.links.live || p.links.repo);
 
   return (
-    <div className="fun-only" data-fun-root data-stage>
+    <div data-fun-root data-stage>
       <article className={styles.page} aria-labelledby="case-title">
         <header className={styles.head} data-drop>
           <p className={styles.eyebrow}>

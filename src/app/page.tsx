@@ -1,4 +1,3 @@
-import { RecruiterHome } from '@/components/recruiter/RecruiterHome';
 import { Hero } from '@/components/sections/Hero';
 import { Signature } from '@/components/sections/Signature';
 import { About } from '@/components/sections/About';
@@ -10,7 +9,7 @@ import { Contact } from '@/components/sections/Contact';
 export default function Home() {
   return (
     <>
-      <div className="fun-only" data-fun-root data-stage>
+      <div data-fun-root data-stage>
         <Hero />
         <Signature />
         <About />
@@ -19,7 +18,6 @@ export default function Home() {
         <Timeline />
         <Contact />
       </div>
-      <RecruiterHome />
     </>
   );
 }

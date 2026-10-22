@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import { Analytics } from '@vercel/analytics/next';
 import { site } from '@/data/site';
-import { MODE_SCRIPT } from '@/lib/mode-script';
+import { BOOT_SCRIPT } from '@/lib/mode-script';
 import { Header } from '@/components/chrome/Header';
+import { Curtain } from '@/components/chrome/Curtain';
 import { RecruiterToggle } from '@/components/chrome/RecruiterToggle';
 import { Motion } from '@/components/Motion';
 import { azeret, clash, general } from './fonts';
@@ -55,14 +56,14 @@ const jsonLd = {
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
-    <html lang="en" data-mode="fun" className={`${clash.variable} ${general.variable} ${azeret.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${clash.variable} ${general.variable} ${azeret.variable}`} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: MODE_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: BOOT_SCRIPT }} />
       </head>
       <body>
         <a className="skip-link" href="#main">Skip to content</a>
-        <div id="curtain" className="fun-only" aria-hidden="true"><div className="curtain__panel" /></div>
-        <div id="cursor" className="fun-only" aria-hidden="true">
+        <Curtain />
+        <div id="cursor" aria-hidden="true">
           <span className="cursor__dot" />
           <span className="cursor__label" data-cursor-label />
         </div>

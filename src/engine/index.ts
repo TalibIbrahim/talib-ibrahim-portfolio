@@ -3,13 +3,12 @@
 //   boot(setup)            once, on first load
 //   leave() → cleanup()    before the route swaps
 //   enter()                after the new page is in the DOM
-// Recruiter Mode calls suspend() / resume(): the engine (Lenis, ScrollTriggers, cursor, GL) only
-// runs while <html data-mode="fun">.
+// suspend() / resume() stop and restart the whole engine (Lenis, ScrollTriggers, cursor).
 // Project code hooks in with onPage(fn): fn runs on every page load inside a gsap.context, so the
 // tweens and ScrollTriggers it creates are reverted automatically. Return a cleanup for the rest.
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { destroyScroll, initScroll, resetScroll, startScroll, stopScroll } from './scroll';
+import { destroyScroll, initScroll, resetScroll, scrollToTarget, startScroll, stopScroll } from './scroll';
 import { initReveals } from './reveal';
 import { destroyCursor, initCursor, initMagnetic } from './cursor';
 import { playEnter, playLeave } from './transition';
@@ -32,7 +31,6 @@ let ready = false;
 let booted = false;
 let running = false;
 
-export const isFun = () => (document.documentElement.dataset.mode ?? 'fun') === 'fun';
 
 /** Run fn on every page load (and now, if a page is ready). Returns an unsubscribe. */
 export function onPage(fn: PageFn) {
@@ -69,7 +67,7 @@ function stopPageFn(fn: PageFn) {
 export function syncFlags() {
   const h = document.documentElement.classList;
   h.add('js', 'is-booted');
-  h.toggle('motion', !prefersReducedMotion() && isFun());
+  h.toggle('motion', !prefersReducedMotion());
 }
 
 function initPage() {
@@ -100,7 +98,7 @@ export function boot(setup?: () => void) {
   booted = true;
   setup?.();
   syncFlags();
-  if (isFun()) start();
+  start();
 }
 
 /** Tear down the current page: reverts every tween, ScrollTrigger and split. */
@@ -136,8 +134,25 @@ export async function leave() {
   await playLeave();
 }
 
+/** Jump to #anchor under the curtain, then re-land while the new page's layout settles (styles,
+ *  pin spacers, fonts), stopping as soon as the visitor scrolls on their own. */
+function landOn(hash: string) {
+  const land = () => {
+    ScrollTrigger.refresh();
+    scrollToTarget(hash, { immediate: true });
+    return scrollY;
+  };
+  let at = land();
+  [0.3, 0.8, 1.6].forEach((t) =>
+    gsap.delayedCall(t, () => {
+      if (Math.abs(scrollY - at) > 4) return; // the visitor moved: leave them be
+      at = land();
+    }),
+  );
+}
+
 /** Init the new page. `transition: false` for back/forward, where no leave ran. */
-export async function enter({ transition = true, scrollTop = true } = {}) {
+export async function enter({ transition = true, scrollTop = true, hash = '' } = {}) {
   if (!booted) return;
   if (!running) {
     if (scrollTop) scrollTo(0, 0);
@@ -146,6 +161,8 @@ export async function enter({ transition = true, scrollTop = true } = {}) {
   cleanup();
   if (scrollTop) resetScroll();
   initPage();
+  // /#about from another page: land on the section, not the top (after pins have measured).
+  if (hash && document.querySelector(hash)) landOn(hash);
   if (transition) await playEnter();
   startScroll();
   intro?.play();
