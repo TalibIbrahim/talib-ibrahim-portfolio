@@ -1,0 +1,292 @@
+/* ============================================================
+   SHOWREEL
+   Base (no JS, reduced motion, phones): a stacked list of reels.
+   [data-film] (desktop + motion, set by ShowreelMotion): sticky film stage.
+   Elements GSAP animates carry no CSS transform: [data-frame], [data-strip],
+   [data-window], [data-poster], [data-idle], split chars/lines.
+   ============================================================ */
+
+.section {
+  overflow-x: clip; /* poster bleed stays inside the section (clip keeps sticky working) */
+  position: relative;
+  padding-block: calc(var(--u) * 12) calc(var(--u) * 8);
+  overflow-x: clip;
+}
+
+/* ---------- heading ---------- */
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: calc(var(--u) * 2);
+  padding-inline: var(--gutter);
+  padding-bottom: calc(var(--u) * 5);
+}
+.heading {
+  font-family: var(--f-display);
+  font-size: var(--t-l);
+  letter-spacing: var(--track-l);
+  line-height: 0.95;
+}
+.count {
+  font-size: var(--t-s);
+  color: var(--c-muted);
+  white-space: nowrap;
+}
+
+/* ---------- list (base) ---------- */
+.track { position: relative; }
+.stage { position: relative; }
+.frame { position: relative; }
+.strip {
+  display: grid;
+  gap: calc(var(--u) * 3);
+  padding-inline: var(--gutter);
+}
+
+.sprockets,
+.timecode { display: none; }
+
+/* ---------- reel ---------- */
+.reel {
+  --reel-accent: var(--c-accent);
+  position: relative;
+}
+.window {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: clip;
+  /* Each frame clips its own poster motion (pan / zoom / drift run on composited layers;
+     paint containment keeps them inside even inside the 3D-tilted frame). */
+  contain: paint;
+  background: var(--c-bg-2);
+}
+@media (min-width: 768px) {
+  .window { aspect-ratio: 16 / 9; }
+}
+
+.media {
+  position: absolute;
+  inset: 0;
+  overflow: clip;
+  clip-path: inset(0% 0% 0% 0%);
+  transition: clip-path 0.7s var(--ease-out);
+}
+.poster {
+  position: absolute;
+  inset: -8%;
+}
+.idle {
+  position: absolute;
+  inset: 0;
+}
+.img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 0%;
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, rgb(11 11 12 / 0.7) 0%, rgb(11 11 12 / 0) 24%),
+    linear-gradient(to top, rgb(11 11 12 / 0.97) 0%, rgb(11 11 12 / 0.88) 38%, rgb(11 11 12 / 0.4) 60%, rgb(11 11 12 / 0) 78%);
+}
+
+/* Copy sits over the image; it is the positioning box for the stretched link. */
+.copy {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: calc(var(--u) * 2) var(--gutter) calc(var(--u) * 2.5);
+}
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25em 1.5em;
+  font-size: var(--t-xs);
+  color: var(--c-fg);
+}
+.index {
+  letter-spacing: 0.04em;
+  color: var(--c-accent-text);
+}
+.bottom {
+  display: grid;
+  gap: calc(var(--u) * 1.25);
+  max-width: 62rem;
+}
+
+.title {
+  font-family: var(--f-display);
+  font-size: var(--t-xl);
+  letter-spacing: var(--track-xl);
+  line-height: 0.92;
+}
+.link {
+  display: inline-block;
+  min-height: 44px;
+}
+/* One link per reel, stretched over the whole frame. */
+.link::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+.link:focus-visible { outline: none; }
+.link:focus-visible::after {
+  outline: 2px solid var(--reel-accent);
+  outline-offset: -10px;
+}
+
+.titleShift {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.12em;
+  translate: 0 0;
+  transition: translate 0.6s var(--ease-out);
+}
+.titleText { display: inline-block; }
+/* Room for Boska descenders inside the per-char masks. */
+.titleText :global(.reel-char-mask) {
+  padding-block: 0.06em 0.14em;
+  margin-block: -0.06em -0.14em;
+}
+.arrow {
+  flex: none;
+  width: 0.42em;
+  height: 0.42em;
+  margin-top: 0.1em;
+  color: var(--reel-accent);
+  translate: 0 0;
+  transition: translate 0.5s var(--ease-soft);
+}
+
+.tagline {
+  font-size: var(--t-body);
+  color: var(--c-fg);
+  max-width: 44ch;
+}
+.stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25em 1.25em;
+  padding: 0;
+  list-style: none;
+  font-size: var(--t-xs);
+  color: var(--c-muted);
+}
+.stack li { color: rgb(236 232 223 / 0.72); }
+
+/* ---------- hover / focus: the frame tightens, the title leads ---------- */
+@media (hover: hover) and (pointer: fine) {
+  .reel:hover .media { clip-path: inset(2% 2% 2% 2%); }
+  .reel:hover .titleShift { translate: 0.08em 0; }
+  .reel:hover .arrow { translate: 0.06em -0.06em; }
+}
+.reel:has(.link:focus-visible) .media { clip-path: inset(2% 2% 2% 2%); }
+.reel:has(.link:focus-visible) .titleShift { translate: 0.08em 0; }
+
+/* ============================================================
+   FILM (desktop + motion)
+   ============================================================ */
+.section[data-film] { padding-bottom: 0; }
+
+.section[data-film] .track {
+  height: calc((var(--n) + 1) * 100svh);
+}
+.section[data-film] .stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  perspective: 1400px;
+}
+.section[data-film] .frame {
+  height: 100%;
+  overflow: clip;
+  background: var(--c-bg);
+}
+.section[data-film] .strip {
+  display: block;
+  height: calc(var(--n) * 100%);
+  padding: 0;
+}
+.section[data-film] .reel {
+  height: calc(100% / var(--n));
+  overflow: clip;
+  contain: paint;
+}
+.section[data-film] .window {
+  aspect-ratio: auto;
+  height: 100%;
+}
+/* More bleed at the top: the posters are site screenshots, and with the zoom / drift settling
+   back to 1 the bottom edge of their own nav bar used to peek in as a sliver at the gate's top. */
+.section[data-film] .poster {
+  inset: -16% -8% -8%;
+}
+.section[data-film] .reel + .reel .window {
+  border-top: 1px solid var(--c-line);
+}
+.section[data-film] .copy {
+  padding: calc(var(--header-h) + var(--u) * 2) calc(var(--gutter) + 1.75rem) calc(var(--u) * 5);
+}
+.section[data-film] .bottom {
+  max-width: 72rem;
+}
+
+/* Perforated edges, both sides. */
+.section[data-film] .sprockets {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+.sprockets span {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1.25rem;
+  background:
+    repeating-linear-gradient(
+      to bottom,
+      transparent 0 10px,
+      rgb(236 232 223 / 0.22) 10px 22px,
+      transparent 22px 34px
+    )
+    50% 0 / 0.5rem 100% no-repeat,
+    rgb(11 11 12 / 0.86);
+}
+.sprockets span:first-child { left: 0; border-right: 1px solid var(--c-line); }
+.sprockets span:last-child { right: 0; border-left: 1px solid var(--c-line); }
+
+/* Timecode: real position in the reel. */
+.section[data-film] .timecode {
+  display: flex;
+  gap: 1.5em;
+  position: absolute;
+  z-index: 2;
+  right: calc(var(--gutter) + 1.75rem);
+  top: calc(var(--header-h) + var(--u) * 2);
+  font-size: var(--t-xs);
+  letter-spacing: 0.04em;
+  font-family: var(--f-mono);
+  text-transform: uppercase;
+  color: var(--c-fg);
+  pointer-events: none;
+}
+.tcNum {
+  color: var(--tc-accent, var(--c-accent-text));
+  font-variant-numeric: tabular-nums;
+}
+/* The per-reel index duplicates the timecode in film mode. */
+.section[data-film] .index { display: none; }

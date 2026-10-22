@@ -1,0 +1,238 @@
+/* ============================================================
+   CONTACT (finale + footer)
+   The finale is paper again: the dark Timeline sheet slides off it.
+   Base (no JS, reduced motion): plain flow under the Timeline, everything visible.
+   GSAP animates [data-under] (y, scale), [data-dim] (opacity) and [data-char] (yPercent).
+   None of them carry a CSS transform. The hover roll moves .ca / .cb with `translate`.
+   ============================================================ */
+
+.section {
+  /* Ink on paper, derived from the tokens */
+  --p-bg: var(--c-fg);
+  --p-fg: var(--c-bg);
+  --p-muted: color-mix(in oklab, var(--c-bg) 62%, var(--c-fg)); /* ~6:1 on paper */
+  --p-line: rgb(11 11 12 / 0.16);
+  --p-accent: color-mix(in oklab, var(--c-accent) 72%, var(--c-bg)); /* small text on paper */
+
+  position: relative;
+  z-index: 1; /* under the Timeline sheet */
+  background: var(--p-bg);
+  color: var(--p-fg);
+  overflow-x: clip;
+}
+.under {
+  position: relative;
+  background: var(--p-bg);
+}
+.section ::selection { background: var(--c-accent); color: #fff; }
+.dim {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: var(--c-bg);
+  opacity: 0;
+  pointer-events: none;
+}
+:global(html.motion) .dim { display: block; }
+
+/* ---------- lead: the first screen uncovered ---------- */
+.lead {
+  min-height: 100svh;
+  display: grid;
+  align-content: end;
+  gap: calc(var(--u) * 5);
+  padding: calc(var(--header-h) + var(--u) * 4) var(--gutter) calc(var(--u) * 8);
+}
+
+.heading {
+  font-family: var(--f-display);
+  font-size: var(--t-mega);
+  letter-spacing: var(--track-mega);
+  line-height: 0.88;
+  font-weight: 600;
+}
+.mail {
+  display: inline-block;
+  color: var(--p-fg);
+}
+.mail:focus-visible { outline-offset: 0.08em; }
+.word {
+  display: inline-block;
+  white-space: nowrap;
+}
+/* One mask per character: the reveal (GSAP) moves .cr, the hover roll moves .ca / .cb */
+.cm {
+  display: inline-block;
+  overflow: clip;
+  vertical-align: top;
+  padding: 0.1em 0.01em 0.16em;
+  margin: -0.1em -0.01em -0.16em;
+}
+.cr {
+  position: relative;
+  display: inline-block;
+}
+.ca,
+.cb {
+  display: block;
+  transition: translate 0.75s var(--ease-out);
+  transition-delay: calc(var(--i) * 24ms);
+}
+.cb {
+  position: absolute;
+  inset: 0;
+  translate: 0 130%;
+  color: var(--c-accent);
+}
+.mail:hover .ca,
+.mail:focus-visible .ca { translate: 0 -130%; }
+.mail:hover .cb,
+.mail:focus-visible .cb { translate: 0 0; }
+
+.arrowMask { margin-left: 0.04em; }
+.arrow {
+  width: 0.42em;
+  height: 0.42em;
+  color: var(--c-accent);
+  transition: translate 0.75s var(--ease-out);
+  vertical-align: top;
+  margin-top: 0.08em;
+}
+.mail:hover .arrow,
+.mail:focus-visible .arrow { translate: 0.06em -0.06em; }
+
+.leadRow {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  column-gap: var(--gutter);
+  row-gap: calc(var(--u) * 3);
+  align-items: end;
+}
+.body {
+  grid-column: 1 / span 6;
+  max-width: 52ch;
+  font-size: var(--t-body);
+}
+.address {
+  grid-column: 9 / span 4;
+  display: grid;
+  gap: 0.3em;
+  font-size: var(--t-s);
+}
+.addressLabel {
+  font-size: var(--t-xs);
+  letter-spacing: 0.04em;
+  font-family: var(--f-mono);
+  text-transform: uppercase;
+  color: var(--p-muted);
+}
+.addressValue {
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+
+/* ---------- form ---------- */
+.write {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  column-gap: var(--gutter);
+  row-gap: calc(var(--u) * 4);
+  padding: calc(var(--u) * 10) var(--gutter) calc(var(--u) * 14);
+  border-top: 1px solid var(--p-line);
+}
+.writeHead { grid-column: 1 / span 4; }
+.writeTitle {
+  font-family: var(--f-display);
+  font-size: var(--t-l);
+  letter-spacing: var(--track-l);
+  line-height: 0.95;
+}
+.writeNote {
+  margin-top: calc(var(--u) * 1.5);
+  font-size: var(--t-s);
+  color: var(--p-muted);
+  max-width: 28ch;
+}
+.formCol { grid-column: 5 / span 8; min-width: 0; }
+
+/* ---------- footer row ---------- */
+.foot {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  column-gap: var(--gutter);
+  row-gap: calc(var(--u) * 2);
+  align-items: center;
+  border-top: 1px solid var(--p-line);
+  /* keep the fixed "Recruiter mode" button's corner clear at the page end */
+  padding: calc(var(--u) * 3) var(--gutter) calc(var(--gutter) + 2.75rem + var(--u) * 3);
+  font-size: var(--t-s);
+}
+.copy { grid-column: 1 / span 4; color: var(--p-muted); }
+.links {
+  grid-column: 5 / span 4;
+  list-style: none;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 calc(var(--u) * 2.5);
+}
+.colophon {
+  grid-column: 9 / span 4;
+  color: var(--p-muted);
+  font-size: var(--t-xs);
+}
+
+/* Utility links: the underline draws */
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  min-height: 2.75rem;
+}
+.linkText { position: relative; }
+.linkText::before,
+.linkText::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.2em;
+  height: 1px;
+  background: currentColor;
+}
+.linkText::before { opacity: 0.25; }
+.linkText::after {
+  scale: 0 1;
+  transform-origin: 100% 50%;
+  transition: scale 0.6s var(--ease-out);
+}
+.link:hover .linkText::after,
+.link:focus-visible .linkText::after {
+  scale: 1 1;
+  transform-origin: 0% 50%;
+}
+.link svg { color: var(--p-muted); transition: translate 0.5s var(--ease-out), color 0.3s var(--ease-soft); }
+.link:hover svg { translate: 2px -2px; color: var(--p-fg); }
+
+/* ---------- phones ---------- */
+@media (max-width: 767px) {
+  .lead { min-height: 92svh; gap: calc(var(--u) * 4); }
+  .body, .address, .writeHead, .formCol, .copy, .links, .colophon { grid-column: 1 / -1; }
+  .write { padding-block: calc(var(--u) * 8) calc(var(--u) * 10); }
+  /* the toggle sits bottom-centre here */
+  .foot { padding-bottom: calc(var(--gutter) + 2.75rem + var(--u) * 5); }
+}
+@media (min-width: 768px) and (max-width: 1099px) {
+  .body { grid-column: 1 / span 7; }
+  .address { grid-column: 9 / span 4; }
+  .writeHead { grid-column: 1 / -1; }
+  .formCol { grid-column: 1 / -1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cb { display: none; }
+  .mail:hover .ca,
+  .mail:focus-visible .ca { translate: none; color: var(--c-accent); }
+  .mail:hover .arrow,
+  .mail:focus-visible .arrow { translate: none; }
+}
