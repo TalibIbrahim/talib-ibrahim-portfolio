@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import { clientIp, limitContact } from '@/lib/rate-limit';
 
 export const runtime = 'nodejs';
 
@@ -64,6 +65,20 @@ export async function POST(request: Request): Promise<NextResponse<ContactRespon
       return NextResponse.json<ContactResponse>(
         { success: true, message: 'Email sent successfully!' },
         { status: 200 },
+      );
+    }
+
+    // Rate limit: 3 per 10 minutes per visitor (and 30 a day site-wide when Upstash is configured).
+    const limited = await limitContact(clientIp(request));
+    if (!limited.ok) {
+      const minutes = Math.max(1, Math.ceil(limited.retryAfter / 60));
+      return NextResponse.json<ContactResponse>(
+        {
+          success: false,
+          message: `Too many messages. Please try again in ${minutes} minute${minutes === 1 ? '' : 's'}, or email directly.`,
+          error: 'Rate limited',
+        },
+        { status: 429, headers: { 'Retry-After': String(limited.retryAfter) } },
       );
     }
 

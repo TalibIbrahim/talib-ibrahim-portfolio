@@ -20,7 +20,7 @@
   column-gap: var(--gutter);
   row-gap: calc(var(--u) * 6);
   padding: calc(var(--u) * 16) var(--gutter) calc(var(--u) * 18);
-  overflow-x: clip; /* the portrait canvas overhangs its frame */
+  overflow-x: clip; /* the globe canvas overhangs its frame */
 }
 .label {
   grid-column: 1 / span 4;
@@ -65,42 +65,115 @@
   color: var(--c-bg);
 }
 
-/* ---------- halftone portrait ----------
+/* ---------- ink-dot globe ----------
    Desktop: cols 9-12 beside the lead and body, hanging under the meta (col 9).
-   Base: the <img> as a screen print (grayscale, multiplied onto the paper, fine dot mask).
-   .gl: the OGL dot canvas has taken over; the <img> stays in the DOM for alt / SEO. */
-.portrait {
+   Base: the SVG print (front hemisphere at the rest pose, pre-projected by scripts/gen-globe-dots.mjs).
+   .gl: the OGL dot canvas has taken over; the pin keeps riding on Lahore above it. */
+.globe {
+  --globe-deep: #1a2470; /* accent pressed toward the desk black */
   grid-column: 9 / span 4;
   grid-row: 2 / span 2;
   align-self: start;
   position: relative;
   margin: 0;
-  aspect-ratio: 476 / 820;
+  aspect-ratio: 1;
   width: min(100%, 26rem);
   justify-self: end;
-  touch-action: pan-y; /* sideways drags push dots; vertical drags still scroll */
+  touch-action: pan-y; /* sideways drags turn the globe; vertical drags still scroll */
+  user-select: none;
+  -webkit-user-select: none;
 }
 .print {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: contain;
-  filter: grayscale(1) contrast(1.15) brightness(1.05);
-  mix-blend-mode: multiply;
-  -webkit-mask-image: radial-gradient(circle, #000 0.95px, transparent 1.45px);
-  mask-image: radial-gradient(circle, #000 0.95px, transparent 1.45px);
-  -webkit-mask-size: 3px 3px;
-  mask-size: 3px 3px;
+  overflow: visible;
   transition: opacity 0.6s var(--ease-soft);
+}
+.limbRing {
+  fill: none;
+  stroke: var(--c-accent);
+  stroke-opacity: 0.32;
+  stroke-width: 3.6;
+  stroke-linecap: round;
+  stroke-dasharray: 0 9.6;
+}
+.faceDots,
+.limbDots {
+  fill: none;
+  stroke-linecap: round;
+}
+.faceDots {
+  stroke: var(--c-accent);
+  stroke-width: 6.2;
+}
+.limbDots {
+  stroke: color-mix(in srgb, var(--c-accent) 58%, var(--globe-deep));
+  stroke-width: 5;
 }
 .dots {
   position: absolute;
-  inset: -8%; /* overhang (PAD in HalftonePortrait) so pushed dots are not clipped */
+  inset: -8%; /* overhang (PAD in AboutGlobe) so scattered dots are not clipped */
   pointer-events: none;
   opacity: 0;
 }
 .dots :global(canvas) { display: block; width: 100%; height: 100%; }
 .gl .print { opacity: 0; }
+.globe[data-dragging] { cursor: grabbing; }
+
+/* The Lahore pin: a zero-size anchor at Lahore; the GL scene moves it with transform. */
+.pin {
+  position: absolute;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.core,
+.ring {
+  position: absolute;
+  left: -0.3125rem;
+  top: -0.3125rem;
+  width: 0.625rem;
+  height: 0.625rem;
+  border-radius: 50%;
+}
+.core {
+  background: var(--c-accent);
+  box-shadow: 0 0 0 2px var(--c-fg);
+}
+.ring {
+  border: 1.5px solid var(--c-accent);
+  opacity: 0;
+  animation: pinPulse 2.6s var(--ease-out) infinite;
+  animation-play-state: paused;
+}
+.globe[data-live] .ring { animation-play-state: running; }
+@keyframes pinPulse {
+  0% { transform: scale(1); opacity: 0.9; }
+  100% { transform: scale(4.2); opacity: 0; }
+}
+.tag {
+  position: absolute;
+  left: 0.875rem;
+  top: 0;
+  translate: 0 -50%;
+  display: flex;
+  gap: 0.6em;
+  padding: 0.2em 0.45em;
+  background: var(--c-fg);
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.05em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--c-bg);
+}
+.pin[data-flip] .tag { left: auto; right: 0.875rem; }
+.tag time { color: var(--paper-muted); font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) {
+  .ring { animation: none; opacity: 0.35; transform: scale(2.2); }
+}
 
 /* Word ink-fill (motion only, set once the text is split). */
 .inking :global(.about-word) {
@@ -171,7 +244,7 @@
   .meta { grid-column: 3 / span 2; }
   .lead { grid-column: 1 / -1; text-indent: calc((100% + var(--gutter)) / 4 * 1); }
   .body { grid-column: 2 / -1; grid-row: 4; }
-  .portrait {
+  .globe {
     grid-column: 2 / -1;
     grid-row: 3;
     justify-self: stretch;

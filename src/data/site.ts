@@ -10,6 +10,7 @@ export const site: Site = {
   description:
     'Muhammad Talib Ibrahim, full-stack developer in Lahore. Scalable web apps, real-time systems and AI-powered tools with the MERN stack and Next.js.',
   location: 'Lahore, Pakistan',
+  globe: { caption: 'Globe showing Lahore, Pakistan', timeCaption: 'local time' },
   email: 'talibibrahim04@gmail.com',
   tagline:
     'I build scalable web applications with modern JavaScript, from real-time systems to AI-powered tools.',
@@ -115,6 +116,23 @@ export const site: Site = {
       { value: 'Requesting your Resume', label: 'Ask for my resume' },
       { value: 'Project Idea', label: 'Project idea' },
     ],
+    // Ready-made messages typed into the form when that subject is picked. [BRACKETS] are blanks.
+    templates: {
+      'Requesting your Resume':
+        "Hi Talib,\n\nI'm [YOUR NAME], [YOUR ROLE] at [COMPANY]. We're hiring for [POSITION] and I'd love to see your latest resume.\n\nBest,\n[YOUR NAME]",
+      'Project Idea':
+        "Hi Talib,\n\nI'm [YOUR NAME] from [COMPANY]. I have a project in mind: [ONE LINE ABOUT IT].\n\nTimeline: [WHEN]\nBudget: [RANGE]\n\nCould we talk this week?\n\n[YOUR NAME]",
+    },
+    templateUi: {
+      use: 'Use the {subject} template',
+      next: 'Next blank',
+      of: '{n} of {total}',
+      added: 'Template added. {total} blanks to fill.',
+      addedOne: 'Template added. 1 blank to fill.',
+      blank: 'Blank {n} of {total}: {name}',
+      done: 'All blanks filled.',
+      pending: 'Some blanks are still in brackets',
+    },
     finale: {
       inkLabel: 'Leave your mark',
       inkHintPointer: 'Move the pointer to draw',
@@ -128,11 +146,40 @@ export const site: Site = {
       timeZoneLabel: 'GMT+5',
       writeTitle: 'Or write it here',
       writeNote: 'Every field except the subject is required.',
-      signoffLabel: 'Signed',
-      signoffNote: 'Thanks for reading all the way down.',
       backToTop: 'Back to top',
       colophon: 'Set in Clash Display and General Sans. Built with Next.js, GSAP, Lenis and OGL.',
       copy: { label: 'Copy email address', copied: 'Copied', failed: 'Selected, press Ctrl+C' },
+    },
+    // The ending: breakout with an ink drop and a pen; the bricks are the site.stack items.
+    // {n} {total} {lives} are filled in.
+    breakout: {
+      label: 'Clear my stack',
+      invite: 'Thanks for reading all the way down. One last thing: knock my whole stack off the page.',
+      hintPointer: 'Move the pointer to steer the pen. Click or press Space to play.',
+      hintTouch: 'Drag on the board to steer the pen. Tap to play.',
+      launchPointer: 'Click or press Space to launch',
+      launchTouch: 'Tap to launch',
+      play: 'Play',
+      pause: 'Pause',
+      resume: 'Resume',
+      retry: 'Try again',
+      again: 'Play again',
+      paused: 'Paused',
+      over: 'Out of ink',
+      winLead: "You'd be great at this job too.",
+      winCta: 'Email me',
+      gameLabel: 'Ink breakout',
+      description:
+        'A breakout game. An ink drop bounces off a pen at the bottom of the board, and every brick is one tool from my stack. Left and Right arrows, or A and D, move the pen. Space or Enter launches the drop. Escape pauses. You have {lives} drops.',
+      announce: {
+        start: 'Game on. {total} bricks, {lives} drops. Press Space to launch.',
+        cleared: '{n} of {total} cleared.',
+        missed: 'Missed. {lives} drops left. Press Space to launch.',
+        missedOne: 'Missed. 1 drop left. Press Space to launch.',
+        paused: 'Paused.',
+        over: 'Out of ink. {n} of {total} cleared.',
+        won: "All {total} cleared. You'd be great at this job too. Email me.",
+      },
     },
   },
   recruiter: {

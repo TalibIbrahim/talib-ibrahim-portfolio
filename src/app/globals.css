@@ -165,10 +165,14 @@ html.lenis, html.lenis body { height: auto; }
   box-shadow: inset 0 0 0 1px #fff; /* a ring: the link's own hover stays readable inside it */
 }
 #cursor[data-state='view'] .cursor__dot,
-#cursor[data-state='play'] .cursor__dot,
-#cursor[data-state='drag'] .cursor__dot {
+#cursor[data-state='play'] .cursor__dot {
   width: 5.5rem; height: 5.5rem; background: var(--c-accent); mix-blend-mode: normal;
 }
+/* Drag (the globe): a small pill, so it never hides what you're about to drag. */
+#cursor[data-state='drag'] .cursor__dot {
+  width: 3.25rem; height: 1.6rem; border-radius: 999px; background: var(--c-accent); mix-blend-mode: normal;
+}
+#cursor[data-state='drag'] .cursor__label { font-size: 0.625rem; letter-spacing: 0.06em; }
 #cursor[data-state='view'] .cursor__label,
 #cursor[data-state='play'] .cursor__label,
 #cursor[data-state='drag'] .cursor__label { opacity: 1; scale: 1; }

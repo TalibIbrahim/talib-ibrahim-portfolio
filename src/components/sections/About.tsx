@@ -7,7 +7,7 @@
 //                its "o" fills with desk black and the word scales around that counter until the
 //                dark disc covers the viewport, so the visitor falls through the letter into the
 //                showreel (which then lands its own frame .56 -> 1).
-//   Portrait     a halftone of pen-blue ink dots (HalftonePortrait, lazy OGL) beside the text.
+//   Globe        an ink-dot globe facing Lahore with its local time (AboutGlobe, lazy OGL) beside the text.
 // Reduced motion / no JS / Recruiter Mode: a calm paper section, no sticky stage, no disc.
 import { useRef } from 'react';
 import { gsap } from 'gsap';
@@ -16,7 +16,7 @@ import { SplitText } from 'gsap/SplitText';
 import { site } from '@/data/site';
 import { usePage } from '@/engine/next';
 import { ease } from '@/engine';
-import { HalftonePortrait } from './HalftonePortrait';
+import { AboutGlobe } from './AboutGlobe';
 import styles from './About.module.css';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
@@ -65,6 +65,8 @@ function initText(root: HTMLElement) {
               scrollTrigger: { trigger: p, start: 'top 92%', end: 'top 50%', scrub: 0.6 },
             },
           ),
+        );
+        if (inks.length) anims.push(
           gsap.fromTo(
             inks,
             { opacity: 0 },
@@ -212,7 +214,7 @@ export function About() {
         <p className={styles.lead} data-ink data-drop>
           {lead}
         </p>
-        <HalftonePortrait />
+        <AboutGlobe />
         {rest.map((p) => (
           <p key={p.slice(0, 24)} className={styles.body} data-ink data-drop>
             {p}

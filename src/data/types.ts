@@ -68,6 +68,7 @@ export type Site = {
   url: string; // production URL, no trailing slash
   description: string; // 120 to 160 chars, meta description
   location: string;
+  globe: { caption: string; timeCaption: string }; // About's globe, read by screen readers
   email: string;
   phone?: string;
   tagline: string;
@@ -81,6 +82,19 @@ export type Site = {
     heading: string;
     body: string;
     subjects: { value: string; label: string }[];
+    /** Message templates keyed by subject value; [UPPERCASE] runs are blanks to fill. */
+    templates: Partial<Record<string, string>>;
+    /** Template UI copy; {subject} {n} {total} {name} are filled in. */
+    templateUi: {
+      use: string;
+      next: string;
+      of: string;
+      added: string;
+      addedOne: string;
+      blank: string;
+      done: string;
+      pending: string;
+    };
     finale: {
       inkLabel: string;
       inkHintPointer: string;
@@ -94,11 +108,38 @@ export type Site = {
       timeZoneLabel: string;
       writeTitle: string;
       writeNote: string;
-      signoffLabel: string;
-      signoffNote: string;
       backToTop: string;
       colophon: string;
       copy: { label: string; copied: string; failed: string };
+    };
+    /** The ending game (bricks are the stack items). {n} {total} {lives} are filled in. */
+    breakout: {
+      label: string; // small mono label
+      invite: string; // the one line inviting play
+      hintPointer: string;
+      hintTouch: string;
+      launchPointer: string;
+      launchTouch: string;
+      play: string;
+      pause: string;
+      resume: string;
+      retry: string;
+      again: string;
+      paused: string;
+      over: string;
+      winLead: string;
+      winCta: string;
+      gameLabel: string;
+      description: string; // text alternative for the canvas
+      announce: {
+        start: string;
+        cleared: string;
+        missed: string;
+        missedOne: string;
+        paused: string;
+        over: string;
+        won: string;
+      };
     };
   };
   recruiter: {
