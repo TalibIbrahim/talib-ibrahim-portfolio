@@ -19,6 +19,7 @@
   transition: translate 0.6s var(--ease-out);
   transition-delay: calc(var(--i) * 18ms);
 }
+.ch::before { content: attr(data-ch); }
 .copy .ch { translate: 0 0; }
 
 :is(a, button):hover .roll .ch,
