@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Analytics } from '@vercel/analytics/next';
 import { site } from '@/data/site';
 import { BOOT_SCRIPT } from '@/lib/mode-script';
+import { ldScript, personLd } from '@/lib/agents';
 import { Header } from '@/components/chrome/Header';
 import { Curtain } from '@/components/chrome/Curtain';
 import { RecruiterToggle } from '@/components/chrome/RecruiterToggle';
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
   applicationName: site.name,
   authors: [{ name: site.name, url: site.url }],
   creator: site.name,
-  alternates: { canonical: './' },
+  alternates: { canonical: './', types: { 'text/markdown': '/llms.txt' } },
   openGraph: {
     type: 'website',
     siteName: site.name,
@@ -42,18 +43,6 @@ export const viewport: Viewport = {
   colorScheme: 'dark light',
 };
 
-const jsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'Person',
-  name: site.name,
-  jobTitle: site.role,
-  url: site.url,
-  email: `mailto:${site.email}`,
-  address: { '@type': 'PostalAddress', addressLocality: 'Lahore', addressCountry: 'PK' },
-  alumniOf: site.education.map((e) => ({ '@type': 'CollegeOrUniversity', name: e.school })),
-  sameAs: [site.links.github.href, site.links.linkedin.href],
-};
-
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html lang="en" className={`${clash.variable} ${general.variable} ${azeret.variable}`} suppressHydrationWarning>
@@ -72,7 +61,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
         <RecruiterToggle />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+          dangerouslySetInnerHTML={{ __html: ldScript(personLd()) }}
         />
         {process.env.VERCEL && <Analytics />}
         <Motion />

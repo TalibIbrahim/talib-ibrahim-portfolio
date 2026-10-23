@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { CaseStudy } from '@/components/case/CaseStudy';
 import { getNext, getProject, getProjects } from '@/data/projects';
 import { site } from '@/data/site';
+import { ldScript, projectLd } from '@/lib/agents';
 import { loadCaseStudy } from '@/lib/mdx';
 
 export const dynamicParams = false;
@@ -49,6 +50,7 @@ export default async function WorkPage(props: PageProps<'/work/[slug]'>) {
   return (
     <>
       <CaseStudy project={p} next={next} Body={Body} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: ldScript(projectLd(p)) }} />
     </>
   );
 }

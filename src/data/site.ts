@@ -6,7 +6,7 @@ export const site: Site = {
   name: 'Muhammad Talib Ibrahim',
   shortName: 'Talib Ibrahim',
   role: 'Full-stack developer',
-  url: 'https://muhammad-talib.dev',
+  url: 'https://www.muhammad-talib.dev',
   description:
     'Muhammad Talib Ibrahim, full-stack developer in Lahore. Scalable web apps, real-time systems and AI-powered tools with the MERN stack and Next.js.',
   location: 'Lahore, Pakistan',
@@ -21,7 +21,7 @@ export const site: Site = {
   links: {
     github: { label: 'GitHub', href: 'https://github.com/TalibIbrahim' },
     linkedin: { label: 'LinkedIn', href: 'https://www.linkedin.com/in/muhammad-talib-ibrahim' },
-    site: { label: 'muhammad-talib.dev', href: 'https://muhammad-talib.dev' },
+    site: { label: 'muhammad-talib.dev', href: 'https://www.muhammad-talib.dev' },
   },
   education: [
     {
