@@ -46,3 +46,11 @@ next-env.d.ts
 
 # QA screenshots (awwwards skill)
 .shots/
+
+# Owner reference screenshots for lucius
+design-refs/
+
+# Private: agents and local agent notes never go to GitHub
+.claude/agents/
+CLAUDE.local.md
+.claude/skills/
