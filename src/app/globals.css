@@ -10,10 +10,11 @@
   --c-accent: #4d6bff;
   --c-accent-text: #8094ff;
   --c-curtain: #4d6bff;
+  --c-accent-ink: #3048d6; /* the accent for small text on paper (5.6:1 on --c-fg) */
 
   --f-display: var(--font-clash), 'Arial', sans-serif;
   --f-body: var(--font-general), 'Arial', sans-serif;
-  --f-mono: var(--font-azeret), ui-monospace, 'Menlo', monospace;
+  --f-mono: var(--font-mono), ui-monospace, 'Menlo', 'Consolas', monospace; /* JetBrains Mono: code details */
 
   /* Fluid type scale (375px → 1440px). Big jumps on purpose. */
   --t-mega: clamp(4.5rem, 1.2rem + 14vw, 17rem);
@@ -55,6 +56,11 @@
 @media (max-width: 767px) {
   :root { --cols: 4; --header-h: 3.75rem; }
 }
+/* Home-only faces: their font variables live on the home wrapper (src/app/page.tsx), so the tokens do too. */
+[data-fun-root] {
+  --f-pixel: var(--font-departure), ui-monospace, 'Menlo', monospace; /* Departure Mono: hero rows only */
+  --f-serif: var(--font-fraunces), Georgia, serif; /* Fraunces italic: headline accents only */
+}
 
 /* ============================================================
    FOUNDATION
@@ -92,11 +98,18 @@ p { text-wrap: pretty; }
 :focus-visible { outline: 2px solid var(--c-accent); outline-offset: 3px; }
 #main:focus { outline: none; }
 .skip-link {
-  position: fixed; left: var(--gutter); top: var(--gutter); z-index: calc(var(--z-dialog) + 1);
-  padding: 0.6em 1em; background: var(--c-fg); color: var(--c-bg); font-size: var(--t-s);
-  translate: 0 -200%;
+  /* top centre, clear of the logo and nav pills, on a solid backing */
+  position: fixed; left: 50%; top: var(--gutter); z-index: calc(var(--z-dialog) + 1);
+  display: inline-flex; align-items: center; min-height: 2.75rem;
+  padding: 0 1.1em; background: var(--c-fg); color: var(--c-bg); font-size: var(--t-s);
+  box-shadow: 0 0 0 4px var(--c-bg);
+  translate: -50% -200%;
 }
-.skip-link:focus-visible { translate: 0 0; }
+.skip-link:focus-visible { translate: -50% 0; }
+@media (max-width: 767px) {
+  /* under the header row when focused; fully off screen otherwise */
+  .skip-link:focus-visible { top: calc(var(--header-h) + var(--u)); }
+}
 .sr-only {
   position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
   overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
@@ -126,6 +139,12 @@ html.lenis, html.lenis body { height: auto; }
   pointer-events: none; visibility: hidden; overflow: hidden;
 }
 .curtain__svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.curtain__title {
+  position: absolute; left: var(--gutter); right: var(--gutter); top: 50%; margin: 0;
+  translate: 0 -50%; text-align: center; visibility: hidden;
+  font-family: var(--f-display); font-weight: 600; font-size: var(--t-xl);
+  letter-spacing: var(--track-xl); line-height: 0.95; color: #fff;
+}
 .curtain__brush { filter: url(#curtain-brush); }
 .curtain__svg path {
   fill: none;
@@ -154,11 +173,11 @@ html.lenis, html.lenis body { height: auto; }
   width: 0.5rem; height: 0.5rem; border-radius: 50%;
   background: var(--c-fg); mix-blend-mode: difference;
   transition: width 0.45s var(--ease-out), height 0.45s var(--ease-out), border-radius 0.45s var(--ease-out),
-    background-color 0.3s var(--ease-soft), scale 0.2s var(--ease-soft);
+    background-color 0.3s var(--ease-soft), scale 0.2s var(--ease-soft), translate 0.45s var(--ease-out);
 }
 .cursor__label {
   font-size: var(--t-xs); letter-spacing: 0.04em; text-transform: uppercase; color: #fff;
-  opacity: 0; scale: 0.6; transition: opacity 0.3s var(--ease-soft), scale 0.45s var(--ease-out);
+  opacity: 0; scale: 0.6; transition: opacity 0.3s var(--ease-soft), scale 0.45s var(--ease-out), translate 0.45s var(--ease-out);
 }
 #cursor[data-state='link'] .cursor__dot {
   width: 2.75rem; height: 2.75rem; background: transparent;
@@ -168,6 +187,12 @@ html.lenis, html.lenis body { height: auto; }
 #cursor[data-state='play'] .cursor__dot {
   width: 5.5rem; height: 5.5rem; background: var(--c-accent); mix-blend-mode: normal;
 }
+/* the big labelled disc sits below-right of the pointer (its edge ~28px away), so the title under the
+   pointer stays readable */
+#cursor[data-state='view'] .cursor__dot, #cursor[data-state='view'] .cursor__label,
+#cursor[data-state='play'] .cursor__dot, #cursor[data-state='play'] .cursor__label {
+  translate: calc(-50% + 4.5rem) calc(-50% + 4.5rem);
+}
 /* Drag (the globe): a small pill, so it never hides what you're about to drag. */
 #cursor[data-state='drag'] .cursor__dot {
   width: 3.25rem; height: 1.6rem; border-radius: 999px; background: var(--c-accent); mix-blend-mode: normal;
@@ -176,6 +201,7 @@ html.lenis, html.lenis body { height: auto; }
 #cursor[data-state='view'] .cursor__label,
 #cursor[data-state='play'] .cursor__label,
 #cursor[data-state='drag'] .cursor__label { opacity: 1; scale: 1; }
+#cursor[data-state='off'] .cursor__dot { scale: 0; }
 #cursor[data-state='text'] .cursor__dot { width: 2px; height: 1.6rem; border-radius: 1px; }
 #cursor.is-pressed .cursor__dot { scale: 0.8 1.1; }
 @media (hover: none), (pointer: coarse) { #cursor { display: none; } }

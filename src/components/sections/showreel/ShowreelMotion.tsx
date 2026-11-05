@@ -1,259 +1,667 @@
 'use client';
-// Showreel motion. Renders nothing; wires the server-rendered #work section on every page load.
+// Work motion. Renders nothing; wires the server-rendered #work section on every page load.
 //
-// Desktop (>= 768px, html.motion): the section gets data-film, CSS turns the list into a sticky
-// stage over a (n+1)*100svh track, and ONE scrubbed timeline runs over that track in n+1 units:
-//   unit 0          entry: the frame lands (scale .56 -> 1, rotateX 24 -> 0, y 16vh -> 0, radius 18 -> 0)
-//   unit 1+i        project i holds the gate; the film advances to project i centred on 1+i (width .5)
-//   per frame       poster pan / zoom / drift across the span that frame is visible
-//                   title chars + tagline lines reveal as the frame arrives
-// Phones (html.motion): stacked reels, the window tightens (inset 6% -> 0) and the poster drifts.
-// Reduced motion / no JS / Recruiter Mode: the static list, nothing here runs.
+// Desktop (>= 768px, html.motion): the section gets data-strip; CSS makes a sticky 100svh stage over
+// 180svh + --travel of scroll. Two scrubbed drivers, one after the other:
+//   entrance  p 0 -> 1 over the first 80svh after the stage sticks (scrub .6). Project 01's cover is a
+//             small tilted duotone card under the title; it pulls flat into its slot (OGL plane, the
+//             top-left corner leads, the sheet sags; DOM FLIP when there is no GL). Meanwhile the
+//             paper ground fades to ink (.4 -> .75), the title rises into its band and parts around
+//             the chip as the chip opens (.3 -> 1), and the title decodes once at p >= .9.
+//   travel    the track slides sideways by its overflow O over O / 1.7 of scroll (ease none, scrub .6).
+//             One onUpdate drives everything from cached offsets: the focus band at .4vw (scale,
+//             duotone, the head node), parallax inside each frame, captions typing in as items cross
+//             85%, and the git-graph line, whose head runs a little ahead of the focus band.
+// Phones (html.motion): stacked; project 01 un-skews from a polygon and its colour comes in; each
+// cover fades duotone -> colour as it reaches the middle; a rail draws down the left with a node per
+// project. Reduced motion / no JS / Recruiter Mode: the static grid, nothing here runs.
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
-import { ease, prefersReducedMotion, scrollToTarget } from '@/engine';
+import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
+import { ease, scrollToTarget } from '@/engine';
 import { usePage } from '@/engine/next';
+import { webglOK } from '@/lib/webgl';
+import { holdGL } from '@/lib/gl-hold';
+import type { EntranceScene, Rect } from './entrance-scene';
 
-gsap.registerPlugin(ScrollTrigger, SplitText);
+gsap.registerPlugin(ScrollTrigger, SplitText, ScrambleTextPlugin);
 
-const pad = (n: number) => String(n).padStart(2, '0');
 const q = <T extends Element = HTMLElement>(root: ParentNode, sel: string) => root.querySelector<T>(sel);
+const qa = <T extends Element = HTMLElement>(root: ParentNode, sel: string) => [...root.querySelectorAll<T>(sel)];
+const clamp01 = gsap.utils.clamp(0, 1);
+const fit = (p: number, a: number, b: number) => clamp01((p - a) / (b - a));
+const NOISE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+const ENTRANCE = 0.8; // screens of scroll for the entrance
+const RATIO = 1.7; // sideways px per px of scroll
+const BAND = 0.4; // focus band, share of the stage width
+const THUMB_ROT = -4; // degrees
 
 export function ShowreelMotion() {
   usePage(() => {
     const section = document.getElementById('work');
     if (!section) return;
-    const reels = gsap.utils.toArray<HTMLElement>('[data-reel]', section);
-    if (!reels.length) return;
-
-    const offVideo = initVideos(section);
     const mm = gsap.matchMedia();
     mm.add(
       {
-        film: '(min-width: 768px) and (prefers-reduced-motion: no-preference)',
+        strip: '(min-width: 768px) and (prefers-reduced-motion: no-preference)',
         phone: '(max-width: 767px) and (prefers-reduced-motion: no-preference)',
       },
       (c) => {
         if (!document.documentElement.classList.contains('motion')) return;
-        return c.conditions?.film ? initFilm(section, reels) : initPhone(reels);
+        return c.conditions?.strip ? initStrip(section) : initPhone(section);
       },
     );
-    return () => {
-      mm.revert();
-      offVideo();
-    };
+    return () => mm.revert();
   });
   return null;
 }
 
-/* ---------------------------------------------------------------- desktop: film */
+/* ---------------------------------------------------------------- shared: text effects */
 
-function initFilm(section: HTMLElement, reels: HTMLElement[]) {
+/** The title words resolve from noise once, char by char (fixed-width slots, so nothing reflows). */
+function makeDecode(words: HTMLElement[]) {
+  const splits = words.map((w) => SplitText.create(w, { type: 'chars', charsClass: 'work-char', aria: 'none' }));
+  splits.forEach((s) => s.chars.forEach((c) => ((c as HTMLElement).style.width = `${(c as HTMLElement).offsetWidth}px`)));
+  let done = false;
+  let tl: gsap.core.Timeline | null = null;
+  return {
+    play() {
+      if (done) return;
+      done = true;
+      tl = gsap.timeline();
+      splits.forEach((s, wi) =>
+        s.chars.forEach((c, ci) =>
+          tl!.to(
+            c,
+            { duration: 0.6, ease: 'none', scrambleText: { text: c.textContent ?? '', chars: NOISE, speed: 0.6 } },
+            wi * 0.25 + ci * 0.05,
+          ),
+        ),
+      );
+    },
+    revert() {
+      tl?.progress(1).kill();
+      splits.forEach((s) => s.revert());
+    },
+  };
+}
+
+/** A caption types itself in behind a block caret, once. */
+function typeIn(cap: HTMLElement) {
+  const text = q(cap, '[data-cap-text]');
+  const caret = q(cap, '[data-caret]');
+  if (!text || !caret || cap.dataset.typed) return null;
+  cap.dataset.typed = '';
+  const n = Math.max(1, (text.textContent ?? '').length);
+  const w = text.offsetWidth;
+  const d = Math.min(0.9, n * 0.028);
+  return gsap
+    .timeline()
+    .set(caret, { visibility: 'visible', x: 0 })
+    .to(text, { clipPath: 'inset(-10% 0% -10% 0%)', ease: `steps(${n})`, duration: d }, 0)
+    .to(caret, { x: w, ease: `steps(${n})`, duration: d }, 0)
+    .to(caret, { opacity: 0, duration: 0.01, repeat: 3, yoyo: true, repeatDelay: 0.22 }, d + 0.1)
+    .set(caret, { visibility: 'hidden' });
+}
+const hideCaption = (cap: HTMLElement) => {
+  const text = q(cap, '[data-cap-text]');
+  if (text) gsap.set(text, { clipPath: 'inset(-10% 100% -10% 0%)' });
+};
+
+/* ---------------------------------------------------------------- desktop: the strip */
+
+type Item = {
+  cell: HTMLElement;
+  frame: HTMLElement;
+  media: HTMLElement;
+  par: HTMLElement;
+  duo: HTMLElement | null;
+  node: HTMLElement | null;
+  cap: HTMLElement | null;
+  x0: number; // frame left in track px
+  w: number;
+  setScale: (v: number) => void;
+  setDuo: (v: number) => void;
+  setPar: (v: number) => void;
+  lit: boolean;
+  head: boolean;
+};
+
+function initStrip(section: HTMLElement) {
+  const stage = q(section, '[data-stage]');
+  const ground = q(section, '[data-ground]');
+  const glHost = q(section, '[data-gl]');
+  const head = q(section, '[data-head]');
   const track = q(section, '[data-track]');
-  const frame = q(section, '[data-frame]');
-  const strip = q(section, '[data-strip]');
-  const timecode = q(section, '[data-timecode]');
-  const tcIndex = q(section, '[data-tc-index]');
-  const tcTitle = q(section, '[data-tc-title]');
-  if (!track || !frame || !strip) return;
+  const chip = q(section, '[data-chip]');
+  const line = q<SVGPathElement>(section, '[data-line]');
+  const allEl = q(section, '[data-all]');
+  const wordEls = qa(section, '[data-word]');
+  if (!stage || !ground || !glHost || !head || !track || !chip || !line || !allEl) return;
 
-  const n = reels.length;
-  const U = n + 1; // timeline units: entry + one per project
-  section.dataset.film = '';
+  section.dataset.strip = '';
+  const late: gsap.core.Animation[] = [];
 
-  const splits: SplitText[] = [];
-  const idles: gsap.core.Tween[] = [];
-  let active = -1;
-  let onScreen = false;
+  const items: Item[] = qa(section, '[data-item]').map((el) => {
+    const frame = q(el, '[data-frame]')!;
+    const media = q(el, '[data-media]')!;
+    const par = q(el, '[data-par]')!;
+    const duo = q(el, '[data-duo]');
+    return {
+      cell: el.parentElement as HTMLElement,
+      frame,
+      media,
+      par,
+      duo,
+      node: q(el, '[data-node]'),
+      cap: q(el, '[data-cap]'),
+      x0: 0,
+      w: 1,
+      setScale: gsap.quickSetter(media, 'scale') as (v: number) => void,
+      setDuo: duo ? (gsap.quickSetter(duo, 'opacity') as (v: number) => void) : () => {},
+      setPar: gsap.quickSetter(par, 'x', 'px') as (v: number) => void,
+      lit: false,
+      head: false,
+    };
+  });
+  if (!items.length) return;
+  const p1 = items[0];
+  const allNode = q(allEl, '[data-node]');
+  const p1Text = qa(p1.cell, '[data-copy]');
 
-  const setActive = (i: number) => {
-    if (i === active) return;
-    idles[active]?.pause();
-    active = i;
-    const reel = reels[i];
-    if (tcIndex) tcIndex.textContent = pad(i + 1);
-    if (tcTitle) tcTitle.textContent = reel.dataset.name ?? '';
-    if (timecode) {
-      if (reel.dataset.accent) timecode.style.setProperty('--tc-accent', reel.dataset.accent);
-      else timecode.style.removeProperty('--tc-accent');
-    }
-    if (onScreen) idles[i]?.play();
+  items.forEach((it) => it.cap && hideCaption(it.cap));
+  const decode = makeDecode(wordEls);
+
+  /* ---------- measure (on every refresh, before positions are computed) ---------- */
+  const m = {
+    W: 1,
+    H: 1,
+    O: 0,
+    slot: { cx: 0, cy: 0, w: 1, h: 1 } as Rect,
+    thumb: { cx: 0, cy: 0, w: 1, h: 1 } as Rect,
+    shift: 0, // how far each title word moves out for the chip
+    chipW: 0,
+    rise: 0, // the title's start offset (down), px
+    total: 0, // line length
+    xs: new Float32Array(0), // line samples: x at each length step
+    step: 1,
+    nodeX: [] as number[],
+    allX: 0,
   };
 
-  const tl = gsap.timeline({
-    defaults: { ease: 'none' },
-    scrollTrigger: {
-      trigger: track,
-      start: 'top bottom',
-      end: 'bottom bottom',
-      scrub: 0.6,
-      invalidateOnRefresh: true,
-      onUpdate: (self) => setActive(gsap.utils.clamp(0, n - 1, Math.floor(self.progress * U - 1))),
-    },
-  });
+  function measure() {
+    gsap.set(track, { x: 0 });
+    gsap.set(head, { x: 0, y: 0 });
+    gsap.set(wordEls, { x: 0 });
+    gsap.set(chip, { clipPath: 'none' });
+    m.W = stage!.clientWidth;
+    m.H = stage!.clientHeight;
+    m.O = Math.max(0, track!.offsetWidth - m.W);
+    section.style.setProperty('--travel', `${Math.round(m.O / RATIO)}px`);
 
-  // 1. Entry: the frame lands (the About "o" zoom-through hands into this frame).
-  gsap.set(frame, { transformOrigin: '50% 100%' });
-  tl.fromTo(
-    frame,
-    { scale: 0.56, rotationX: 24, y: () => innerHeight * 0.16, clipPath: 'inset(0% 0% 0% 0% round 18px)' },
-    { scale: 1, rotationX: 0, y: 0, clipPath: 'inset(0% 0% 0% 0% round 0px)', duration: 1 },
-    0,
-  );
+    items.forEach((it) => {
+      const art = it.frame.offsetParent as HTMLElement;
+      it.x0 = art.offsetLeft + it.frame.offsetLeft;
+      it.w = it.frame.offsetWidth;
+    });
+    const art = p1.frame.offsetParent as HTMLElement;
+    const sw = p1.frame.offsetWidth;
+    const sh = p1.frame.offsetHeight;
+    m.slot = { cx: art.offsetLeft + p1.frame.offsetLeft + sw / 2, cy: art.offsetTop + p1.frame.offsetTop + sh / 2, w: sw, h: sh };
+    // Title: where the words sit with the chip open, and how far apart that is.
+    const [a, b] = wordEls;
+    const fs = parseFloat(getComputedStyle(head!.querySelector('[data-words]')!).fontSize) || 100;
+    // The card waits under the title (never under the letters: the title is difference-blended).
+    const tw = gsap.utils.clamp(220, 340, m.W * 0.22);
+    const th = (tw * sh) / sw;
+    const startCy = m.H * 0.4;
+    m.thumb = { cx: m.W / 2, cy: startCy + fs * 0.45 + m.H * 0.05 + th / 2, w: tw, h: th };
+    if (a && b) {
+      const gap = b.offsetLeft - (a.offsetLeft + a.offsetWidth);
+      m.shift = Math.max(0, (gap - fs * 0.24) / 2);
+    }
+    m.chipW = chip!.offsetWidth;
+    const wordsCy = head!.offsetTop + head!.offsetHeight / 2;
+    m.rise = startCy - wordsCy;
 
-  // 2. Film advance: one frame per project, centred on unit 1+i.
-  for (let i = 1; i < n; i++) {
-    tl.to(strip, { yPercent: (-100 / n) * i, duration: 0.5, ease: ease.inOut }, 1 + i - 0.25);
+    buildLine();
+    placeGL();
+    glScene?.setPose({ from: m.thumb, rot: (THUMB_ROT * Math.PI) / 180, to: m.slot, focus: focusOf(p1) });
   }
 
-  // 3. Inside each frame.
-  reels.forEach((reel, i) => {
-    const poster = q(reel, '[data-poster]');
-    const idle = q(reel, '[data-idle]');
-    const title = q(reel, '[data-title]');
-    const tagline = q(reel, '[data-tagline]');
-    const from = i === 0 ? 0 : i + 0.75;
-    const to = i === n - 1 ? U : i + 2.25;
+  /** The canvas covers only the card's path: the card, the slot, the sag and the tilt. */
+  function placeGL() {
+    const t = m.thumb;
+    const sl = m.slot;
+    const r = Math.hypot(t.w, t.h) / 2;
+    const pad = 4;
+    const x0 = Math.max(0, Math.floor(Math.min(t.cx - r, sl.cx - sl.w / 2) - pad));
+    const y0 = Math.max(0, Math.floor(Math.min(t.cy - r, sl.cy - sl.h / 2) - pad));
+    const x1 = Math.min(m.W, Math.ceil(Math.max(t.cx + r, sl.cx + sl.w / 2) + pad));
+    const y1 = Math.min(m.H, Math.ceil(Math.max(t.cy + r, sl.cy + sl.h / 2) + sl.h * 0.06 + pad));
+    Object.assign(glHost!.style, { left: `${x0}px`, top: `${y0}px`, width: `${x1 - x0}px`, height: `${y1 - y0}px` });
+    glScene?.resize(x0, y0, x1 - x0, y1 - y0);
+  }
 
-    if (poster) {
-      const m = reel.dataset.motion;
-      const [a, b]: gsap.TweenVars[] =
-        m === 'pan' ? [{ xPercent: -5 }, { xPercent: 5 }]
-        : m === 'zoom' ? [{ scale: 1.15 }, { scale: 1 }]
-        : m === 'video' ? [{ scale: 1.06 }, { scale: 1 }]
-        : [{ xPercent: -3, yPercent: 3, scale: 1.04 }, { xPercent: 3, yPercent: -3, scale: 1.04 }];
-      tl.fromTo(poster, a, { ...b, duration: to - from }, from);
-    }
+  /* ---------- the git-graph line: through every frame's middle, curving in the gaps ---------- */
+  function buildLine() {
+    const pts = items.map((it) => {
+      const art = it.frame.offsetParent as HTMLElement;
+      const node = it.node;
+      const nx = art.offsetLeft + it.frame.offsetLeft + (node ? node.offsetLeft + node.offsetWidth / 2 : -16);
+      const ny = art.offsetTop + it.frame.offsetTop + it.frame.offsetHeight / 2;
+      return { nx, ny, right: art.offsetLeft + it.frame.offsetLeft + it.frame.offsetWidth };
+    });
+    // the link is positioned (it holds the node), so its offsetParent is the track
+    const link = (allEl!.firstElementChild as HTMLElement | null) ?? allEl!;
+    const ax = link.offsetLeft + (allNode ? allNode.offsetLeft + allNode.offsetWidth / 2 : 0);
+    const ay = link.offsetTop + (allNode ? allNode.offsetTop + allNode.offsetHeight / 2 : link.offsetHeight / 2);
+    m.nodeX = pts.map((p) => p.nx);
+    m.allX = ax;
 
-    if (idle) {
-      idles[i] = gsap.to(idle, {
-        xPercent: 1.2,
-        yPercent: -0.9,
-        duration: 9,
-        ease: 'sine.inOut',
-        repeat: -1,
-        yoyo: true,
-        paused: true,
-      });
-    }
+    let d = `M 0 ${pts[0].ny.toFixed(1)} H ${pts[0].nx.toFixed(1)}`;
+    const curve = (fromX: number, fromY: number, toX: number, toY: number, endX: number) => {
+      const gs = fromX + 6;
+      const ge = Math.max(gs + 24, toX - 22);
+      const mid = (gs + ge) / 2;
+      d += ` H ${gs.toFixed(1)} C ${mid.toFixed(1)} ${fromY.toFixed(1)} ${mid.toFixed(1)} ${toY.toFixed(1)} ${ge.toFixed(1)} ${toY.toFixed(1)} H ${endX.toFixed(1)}`;
+    };
+    for (let i = 0; i < pts.length - 1; i++) curve(pts[i].right, pts[i].ny, pts[i + 1].nx, pts[i + 1].ny, pts[i + 1].nx);
+    const last = pts[pts.length - 1];
+    curve(last.right, last.ny, ax, ay, ax);
+    line!.setAttribute('d', d);
 
-    const at = i === 0 ? 0.55 : 1 + i - 0.05; // title starts as the frame settles in the gate
-    if (title) {
-      const split = SplitText.create(title, { type: 'words,chars', mask: 'chars', charsClass: 'reel-char', aria: 'auto' }) // one accessible copy: aria-label on the title, chars hidden;
-      splits.push(split);
-      tl.fromTo(split.chars, { yPercent: 110 }, { yPercent: 0, duration: 0.28, stagger: { amount: 0.18 } }, at);
-    }
-    if (tagline) {
-      splits.push(
-        SplitText.create(tagline, {
-          type: 'lines',
-          mask: 'lines',
-          linesClass: 'split-line',
-          autoSplit: true,
-          onSplit(self) {
-            // Re-split on resize / font load: SplitText kills the old tween (removing it from tl)
-            // and this one takes its place at the same position.
-            // immediateRender:false so the new lines are not parked at their hidden "from" state;
-            // then render the tween at the scrubbed playhead, so a re-split mid-scroll shows the
-            // tagline exactly as far in as the scroll says (fully in once its frame has settled).
-            const tw = gsap.fromTo(
-              self.lines,
-              { yPercent: 110 },
-              { yPercent: 0, ease: 'none', duration: 0.3, stagger: 0.06, immediateRender: false },
-            );
-            tl.add(tw, at + 0.14);
-            const local = Math.min(tw.totalDuration(), tl.time() - tw.startTime());
-            if (local > 0) tw.render(local, true, true);
-            else gsap.set(self.lines, { yPercent: 110 }); // its frame has not arrived yet
-            return tw;
-          },
-        }),
-      );
-    }
-  });
-  tl.add(() => {}, U); // the timeline is exactly n+1 units long
+    const total = line!.getTotalLength();
+    const N = 600;
+    m.total = total;
+    m.step = total / N;
+    m.xs = new Float32Array(N + 1);
+    for (let i = 0; i <= N; i++) m.xs[i] = line!.getPointAtLength(i * m.step).x;
+    line!.style.strokeDasharray = `${total} ${total + 10}`;
+    line!.style.strokeDashoffset = `${total}`;
+    drawn = -1;
+  }
+  let drawn = -1;
+  /** Draw the line up to track-x `hx` (the samples are monotonic in x). */
+  function drawTo(hx: number) {
+    const xs = m.xs;
+    let lo = 0;
+    let hi = xs.length - 1;
+    if (hx <= xs[0]) hi = 0;
+    else
+      while (lo < hi) {
+        const mid = (lo + hi + 1) >> 1;
+        if (xs[mid] <= hx) lo = mid;
+        else hi = mid - 1;
+      }
+    const len = Math.min(m.total, hi * m.step);
+    if (Math.abs(len - drawn) < 0.5) return;
+    drawn = len;
+    line!.style.strokeDashoffset = `${(m.total - len).toFixed(1)}`;
+  }
 
-  // Idle drift only while the section is on screen.
-  const visible = ScrollTrigger.create({
-    trigger: track,
-    start: 'top bottom',
-    end: 'bottom top',
-    onToggle: (self) => {
-      onScreen = self.isActive;
-      if (onScreen) idles[active]?.play();
-      else idles.forEach((t) => t.pause());
+  /* ---------- entrance ---------- */
+  const setHeadY = gsap.quickSetter(head, 'y', 'px') as (v: number) => void;
+  const setHeadX = gsap.quickSetter(head, 'x', 'px') as (v: number) => void;
+  const setA = wordEls[0] ? (gsap.quickSetter(wordEls[0], 'x', 'px') as (v: number) => void) : () => {};
+  const setB = wordEls[1] ? (gsap.quickSetter(wordEls[1], 'x', 'px') as (v: number) => void) : () => {};
+  const setGround = gsap.quickSetter(ground, 'opacity') as (v: number) => void;
+  const inOut = gsap.parseEase(ease.inOut);
+  const out = gsap.parseEase(ease.out);
+  const others = items.slice(1);
+
+  let glScene: EntranceScene | null = null;
+  let travel: gsap.core.Tween | null = null;
+  let release: (() => void) | null = null;
+  let landed = false;
+  let lastP = -1;
+
+  function applyEntrance(p: number) {
+    lastP = p;
+    // title: rises into its band, the chip opens, the words part around it
+    const t = inOut(fit(p, 0.3, 1));
+    setHeadY(m.rise * (1 - inOut(fit(p, 0.08, 0.8))));
+    setA(m.shift * (1 - t));
+    setB(-m.shift * (1 - t));
+    const cut = (m.chipW / 2) * (1 - t);
+    chip!.style.clipPath = t >= 1 ? 'none' : `inset(0px ${cut.toFixed(1)}px 0px ${cut.toFixed(1)}px)`;
+    // ground: paper -> ink
+    setGround(1 - fit(p, 0.4, 0.75));
+    // the card
+    const mid = p > 0 && p < 1;
+    if (glScene && mid) {
+      glScene.render(p);
+      glHost!.style.visibility = 'visible';
+      p1.frame.style.visibility = 'hidden';
+      release ??= holdGL();
+    } else {
+      glHost!.style.visibility = 'hidden';
+      p1.frame.style.visibility = '';
+      release?.();
+      release = null;
+    }
+    const k = inOut(p);
+    const s = m.thumb.w / m.slot.w;
+    gsap.set(p1.frame, {
+      x: (m.thumb.cx - m.slot.cx) * (1 - k),
+      y: (m.thumb.cy - m.slot.cy) * (1 - k),
+      scale: s + (1 - s) * k,
+      rotation: THUMB_ROT * (1 - k),
+    });
+    if (p < 1) p1.setDuo(1 - k);
+    // the rest of the first screen prints in under the landing card
+    const r = out(fit(p, 0.62, 0.98));
+    others.forEach((it) => {
+      const v = r >= 1 || it.x0 > m.W ? '' : `inset(0% 0% ${((1 - r) * 100).toFixed(2)}% 0%)`;
+      if (it.cell.style.clipPath !== v) it.cell.style.clipPath = v;
+    });
+    // landing: the title resolves, project 01's text types in
+    if (p >= 0.9) decode.play();
+    const nowLanded = p >= 0.97;
+    if (nowLanded !== landed) {
+      landed = nowLanded;
+      p1Text.forEach((el) => gsap.to(el, { opacity: landed ? 1 : 0, duration: 0.4, ease: ease.soft, overwrite: true }));
+      if (landed) {
+        applyTravel(travel?.progress() ?? 0);
+        items.forEach((it) => {
+          if (it.cap && it.x0 < m.W * 0.85) {
+            const tw = typeIn(it.cap);
+            if (tw) late.push(tw);
+          }
+        });
+      }
+    }
+    // the line's lead-in draws as the card lands
+    if (p < 1) drawTo(fit(p, 0.9, 1) * (m.nodeX[0] ?? 0));
+  }
+
+  const state = { p: 0 };
+  const entrance = gsap.to(state, {
+    p: 1,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: section,
+      start: 'top top',
+      end: () => `+=${innerHeight * ENTRANCE}`,
+      scrub: 0.6,
+      invalidateOnRefresh: true,
     },
+    onUpdate: () => applyEntrance(state.p),
   });
 
-  // Keyboard: frames off the gate are clipped, so bring a focused reel into the gate.
+  /* ---------- travel ---------- */
+  const setTrackX = gsap.quickSetter(track, 'x', 'px') as (v: number) => void;
+  // The frames are promoted (will-change) so the focus scale is a compositor-only change. A promoted
+  // layer keeps the raster scale of its first paint, so the first paint happens at scale 1 (sharp at
+  // focus, a clean downsample elsewhere); the focus scale is armed a few frames later.
+  let armed = false;
+  late.push(
+    gsap.delayedCall(0.3, () => {
+      armed = true;
+      applyTravel(travel?.progress() ?? 0);
+    }),
+  );
+  const power2 = gsap.parseEase('power2.out');
+  function applyTravel(qv: number) {
+    const x = -m.O * qv;
+    setTrackX(x);
+    setHeadX(x);
+    const W = m.W;
+    const band = BAND * W;
+    items.forEach((it, i) => {
+      const left = it.x0 + x;
+      const cx = left + it.w / 2;
+      let f = 1 - clamp01((Math.abs(cx - band) - 0.06 * W) / (0.5 * W));
+      f = power2(f);
+      if (i > 0 || state.p >= 1) {
+        if (armed) it.setScale(0.86 + 0.14 * f);
+        it.setDuo(1 - f);
+      }
+      // parallax: 2rem each way across the stage
+      const u = clamp01((W - left) / (W + it.w));
+      it.setPar(32 - 64 * u);
+      const isHead = f > 0.6;
+      if (isHead !== it.head) {
+        it.head = isHead;
+        it.node?.toggleAttribute('data-head', isHead);
+      }
+      if (it.cap && left < W * 0.85 && landed) {
+        const tw = typeIn(it.cap);
+        if (tw) late.push(tw);
+      }
+    });
+    // the line runs a little ahead of the focus band, and reaches the end card at the end
+    if (state.p >= 1 || qv > 0) {
+      const hx = -x + gsap.utils.interpolate(0.44, 0.97, qv) * W;
+      drawTo(hx);
+      items.forEach((it, i) => {
+        const on = hx >= m.nodeX[i] - 2;
+        if (on !== it.lit) {
+          it.lit = on;
+          it.node?.toggleAttribute('data-on', on);
+        }
+      });
+      allNode?.toggleAttribute('data-on', hx >= m.allX - 2);
+      allNode?.toggleAttribute('data-head', hx >= m.allX - 2);
+    }
+  }
+
+  travel = gsap.to(
+    { q: 0 },
+    {
+      q: 1,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: section,
+        start: () => `top+=${innerHeight * ENTRANCE} top`,
+        end: 'bottom bottom',
+        scrub: 0.6,
+        invalidateOnRefresh: true,
+      },
+      onUpdate() {
+        applyTravel(this.targets()[0].q);
+      },
+    },
+  );
+
+  const onRefreshInit = () => measure();
+  const onRefresh = () => {
+    applyEntrance(state.p);
+    applyTravel(travel?.progress() ?? 0);
+  };
+  ScrollTrigger.addEventListener('refreshInit', onRefreshInit);
+  ScrollTrigger.addEventListener('refresh', onRefresh);
+  measure();
+  applyEntrance(0);
+  applyTravel(0);
+
+  /* ---------- the GL card: built lazily a screen before the section ---------- */
+  let disposed = false;
+  let loading = false;
+  async function loadGL() {
+    if (loading || disposed || !webglOK()) return;
+    loading = true;
+    const img = q<HTMLImageElement>(p1.frame, 'img[data-color]');
+    const src = img?.currentSrc || img?.src;
+    if (!src) return;
+    const [mod, tex] = await Promise.all([
+      import('./entrance-scene').catch(() => null),
+      new Promise<HTMLImageElement | null>((res) => {
+        const im = new Image();
+        im.decoding = 'async';
+        im.onload = () => res(im);
+        im.onerror = () => res(null);
+        im.src = src;
+      }),
+    ]);
+    if (disposed || !mod || !tex) return;
+    glScene = mod.createEntranceScene(glHost!, tex, {
+      onLost: () => {
+        glScene?.destroy();
+        glScene = null;
+        applyEntrance(state.p);
+      },
+    });
+    if (!glScene) return;
+    placeGL();
+    glScene.setPose({ from: m.thumb, rot: (THUMB_ROT * Math.PI) / 180, to: m.slot, focus: focusOf(p1) });
+    applyEntrance(lastP < 0 ? state.p : lastP);
+  }
+  const pre = ScrollTrigger.create({
+    trigger: section,
+    start: 'top bottom+=100%',
+    end: 'bottom top',
+    onToggle: (s) => s.isActive && loadGL(),
+  });
+  if (pre.isActive) loadGL();
+
+  /* ---------- keyboard: bring a focused project (or the end card) into the focus band ---------- */
   const onFocus = (e: FocusEvent) => {
-    const reel = (e.target as Element).closest<HTMLElement>('[data-reel]');
-    const st = tl.scrollTrigger;
-    if (!reel || !st) return;
-    const i = reels.indexOf(reel);
-    if (i < 0 || i === active) return;
-    scrollToTarget(st.start + ((1.5 + i) / U) * (st.end - st.start), { immediate: true }); // keyboard focus must land on a visible frame
+    const target = e.target as Element;
+    const st = travel?.scrollTrigger;
+    if (!st) return;
+    let qv: number | null = null;
+    const art = target.closest('[data-item]');
+    if (art) {
+      const it = items.find((i) => i.frame.offsetParent === art);
+      if (it) qv = m.O > 0 ? clamp01((it.x0 + it.w / 2 - BAND * m.W) / m.O) : 0;
+    } else if (allEl.contains(target)) qv = 1;
+    if (qv === null) return;
+    const y = st.start + qv * (st.end - st.start);
+    if (Math.abs(scrollY - y) > 4) scrollToTarget(y, { immediate: true });
   };
   section.addEventListener('focusin', onFocus);
 
-  setActive(0);
-
   return () => {
+    disposed = true;
     section.removeEventListener('focusin', onFocus);
-    visible.kill();
-    idles.forEach((t) => t.kill());
-    splits.forEach((s) => s.revert());
-    delete section.dataset.film;
+    ScrollTrigger.removeEventListener('refreshInit', onRefreshInit);
+    ScrollTrigger.removeEventListener('refresh', onRefresh);
+    pre.kill();
+    entrance.scrollTrigger?.kill();
+    entrance.kill();
+    travel?.scrollTrigger?.kill();
+    travel?.kill();
+    late.forEach((t) => t.kill());
+    release?.();
+    glScene?.destroy();
+    decode.revert();
+    gsap.set([track, head, ...wordEls, ground, ...p1Text, glHost], { clearProps: 'all' });
+    chip.style.clipPath = '';
+    items.forEach((it) => {
+      // only what this module wrote: the cells carry React's slot variables inline
+      it.cell.style.removeProperty('clip-path');
+      gsap.set([it.frame, it.media, it.par], { clearProps: 'transform,visibility' });
+      if (it.duo) gsap.set(it.duo, { clearProps: 'opacity' });
+      it.node?.removeAttribute('data-on');
+      it.node?.removeAttribute('data-head');
+      if (it.cap) {
+        delete it.cap.dataset.typed;
+        qa(it.cap, '[data-cap-text], [data-caret]').forEach((el) => gsap.set(el, { clearProps: 'all' }));
+      }
+    });
+    allNode?.removeAttribute('data-on');
+    allNode?.removeAttribute('data-head');
+    line.removeAttribute('style');
+    line.setAttribute('d', '');
+    section.style.removeProperty('--travel');
+    delete section.dataset.strip;
   };
 }
 
-/* ---------------------------------------------------------------- phones: touch version */
-
-function initPhone(reels: HTMLElement[]) {
-  reels.forEach((reel) => {
-    const win = q(reel, '[data-window]');
-    const poster = q(reel, '[data-poster]');
-    if (win) {
-      gsap.fromTo(
-        win,
-        { clipPath: 'inset(6% 6% 6% 6%)' },
-        {
-          clipPath: 'inset(0% 0% 0% 0%)',
-          ease: 'none',
-          scrollTrigger: { trigger: reel, start: 'top bottom', end: 'top 45%', scrub: 0.6 },
-        },
-      );
-    }
-    if (poster) {
-      gsap.fromTo(
-        poster,
-        { yPercent: -6 },
-        { yPercent: 6, ease: 'none', scrollTrigger: { trigger: reel, start: 'top bottom', end: 'bottom top', scrub: true } },
-      );
-    }
-  });
+function focusOf(it: { frame: HTMLElement }): [number, number, number] {
+  const img = it.frame.querySelector<HTMLImageElement>('img[data-color]');
+  if (!img) return [0.5, 0.5, 1];
+  const [x, y] = getComputedStyle(img).objectPosition.split(' ').map((v) => parseFloat(v) / 100);
+  const z = parseFloat(getComputedStyle(img).scale) || 1;
+  return [Number.isFinite(x) ? x : 0.5, Number.isFinite(y) ? y : 0.5, z];
 }
 
-/* ---------------------------------------------------------------- video reels */
+/* ---------------------------------------------------------------- phones */
 
-function initVideos(section: HTMLElement) {
-  const videos = [...section.querySelectorAll<HTMLVideoElement>('video[data-video]')];
-  if (!videos.length || prefersReducedMotion()) return () => {};
-  const io = new IntersectionObserver(
-    (entries) =>
-      entries.forEach((e) => {
-        const v = e.target as HTMLVideoElement;
-        if (e.intersectionRatio >= 0.5) {
-          v.preload = 'auto';
-          v.play().catch(() => {});
-        } else v.pause();
-      }),
-    { threshold: [0, 0.5] },
-  );
-  videos.forEach((v) => io.observe(v));
+function initPhone(section: HTMLElement) {
+  const late: gsap.core.Animation[] = [];
+  const cells = qa(section, '[data-item]');
+  const track = q(section, '[data-track]');
+  const head = q(section, '[data-head]');
+  const decode = makeDecode(qa(section, '[data-word]'));
+  if (head) ScrollTrigger.create({ trigger: head, start: 'top 75%', once: true, onEnter: () => decode.play() });
+
+  cells.forEach((el, i) => {
+    const media = q(el, '[data-media]');
+    const duo = q(el, '[data-duo]');
+    const cap = q(el, '[data-cap]');
+    const node = q(el, '[data-node]');
+    if (i === 0 && media) {
+      const tl = gsap.timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: { trigger: media, start: 'top 85%', end: 'top 35%', scrub: 0.6 },
+      });
+      tl.fromTo(media, { clipPath: 'polygon(6% 10%, 100% 0%, 94% 100%, 0% 92%)' }, { clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)' }, 0);
+      if (duo) tl.fromTo(duo, { opacity: 1 }, { opacity: 0 }, 0);
+    } else if (media && duo) {
+      gsap.fromTo(
+        duo,
+        { opacity: 1 },
+        { opacity: 0, ease: 'none', scrollTrigger: { trigger: media, start: 'top 75%', end: 'center 55%', scrub: 0.6 } },
+      );
+    }
+    if (cap) {
+      hideCaption(cap);
+      ScrollTrigger.create({
+        trigger: cap,
+        start: 'top 88%',
+        once: true,
+        onEnter: () => {
+          const tw = typeIn(cap);
+          if (tw) late.push(tw);
+        },
+      });
+    }
+    if (node) {
+      ScrollTrigger.create({
+        trigger: el,
+        start: 'top 70%',
+        onToggle: (s) => {
+          node.toggleAttribute('data-on', s.isActive || s.progress > 0);
+          node.toggleAttribute('data-head', s.isActive);
+        },
+        end: 'bottom 70%',
+      });
+    }
+  });
+  const allNode = q(section, '[data-all] [data-node]');
+  if (allNode)
+    ScrollTrigger.create({
+      trigger: allNode,
+      start: 'top 70%',
+      onToggle: (s) => {
+        allNode.toggleAttribute('data-on', s.progress > 0 || s.isActive);
+        allNode.toggleAttribute('data-head', s.progress > 0 || s.isActive);
+      },
+    });
+  const rail = q(section, '[data-rail]');
+  if (track && rail) {
+    gsap.fromTo(
+      rail,
+      { scaleY: 0 },
+      { scaleY: 1, ease: 'none', scrollTrigger: { trigger: track, start: 'top 70%', end: 'bottom 70%', scrub: 0.6 } },
+    );
+  }
+
   return () => {
-    io.disconnect();
-    videos.forEach((v) => v.pause());
+    late.forEach((t) => t.kill());
+    decode.revert();
+    if (rail) gsap.set(rail, { clearProps: 'transform' });
+    qa(section, '[data-node]').forEach((n) => {
+      n.removeAttribute('data-on');
+      n.removeAttribute('data-head');
+    });
+    qa(section, '[data-cap]').forEach((c) => {
+      delete c.dataset.typed;
+      qa(c, '[data-cap-text], [data-caret]').forEach((el) => gsap.set(el, { clearProps: 'all' }));
+    });
   };
 }

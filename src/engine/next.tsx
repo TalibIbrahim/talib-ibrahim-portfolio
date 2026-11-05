@@ -4,7 +4,7 @@
 // Internal links get leave → push → enter. Opt out with data-no-transition. Back/forward skips the curtain.
 import { useEffect, useRef } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { boot, cleanup, enter, leave, onPage, setTransitionOrigin, type PageFn } from './index';
+import { boot, cleanup, enter, leave, onPage, setTransitionOrigin, setTransitionTitle, type PageFn } from './index';
 
 export function Engine({ setup }: { setup?: () => void }) {
   const router = useRouter();
@@ -29,6 +29,10 @@ export function Engine({ setup }: { setup?: () => void }) {
       if (mode.current !== 'idle') return;
       mode.current = 'push';
       setTransitionOrigin(e.clientX, e.clientY);
+      // the cover names where you are going: the link's [data-title], else its short visible text
+      const named = a.querySelector('[data-title]')?.textContent ?? a.dataset.transitionTitle ?? a.textContent ?? '';
+      const title = named.replace(/\s+/g, ' ').trim();
+      setTransitionTitle(title.length <= 32 ? title : '');
       const href = url.pathname + url.search + url.hash;
       hash.current = url.hash;
       router.prefetch(href);

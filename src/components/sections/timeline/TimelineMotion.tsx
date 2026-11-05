@@ -5,20 +5,21 @@
 // "/" diagonal sweeping left to right, with an accent band (the pen stroke) leading the edge.
 //   Desktop: scrubbed while the section top travels 90% -> 5% of the viewport (ease.wipe).
 //   Phones:  the same wipe, played once in 0.9 s (shortened by scroll velocity).
-// Body, desktop: three depth layers drift at three scroll speeds over the whole section
-//   (experience 3vh, education 10vh, certifications 16vh) and their entries arrive once:
-//   experience from the left (ease.out), education from the right (ease.soft),
-//   certifications from below (ease.inOut).
+// Body, desktop: two depth layers drift at two scroll speeds over the whole section
+//   (experience 3vh, education 10vh) and their entries arrive once: experience from the left
+//   (ease.out), education from the right (ease.soft).
+// Certifications (both): one mono line drifting left on the GSAP ticker (a repeating tween), a
+//   touch faster while the page scrolls (engine onScroll), paused off screen.
 // Body, phones: single column, each entry is a masked (clip-path) reveal. No parallax.
 // Reduced motion / no JS / Recruiter Mode: nothing runs; the sheet is plain and fully visible.
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ease, scrollState, velocityDuration } from '@/engine';
+import { ease, onScroll, scrollState, velocityDuration } from '@/engine';
 import { usePage } from '@/engine/next';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const DEPTH = { a: 0.03, b: 0.1, c: 0.16 } as const; // share of the viewport height, each way
+const DEPTH = { a: 0.03, b: 0.1 } as const; // share of the viewport height, each way
 const LEAD = 0.07; // the ink band leads the paper edge by this share of the width
 
 export function TimelineMotion() {
@@ -36,7 +37,12 @@ export function TimelineMotion() {
       },
       (c) => {
         if (!document.documentElement.classList.contains('motion')) return;
-        return c.conditions?.desk ? initDesk(section, sheet, ink) : initPhone(section, sheet, ink);
+        const offBody = c.conditions?.desk ? initDesk(section, sheet, ink) : initPhone(section, sheet, ink);
+        const offTicker = initTicker(section);
+        return () => {
+          offBody();
+          offTicker();
+        };
       },
     );
     return () => mm.revert();
@@ -119,8 +125,6 @@ function initDesk(section: HTMLElement, sheet: HTMLElement, ink: HTMLElement) {
 
   inLayer('a', '[data-entry]').forEach((el) => arrive([el], { x: -96, autoAlpha: 0 }, ease.out, 1.3, el));
   inLayer('b', '[data-entry]').forEach((el) => arrive([el], { x: 96, autoAlpha: 0 }, ease.soft, 1.2, el));
-  const certs = inLayer('c', '[data-cert]');
-  if (certs[0]) arrive(certs, { y: 64, autoAlpha: 0 }, ease.inOut, 1.1, certs[0].parentElement ?? certs[0]);
 
   return () => {
     late.forEach((t) => t.kill());
@@ -158,7 +162,7 @@ function initPhone(section: HTMLElement, sheet: HTMLElement, ink: HTMLElement) {
   });
 
   // Masked reveals, one per entry.
-  gsap.utils.toArray<HTMLElement>('[data-entry], [data-cert]', section).forEach((el) => {
+  gsap.utils.toArray<HTMLElement>('[data-entry]', section).forEach((el) => {
     gsap.set(el, { clipPath: 'inset(0% 0% 100% 0%)', y: 24 });
     ScrollTrigger.create({
       trigger: el,
@@ -180,5 +184,54 @@ function initPhone(section: HTMLElement, sheet: HTMLElement, ink: HTMLElement) {
   return () => {
     late.forEach((t) => t.kill());
     sheet.style.removeProperty('clip-path');
+  };
+}
+
+/* ---------------------------------------------------------------- certifications ticker */
+
+function initTicker(section: HTMLElement) {
+  const run = section.querySelector<HTMLElement>('[data-ticker-run]');
+  const box = section.querySelector<HTMLElement>('[data-ticker]');
+  if (!run || !box) return () => {};
+  // The loop's second copy exists only here (decorative, hidden from assistive tech), so the page
+  // text never lists the certifications twice.
+  const copy = run.cloneNode(true) as HTMLElement;
+  copy.removeAttribute('data-ticker-run');
+  copy.setAttribute('aria-hidden', 'true');
+  copy.dataset.tickerCopy = '';
+  run.after(copy);
+  // ~45 px/s at rest: the list (and its copy right behind it) moves one list-width per loop.
+  const drift = gsap.fromTo(
+    [run, copy],
+    { xPercent: 0 },
+    { xPercent: -100, ease: 'none', duration: () => Math.max(8, run.offsetWidth / 45), repeat: -1, paused: true },
+  );
+  const vis = ScrollTrigger.create({
+    trigger: box,
+    start: 'top bottom',
+    end: 'bottom top',
+    onToggle: (s) => (s.isActive ? drift.play() : drift.pause()),
+  });
+  if (vis.isActive) drift.play();
+  // Scrolling pushes it along (up to 4x), easing back when the page stops.
+  const speed = { v: 1 };
+  let back: gsap.core.Tween | null = null;
+  const off = onScroll(({ velocity }) => {
+    if (!vis.isActive) return;
+    const v = Math.min(4, 1 + Math.abs(velocity) * 0.12);
+    if (v > speed.v) {
+      speed.v = v;
+      drift.timeScale(v);
+    }
+    back?.kill();
+    back = gsap.to(speed, { v: 1, duration: 1.2, ease: ease.soft, onUpdate: () => void drift.timeScale(speed.v) });
+  });
+  return () => {
+    off();
+    back?.kill();
+    vis.kill();
+    drift.kill();
+    gsap.set(run, { clearProps: 'transform' });
+    copy.remove();
   };
 }

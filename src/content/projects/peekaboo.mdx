@@ -1,0 +1,12 @@
+## Context
+
+Peekaboo turns a monitor into a window. It tracks your head through the webcam and moves the view the way a real window would: lean left and you see further behind the right side of things.
+
+## What I built
+
+- An off-axis (asymmetric frustum) projection, recalculated every frame, that locks the view to the edges of the physical screen.
+- Four scenes: a reef where a GPGPU fish school scatters when you lean in, a floating diorama with a robot that turns to look at you, a particle river around a gas giant, and a calibration room.
+
+## Stack notes
+
+Plain JavaScript with Three.js, MediaPipe face tracking and custom GLSL shaders, running on GitHub Pages.

@@ -1,0 +1,13 @@
+## Context
+
+JARVIS controls a Windows PC without touching it: gesture at the webcam or talk to it. A Dynamic Island shows media, calendar, weather and hardware.
+
+## What I built
+
+- Hand tracking with MediaPipe and OpenCV for the cursor, one-handed zoom, a listen gesture and flicks to switch windows.
+- A voice pipeline: an openWakeWord wake word, Silero voice detection, Groq for speech recognition and replies, and Piper for speech.
+- A native PySide6 Dynamic Island at 60 FPS that is click-through when idle and never takes focus.
+
+## Stack notes
+
+Python with PySide6, MediaPipe and the WinRT media controls. Hand tracking runs on the machine; speech goes through the Groq API.

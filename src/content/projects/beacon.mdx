@@ -1,0 +1,13 @@
+## Context
+
+Beacon is a small control panel for a friends-only Minecraft server on an Oracle Cloud VM. It answers "can we play right now?" and lets anyone with the shared password start the server, copy the join address or download the world.
+
+## What I built
+
+- Status, a four-step boot track, players online, start and stop.
+- Backups every 30 minutes from an always-on ARM VM, restores, and an auto-stop after 30 idle minutes.
+- A PBKDF2 password hash, HMAC-signed cookies, CSRF checks, a strict CSP and rate-limited sign-in.
+
+## Stack notes
+
+React and Vite on Cloudflare Pages Functions with Web Crypto only, split across KV and D1 to stay inside free-tier limits. The screenshots use made-up data.

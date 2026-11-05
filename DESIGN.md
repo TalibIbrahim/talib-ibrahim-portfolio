@@ -3,23 +3,29 @@
 Source of truth for every build pass. Read before touching code.
 
 ## Brief
-- Subject: Muhammad Talib Ibrahim, full-stack developer, BS CS at UMT Lahore (expected July 2027, GPA 3.6/4.0), co-founder of Radix Systems.
+- Subject: Muhammad Talib Ibrahim, full-stack developer, BS CS at UMT Lahore (expected July 2027, GPA 3.6/4.0); co-founded Radix Systems (2026, ended).
 - Audience: recruiters and engineering leads, then other developers.
 - Job: get hired / get contacted. Boring Mode is the recruiter and accessibility view.
 - Content rule: only facts in `src/data`. Nothing invented (no awards, no metrics).
 
 ## Concept card
 ```
-Idea:        The site is a pen. You meet the person first; then the page collapses into a single
-             ink dot and the signature writes itself from it. Every section after is something
-             else a pen does, and you never know which one comes next.
-Metaphor:    Ink on a dark desk: touch down, write, bleed, zoom into a loop, turn the page, strike through.
-Signature:   The landing's portrait card shrinks into the ink dot; the camera dives into that dot and
-             follows the nib of a glossy 3D ink pipe (OGL) as it writes the signature, then the ink
-             bleeds into paper. One WebGL scene (pipe + bleed in one canvas). Flat SVG fallback.
-Emotion:     First 3 seconds: a real person, a big name. Then: "wait, where did he go?"
-Motion verb: "flow like ink": long out-expo settles, strokes that lead and trail.
-Screenshot:  The half-written 3D signature with the ballpoint tip mid-stroke.
+Idea:        A developer signs his work. The landing (a real person, a big name) closes into a card,
+             the name runs off into the code behind it, and he signs the card like a commit.
+Metaphor:    A pen on a dark desk, crossed with a commit log: ink strokes, and text that resolves
+             from noise the way code compiles.
+Signature:   The hero morph (one scrubbed timeline, src/components/sections/hero/HeroMotion.tsx):
+             the cream card lifts into a centred frame, "Talib" and "Ibrahim" shrink into the heads
+             of two marquee rows ("Ibrahim" decodes into the stack), the portrait turns black and
+             white, a tilted signature writes over the card in the only full-strength blue, and the
+             header reads "// MUHAMMAD TALIB IBRAHIM  SIGNED <hash>" (the SHA-1 of the strokes).
+             Then the signed card grows to full bleed and becomes the About paper.
+Emotion:     First 3 seconds: a real person, a big name, the role and one project. Then: "he signed it
+             like a commit".
+Motion verb: "flow like ink, resolve like code": long out-expo settles, strokes that lead and trail,
+             text that decodes instead of fading.
+Screenshot:  The signed card mid-stroke, black-and-white portrait, the rows dimmed behind it,
+             SIGNED c3ed5a4 above.
 ```
 
 ## Palette (tokens in src/app/globals.css)
@@ -37,10 +43,28 @@ accent into the browser default link blue `#0000EE`: the identity collapses into
 boring version of itself.
 
 ## Type
-- Display: **Clash Display** (Fontshare, `--font-clash`), 500/600/700. Tracking -0.035em mega, -0.03em xl, -0.02em l.
-- Text: **General Sans** (Fontshare, `--font-general`), 400/500/600 (+400 italic). Body 16–18 px / 1.55.
-- Mono (labels, timecodes, counters only): **Azeret Mono** (`--f-mono`), uppercase +0.04–0.06em.
-- Never: Inter, Roboto, Space Grotesk. (Boska + mono body was the first pass; the owner preferred Clash + General Sans.)
+Every face has one job (src/app/fonts.ts, all self-hosted woff2):
+- Display: **Clash Display** (`--f-display`), 500/600/700. Tracking -0.035em mega, -0.03em xl, -0.02em l.
+- Text: **General Sans** (`--f-body`), 400/500/600 (+400 italic). Body 16-18 px / 1.55.
+- Code details: **JetBrains Mono** (`--f-mono`), 400/500: labels, eyebrows, chips, key words, timecodes,
+  the hero's card header. Replaced Azeret Mono.
+- Hero rows only: **Departure Mono** (`--f-pixel`), the pixel row behind the signed card. Home page only.
+- Headline accents only: **Fraunces** italic (`--f-serif`, opsz 144, ~400), the 2-3 `site.taglineAccents`
+  words inside the tagline, which is About's headline (its only placement), in accent blue. Home page only.
+  (The owner overrode the earlier "no serif" rule for this.)
+- Departure and Fraunces are not preloaded; their tokens live on `[data-fun-root]` with their variables.
+- Never: Inter, Roboto, Space Grotesk.
+
+## Key words (text animation, one effect per idea, at most four per screen)
+- About's lead and body, phrases from `site.aboutFx` (src/components/sections/about/fx.tsx): decode
+  (glyph noise resolves, <= 0.4 s), type-in (caret leading), diff (a struck `-{TODO_specialty}` token
+  leaves, the real phrase rises into the same slot), select (shift+arrow, ends desk black on blue).
+- Rule: proper nouns are never scrambled; they type in or get selected. Only common phrases decode.
+- Every key word sits in a slot as wide as its final text (mono, `ch`), so nothing reflows. Each fires
+  when its line passes 72% of the viewport and is finished before mid-screen. Reduced motion and no JS
+  show the final text. On paper the key words use `--c-accent-ink` `#3048D6` (5.6:1).
+- One reveal voice per block: the About headline (tagline) prints under blue blocks scrubbed per line
+  (85% to 65%); the lead and body rise line by line out of masks that open once each line is home.
 
 ## Motion language
 - Eases (`src/engine/env.ts`, mirrored as CSS vars):
@@ -55,22 +79,36 @@ boring version of itself.
 - Cursor: native always visible. Follower dot (fine pointer only), `data-cursor` states:
   `link` (grows), `view` (label "View"), `play` (label "Play"), `drag` (label "Drag"), `text` (shrinks to a caret),
   `pressed` (squash).
-- Idle: the hero nib glint orbits slowly; the showreel posters drift. Paused off-screen, off under reduced motion.
-- No loader. The landing (portrait + name, real HTML and an eager <img>) is the LCP; its intro plays in ~1.4 s.
+- Idle: the hero's two marquee rows drift; the certifications line under Experience drifts. The Work strip is still at rest (a decision: its line, focus and captions answer scroll; hovers carry the rest). The survey sheet (contour lines
+  from noise, canvas on the GSAP ticker, 20 fps) drifts only while the visitor scrolls or moves the
+  pointer and eases to a stop ~2.5 s after, so the first screen rests as a still poster (a decision:
+  the hero's first frame is still at rest). Phones draw the sheet once. Paused off-screen, static
+  under reduced motion.
+- Fixed corner UI: the Recruiter mode button steps aside while scrolling down (back on scroll up),
+  hides while the contact form is on screen, and on phones while the landing is (its first screen
+  carries the role and a project). The nav pills are near-opaque so text never shows through on paper.
+- No loader. The landing (portrait + name, real HTML and an eager <img>) is the LCP; its CSS intro plays in ~1.4 s.
+- Accent discipline in the hero: the signature is the only full-strength blue; the pixel row is
+  `--c-accent-text` at .8 and steps back to .45 with the name row once the pen comes down.
 
 ## Section timeline (each boundary uses a different transition, never repeated)
 | # | Section | Desktop | Phone |
 |---|---|---|---|
-| 1 | Landing (sticky, 230svh) | intro: card opens, photo rises, "Talib" (behind photo) / "Ibrahim" (in front) settle in; scroll: name pulls apart, photo fades, card **collapses into the ink dot** | 180svh |
-| 2 | Signature (sticky 300svh, starts under the landing's last screen) | handoff on the dot; camera dives in and grazes the 3D pipe's nib, pulls back as it writes (smoothed path + damped camera); i-dots; statement; then **WebGL ink bleed** to paper | 220svh, dpr 1.5 |
-| 3 | About | masked line reveal + word ink-fill (muted→ink) scrubbed | same, no pin |
-| 4 | About→Work | **zoom-through**: the counter of an "o" scales into the reel frame | shorter |
-| 5 | Work showreel (sticky) | full-bleed reels, frame .56→1 + rotateX 24→0, film-advance with timecode | stacked reels, autoplay in view |
-| 6 | Work→Stack | **rotate**: section turns in from -8° around its top-left corner | rotate only |
-| 7 | Stack (pinned horizontal) | 4 groups on a type strip; cards arrive from different directions/eases | native scroll-snap row |
-| 8 | Stack→Experience | **diagonal clip-path wipe** (a strike-through) | same |
-| 9 | Experience + Education | parallax depth, entries from left/right/below at 3 speeds | single column |
-| 10 | Contact (finale) | **reveal from underneath**: Timeline slides off while Contact is held beneath, scaling .92→1 and un-dimming; "Email me" per-char; form | scale .96→1, no hold |
+| 1 | Landing (sticky, 460svh) | first frame = portrait on its cream card, giant "Talib" / "Ibrahim", role + featured project (18px, ink). Scroll: card closes into a centred frame, name shrinks into two marquee rows (Clash name row, Departure pixel row that decodes "ibrahim" into the stack), portrait turns B&W, tilted signature writes, header types `SIGNED <hash>`, role + project under the card | 400svh; rows above and below the frame; caption under the name |
+| 2 | Landing to About | **card expand**: the signed cream card grows to full bleed and IS the About paper | same |
+| 3 | About | tagline headline (Fraunces accents) prints under blue blocks per line; lead and body lines rise, key words resolve per line (decode / type-in / diff / select) | same, no pin |
+| 4 | About to Work | **bent card**: About's paper runs on into the Work stage; project 01's cover waits as a small tilted duotone card under "SELECTED WORK". Once the stage sticks (80svh of scrub) it pulls flat into its slot as one OGL plane, top-left corner leading, the sheet sagging, colour arriving with it; the paper fades to ink, the title rises and parts around a mono `git log --featured · 05` chip, and decodes as the card lands. The About globe pauses while the plane draws. No GL: the same card as a DOM FLIP | no GL: the title on paper, project 01 full bleed across the paper/ink edge, un-skewing from a polygon as its colour comes in |
+| 5 | Work strip (sticky, sideways) | the five covers at mixed sizes and heights (slots in showreel/Reel.tsx) travel sideways, 1.7 px per px of scroll. A focus band at .4vw drives scale .86 to 1 and duotone to colour; captions (`01 · 2024 · NEXT.JS`) type in behind a block caret; a blue git-graph line runs behind the frames through a commit node per project (filled at the focused one) and branches into "All projects" | stacked, alternating right/left, a rail with nodes down the left; each cover fades duotone to colour at mid-screen |
+| 6 | Work to Front end / back end | **seam**: the section opens outwards from its centre line, the seam hairline drawing first | no seam line, no wipe |
+| 7 | Front end / back end | two halves: mono top word over a heavy END, "used in" projects in the outer columns (links), pitch from `site.pitch`, stack chips. Hover or focus-within writes a marker tag (DrawSVG), the other half dims | one column; tags write on scroll-in |
+| 8 | Split to Stack | **rotate**: the paper panel turns in from -8deg around its top-left corner | rotate only |
+| 9 | Stack (pinned horizontal) | 4 groups on a type strip; cards arrive from different directions/eases | native scroll-snap row |
+| 10 | Stack to Experience | **diagonal clip-path wipe** (a strike-through) | same |
+| 11 | Experience + Education | parallax depth, entries from left/right at 2 speeds; certifications as one slim mono line drifting left on the GSAP ticker (faster while scrolling; a plain wrapped line under reduced motion) | single column |
+| 12 | Contact (finale) | **reveal from underneath**: Timeline slides off while Contact is held beneath, scaling .92 to 1 and un-dimming; "Email me" per-char; form | scale .96 to 1, no hold |
+
+The old Signature section (ink-dot collapse + 3D OGL pen) was removed at the owner's request: the hero's
+drawn signature is now the signature moment. Its stroke data (signature-paths.ts) feeds the hero.
 
 ## Recruiter Mode (replaced Boring Mode at the owner's request)
 - A persistent "Recruiter mode" button on the full site. One click: the furniture shrinks, greys and
@@ -89,5 +127,5 @@ Projects = `src/data/projects.ts` only. Case-study body = optional `src/content/
 Boring Mode list and metadata all map over the array.
 
 ## Shape & grid
-- Radius 0 everywhere except the follower dot and the reel frame (animated 18px→0).
+- Radius 0 everywhere except the follower dot and the Work strip's commit nodes (dots on the git-graph line).
 - 12 cols desktop, 4 cols phone, gutter `--gutter`. Hang text from col 1, col 5, col 9.

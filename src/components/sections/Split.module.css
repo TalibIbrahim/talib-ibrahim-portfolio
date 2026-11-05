@@ -1,0 +1,182 @@
+/* ============================================================
+   SPLIT: front end / back end on the desk ground.
+   Base (no JS, reduced motion): both halves complete, tags drawn.
+   html.motion: SplitMotion hides the tags until hover / focus / scroll-in and runs the seam wipe.
+   ============================================================ */
+.section {
+  position: relative;
+  padding: calc(var(--u) * 16) var(--gutter) calc(var(--u) * 18);
+  background: var(--c-bg);
+  overflow-x: clip;
+}
+/* the seam between the halves: a hairline on the centre line */
+.seam {
+  position: absolute;
+  left: 50%;
+  top: calc(var(--u) * 10);
+  bottom: calc(var(--u) * 10);
+  width: 1px;
+  background: var(--c-line);
+  transform-origin: 50% 0;
+}
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: clamp(3rem, 7vw, 8rem);
+}
+
+/* each half: [outer column: used in] [inner column: label, title, pitch, chips] (mirrored) */
+.side {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: clamp(1.5rem, 4vw, 4rem);
+  row-gap: calc(var(--u) * 2.5);
+  align-content: start;
+  transition: opacity 0.5s var(--ease-soft);
+}
+.side > * { grid-column: 2; }
+.front { justify-items: end; text-align: right; }
+.back { grid-template-columns: auto minmax(0, 1fr); }
+.back > * { grid-column: 1; }
+.section[data-active='front'] .back,
+.section[data-active='back'] .front { opacity: 0.28; }
+
+.layer {
+  margin: 0 0 calc(var(--u) * 3);
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.title {
+  position: relative;
+  display: grid;
+  margin: 0;
+  width: fit-content;
+  line-height: 0.84;
+  font-weight: inherit;
+}
+.front .title { justify-items: end; }
+.top {
+  position: relative;
+  width: fit-content;
+  font-family: var(--f-mono);
+  font-weight: 500;
+  font-size: clamp(3.25rem, 8.2vw, 8.4rem);
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+  color: var(--c-fg);
+}
+.end {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: clamp(5.6rem, 14vw, 14.25rem);
+  letter-spacing: -0.02em; /* no hairline seams where the letters meet */
+  text-transform: uppercase;
+  color: var(--c-fg);
+}
+
+/* the tag: "front" sits on END's top edge, mirrored from the right; "back" starts at BACK's left edge */
+/* A tag only ever marks the active side: none at rest, none under reduced motion or without JS. */
+.tag {
+  display: none;
+  position: absolute;
+  overflow: visible;
+  pointer-events: none;
+  translate: 0 -44%;
+}
+.front .tag { right: -2%; top: 100%; width: 98%; }
+.back .tag { left: 1%; top: 56%; width: 150%; }
+:global(html.motion) .tag { display: block; }
+.tag path {
+  fill: none;
+  stroke: var(--c-accent);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* outer column: the projects that used this layer, hung on END's baseline */
+.used {
+  grid-row: 2;
+  align-self: end;
+  display: grid;
+  gap: 0.6rem;
+}
+.front .used { grid-column: 1; justify-self: start; text-align: left; }
+.back .used { grid-column: 2; justify-self: end; text-align: right; }
+.usedLabel {
+  margin: 0 0 0.2rem;
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--c-muted);
+}
+.used ul {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.used a {
+  display: inline-block;
+  min-height: 1.5rem;
+  font-family: var(--f-mono);
+  font-size: var(--t-s);
+  color: var(--c-fg);
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.3em;
+  transition: text-decoration-color 0.3s var(--ease-soft), color 0.3s var(--ease-soft);
+}
+.used a:hover,
+.used a:focus-visible { color: var(--c-accent-text); text-decoration-color: currentColor; }
+
+.pitch {
+  margin: calc(var(--u) * 2) 0 0;
+  max-width: 34ch;
+  font-size: var(--t-body);
+  line-height: 1.55;
+  color: var(--c-fg);
+}
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.front .chips { justify-content: flex-end; }
+.chips li {
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--c-line);
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.04em;
+  color: var(--c-fg);
+}
+
+/* ---------- phones: one column, each half its own composition */
+@media (max-width: 767px) {
+  .seam { display: none; }
+  .grid { grid-template-columns: 1fr; row-gap: calc(var(--u) * 14); }
+  .side,
+  .front,
+  .back { grid-template-columns: 1fr; justify-items: start; text-align: left; }
+  .side > *,
+  .back > *,
+  .front .used,
+  .back .used { grid-column: 1; grid-row: auto; justify-self: start; text-align: left; }
+  .front .title { justify-items: start; }
+  .top { font-size: 17.5vw; }
+  .end { font-size: 41vw; }
+  .front .tag,
+  .back .tag { left: 10%; right: auto; width: 94%; }
+  .front .tag { top: 100%; }
+  .used ul { display: flex; flex-wrap: wrap; gap: 0.35rem 1.1rem; }
+  .front .chips { justify-content: flex-start; }
+  .section[data-active] .side { opacity: 1; }
+}

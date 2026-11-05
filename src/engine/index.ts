@@ -15,7 +15,7 @@ import { playEnter, playLeave } from './transition';
 import { prefersReducedMotion } from './env';
 
 export { onScroll, scrollState, scrollToTarget, stopScroll, startScroll } from './scroll';
-export { setTransitionOrigin } from './transition';
+export { setTransitionOrigin, setTransitionTitle } from './transition';
 export { ease, isTouch, isMobile, prefersReducedMotion, velocityDuration } from './env';
 
 export type PageFn = (page: { intro: gsap.core.Timeline; path: string }) => void | (() => void);

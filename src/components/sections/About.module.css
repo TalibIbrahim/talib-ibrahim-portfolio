@@ -1,16 +1,19 @@
 /* ============================================================
    ABOUT: paper ground (the hero's ink bleed ends on --c-fg).
    Base (no JS, reduced motion): a calm paper section, full-ink text.
-   html.motion: split lines + ink overlay per word, and the zoom-through stage.
-   GSAP-animated elements (.word, split lines, .ink) carry no CSS transform.
+   html.motion: split lines + ink overlay per word.
+   GSAP-animated elements (split lines, .ink) carry no CSS transform.
    ============================================================ */
 .about {
   --paper-muted: #57534c; /* 6.2:1 on paper */
-  --paper-faint: #a7a197; /* un-inked words, transient only */
   position: relative;
+  z-index: 0;
   background: var(--c-fg);
   color: var(--c-bg);
 }
+/* Handoff: About sits under the hero's last screen, so when the signed card has grown into paper and
+   the hero stage steps away, this page is already in place under it (no blank screen of paper). */
+:global(html.motion) .about { margin-top: -100svh; }
 .about ::selection { background: var(--c-bg); color: var(--c-fg); }
 
 /* 12-col grid; text hangs from col 1, col 5 and col 9. */
@@ -42,23 +45,45 @@
   text-transform: uppercase;
   color: var(--paper-muted);
 }
+/* The tagline: the page's headline, Clash caps with Fraunces italic accents (site.taglineAccents).
+   Its one reveal voice is the blue block wipe (about/text.ts). */
+.headline {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  max-width: 17em;
+  margin: 0;
+  font-family: var(--f-display);
+  font-size: var(--t-xl);
+  font-weight: 600;
+  line-height: 0.98;
+  letter-spacing: var(--track-mega);
+  word-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.serif {
+  font-family: var(--f-serif);
+  font-style: italic;
+  font-weight: 400;
+  font-variation-settings: 'opsz' 144;
+  font-size: 1.04em;
+  line-height: 0.9;
+  letter-spacing: -0.01em;
+  word-spacing: 0;
+  text-transform: none;
+  color: var(--c-accent); /* large text: 3.9:1 on paper passes AA for its size */
+}
 .lead {
   grid-column: 1 / span 8;
-  grid-row: 2;
+  grid-row: 3;
   font-family: var(--f-display);
   font-size: var(--t-l);
   font-weight: 600;
   line-height: 1.08;
   letter-spacing: var(--track-l);
-  text-indent: calc((100% + var(--gutter)) / 8 * 4); /* first line hangs from col 5 */
 }
-/* Split lines: only the first line keeps the hang (words are inline-blocks, never indented). */
-.lead * { text-indent: 0; }
-.lead > :first-child,
-.lead > :first-child > :first-child { text-indent: inherit; }
 .body {
   grid-column: 5 / span 4;
-  grid-row: 3;
+  grid-row: 4;
   max-width: 62ch;
   font-size: var(--t-body);
   line-height: 1.6;
@@ -72,7 +97,7 @@
 .globe {
   --globe-deep: #1a2470; /* accent pressed toward the desk black */
   grid-column: 9 / span 4;
-  grid-row: 2 / span 2;
+  grid-row: 3 / span 2;
   align-self: start;
   position: relative;
   margin: 0;
@@ -175,58 +200,95 @@
   .ring { animation: none; opacity: 0.35; transform: scale(2.2); }
 }
 
-/* Word ink-fill (motion only, set once the text is split). */
-.inking :global(.about-word) {
+/* ---------- key words: one style for all four (mono, paper accent), each in a fixed-width slot ---------- */
+.fx {
   position: relative;
-  color: var(--paper-faint);
+  display: inline-block;
+  width: calc(var(--n) * 1ch); /* the final length: no effect ever reflows the paragraph */
+  font-family: var(--f-mono);
+  font-weight: 500;
+  font-size: 0.84em;
+  letter-spacing: 0;
+  line-height: 1;
+  white-space: nowrap;
+  text-align: left;
+  color: var(--c-accent-ink);
 }
-.ink {
+.fxUnit { white-space: nowrap; }
+/* Clash's space is narrow at display sizes with negative tracking: open it so words never read run together */
+.lead,
+.body { word-spacing: 0.12em; }
+/* reveal lines keep the paragraph's leading (no drift while lines rise) */
+.lead :global(.split-line),
+.body :global(.split-line) { line-height: inherit; }
+.fx { word-spacing: 0; } /* the slot is sized in ch: no extra word space inside it */
+.vis { position: relative; }
+.fx[data-state='noise'] .vis,
+.fx[data-state='noise'] .del { color: var(--paper-muted); }
+.caret {
+  position: absolute;
+  left: 0;
+  top: 0.08em;
+  bottom: 0;
+  width: 0.09em;
+  background: var(--c-accent);
+  opacity: 0;
+}
+/* diff: the struck token and the phrase share one slot; the slot clips them (baseline unchanged) */
+.fx_diff { clip-path: inset(-0.1em -0.15em -0.12em -0.15em); }
+.ghost { visibility: hidden; }
+.del,
+.ins {
   position: absolute;
   left: 0;
   top: 0;
-  color: var(--c-bg);
-  opacity: 0;
-  pointer-events: none;
-  white-space: nowrap;
+}
+.del {
+  display: none; /* base: the phrase is already in place; motion shows the token first */
+  font-weight: 400;
+  color: var(--paper-muted);
+}
+.strike {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 52%;
+  height: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+/* select: like shift+arrow in an editor; ends desk black on blue, clear of the comma */
+.fx_select { margin-right: 6px; }
+.selBg {
+  position: absolute;
+  inset: -0.04em -4px -0.1em -4px;
+  background: var(--c-accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+.fx[data-state='selected'] .vis { color: var(--c-bg); }
+
+/* ---------- lead block reveal (motion only, built by about/text.ts) ---------- */
+.bwrap {
+  position: relative;
+  display: inline-block;
+}
+.btxt { visibility: hidden; }
+.blk {
+  position: absolute;
+  inset: -0.02em -0.06em -0.04em;
+  background: var(--c-accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
 }
 
-/* ---------- zoom-through stage (motion only) ---------- */
-.zoom { display: none; }
-:global(html.motion) .zoom {
-  display: block;
-  position: relative;
-  height: 220svh; /* 100svh stage + ~120svh of fall */
-}
-.stage {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  overflow: clip;
-  background: var(--c-fg);
-}
-.wordWrap {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-}
-.word {
-  font-family: var(--f-display);
-  font-weight: 600;
-  font-size: var(--t-mega);
-  line-height: 0.9;
-  letter-spacing: var(--track-mega);
-  color: var(--c-bg);
-  white-space: nowrap;
-  user-select: none;
-}
-.disc {
-  position: absolute;
-  inset: 0;
-  background: var(--c-bg);
-  clip-path: circle(0px at 50% 50%);
-  visibility: hidden;
-  pointer-events: none;
+/* Wide screens: the second paragraph starts where the lead ends, in the column under the globe,
+   so the lower half of the page is not left empty. */
+@media (min-width: 1200px) {
+  .text { padding-bottom: calc(var(--u) * 10); }
+  .globe { grid-row: 3; }
+  .body { grid-column: 9 / span 4; grid-row: 4; margin-top: calc(var(--u) * -2); }
 }
 
 @media (min-width: 768px) and (max-width: 1199px) {
@@ -242,14 +304,12 @@
   }
   .label { grid-column: 1 / span 2; }
   .meta { grid-column: 3 / span 2; }
-  .lead { grid-column: 1 / -1; text-indent: calc((100% + var(--gutter)) / 4 * 1); }
-  .body { grid-column: 2 / -1; grid-row: 4; }
+  .lead { grid-column: 1 / -1; }
+  .body { grid-column: 2 / -1; grid-row: 5; }
   .globe {
     grid-column: 2 / -1;
-    grid-row: 3;
+    grid-row: 4;
     justify-self: stretch;
     width: 100%;
   }
-  :global(html.motion) .zoom { height: 140svh; } /* ~40svh of fall */
-  .word { font-size: clamp(6rem, 34vw, 9rem); }
 }

@@ -4,6 +4,7 @@
 // come from data-cursor-label on the target, or the defaults below.
 import { gsap } from 'gsap';
 import { isTouch, prefersReducedMotion } from './env';
+import { onScroll } from './scroll';
 
 const LABELS: Record<string, string> = { view: 'View', play: 'Play', drag: 'Drag' };
 const INTERACTIVE = 'a, button, [role="button"], input, textarea, select, label, summary';
@@ -18,12 +19,18 @@ export function initCursor() {
   const x = gsap.quickTo(el, 'x', { duration: 0.35, ease: 'power3.out' });
   const y = gsap.quickTo(el, 'y', { duration: 0.35, ease: 'power3.out' });
 
+  // Hidden until the first pointermove (never a dot parked mid-screen), and faded again when the page
+  // scrolls under a pointer that has not moved for a moment: it only follows a hand that is moving.
+  let lastMove = 0;
   const move = (e: PointerEvent) => {
+    lastMove = performance.now();
     x(e.clientX);
     y(e.clientY);
     const t = e.target as Element | null;
     const target = t?.closest<HTMLElement>('[data-cursor]');
     let state = target?.dataset.cursor || '';
+    // Buttons fill themselves on hover (a wipe), so the follower gets out of the way of their labels.
+    if (!state && t?.closest('button, [role="button"]')) state = 'off';
     if (!state && t?.closest(INTERACTIVE)) state = 'link';
     if (el.dataset.state !== state) el.dataset.state = state;
     const text = target?.dataset.cursorLabel ?? LABELS[state] ?? '';
@@ -34,11 +41,16 @@ export function initCursor() {
   const up = () => el.classList.remove('is-pressed');
   const leave = () => el.classList.remove('is-ready');
 
+  const offScroll = onScroll(() => {
+    if (el.classList.contains('is-ready') && performance.now() - lastMove > 1200) el.classList.remove('is-ready');
+  });
+
   addEventListener('pointermove', move, { passive: true });
   addEventListener('pointerdown', down);
   addEventListener('pointerup', up);
   document.documentElement.addEventListener('pointerleave', leave);
   off = () => {
+    offScroll();
     removeEventListener('pointermove', move);
     removeEventListener('pointerdown', down);
     removeEventListener('pointerup', up);

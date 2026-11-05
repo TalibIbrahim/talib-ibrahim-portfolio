@@ -98,6 +98,18 @@ export function Stack() {
           const tl = gsap.timeline({ scrollTrigger: st });
           tl.from(body, { ...a.from, ease: a.ease, duration: 1 }, 0);
           tl.from(chips, { ...a.chips, autoAlpha: 0, ease: a.ease, duration: 0.6, stagger: 0.4 / Math.max(1, chips.length) }, 0.3);
+          // Exit: a group fades as the strip carries it off the left edge, so only the group in front
+          // reads (no orphan letters of the last title at the edge).
+          gsap.fromTo(
+            g,
+            { autoAlpha: 1 },
+            {
+              autoAlpha: 0,
+              ease: 'none',
+              immediateRender: false,
+              scrollTrigger: { trigger: g, containerAnimation: pan, start: 'right 62%', end: 'right 30%', scrub: 0.4 },
+            },
+          );
         });
 
         return () => {

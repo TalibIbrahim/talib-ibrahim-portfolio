@@ -20,6 +20,7 @@ export function Curtain() {
           <path data-stroke className="curtain__bristle curtain__bristle--c" d={PATH} pathLength={1} transform="translate(0 31)" />
         </g>
       </svg>
+      <p className="curtain__title" data-curtain-title />
     </div>
   );
 }

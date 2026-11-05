@@ -7,8 +7,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import type { MDXComponents } from 'mdx/types';
-import type { Project } from '@/data/types';
-import { getProjects } from '@/data/projects';
+import type { SourcedFact, Project } from '@/data/types';
+import { coverOf, getProjects } from '@/data/projects';
 import type { CaseStudyBody } from '@/lib/mdx';
 import { RollText } from '@/components/chrome/RollText';
 import { CaseVideo } from './CaseVideo';
@@ -22,9 +22,11 @@ const UI = {
   stack: 'Stack',
   live: 'Visit the live site',
   repo: 'Read the code',
+  client: "Visit the client's site",
   newTab: '(opens in a new tab)',
   highlights: 'Highlights',
   next: 'Next project',
+  facts: 'Facts',
 };
 
 type Props = {
@@ -69,14 +71,31 @@ const mdx: MDXComponents = {
   strong: (props) => <strong className={styles.strong} {...props} />,
 };
 
+/** Sourced facts from data, placed in the MDX body with <Facts />. */
+function FactList({ facts }: { facts: SourcedFact[] }) {
+  if (!facts.length) return null;
+  return (
+    <ul className={styles.ul} data-reveal="up" aria-label={UI.facts}>
+      {facts.map((m) => (
+        <li key={m.text} className={styles.li}>
+          {m.value && <strong className={styles.strong}>{m.value} </strong>}
+          {m.text}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 export function CaseStudy({ project: p, next, Body }: Props) {
   const list = getProjects();
   const index = list.findIndex((x) => x.slug === p.slug);
   const nextIndex = list.findIndex((x) => x.slug === next.slug);
   const total = list.length;
   const { media } = p;
-  const poster = media.poster;
-  const hasLinks = Boolean(p.links.live || p.links.repo);
+  const facts = p.facts ?? [];
+  const nextCover = coverOf(next);
+  const components: MDXComponents = { ...mdx, Facts: () => <FactList facts={facts} /> };
+  const hasLinks = Boolean(p.links.live || p.links.repo || p.links.client);
 
   return (
     <div data-fun-root data-stage>
@@ -145,20 +164,30 @@ export function CaseStudy({ project: p, next, Body }: Props) {
                   </a>
                 </li>
               )}
+              {p.links.client && (
+                <li>
+                  <a className={styles.cta} href={p.links.client} target="_blank" rel="noopener noreferrer">
+                    <RollText>{UI.client}</RollText>
+                    <span className="sr-only"> {UI.newTab}</span>
+                    <ArrowUpRight className={styles.ctaArrow} aria-hidden="true" strokeWidth={1.25} />
+                  </a>
+                </li>
+              )}
             </ul>
           )}
         </div>
 
+        {media && (
         <figure className={styles.hero} data-drop>
           <div className={styles.heroFrame}>{/* no hidden-until-revealed: this image is the LCP */}
             <div className={styles.heroMedia} data-parallax="0.04">
               {media.kind === 'video' ? (
-                <CaseVideo className={styles.heroImg} src={media.src} poster={poster} />
+                <CaseVideo className={styles.heroImg} src={media.src} poster={media.poster} />
               ) : (
                 <Image
                   className={styles.heroImg}
-                  src={poster.src}
-                  alt={poster.alt}
+                  src={media.poster.src}
+                  alt={media.poster.alt}
                   fill
                   sizes="100vw"
                   loading="eager"
@@ -168,6 +197,7 @@ export function CaseStudy({ project: p, next, Body }: Props) {
             </div>
           </div>
         </figure>
+        )}
 
         <div className={styles.body} data-drop>
           {!Body && (
@@ -176,9 +206,10 @@ export function CaseStudy({ project: p, next, Body }: Props) {
             </p>
           )}
           {Body ? (
-            <Body components={mdx} />
+            <Body components={components} />
           ) : (
             <>
+              <FactList facts={facts} />
               <h2 className={styles.h2} data-split="lines">
                 {UI.highlights}
               </h2>
@@ -192,6 +223,23 @@ export function CaseStudy({ project: p, next, Body }: Props) {
             </>
           )}
         </div>
+
+        {p.gallery?.length ? (
+          <div className={styles.gallery} data-drop>
+            {p.gallery.map((img) => (
+              <figure key={img.src} className={styles.galleryItem} data-reveal="up">
+                <Image
+                  className={styles.galleryImg}
+                  src={img.src}
+                  alt={img.alt}
+                  width={img.width}
+                  height={img.height}
+                  sizes="(min-width: 64em) 80vw, 100vw"
+                />
+              </figure>
+            ))}
+          </div>
+        ) : null}
 
         <nav className={styles.next} aria-label={UI.next} data-drop>
           <Link
@@ -207,15 +255,16 @@ export function CaseStudy({ project: p, next, Body }: Props) {
               <span>{UI.next}</span>
             </span>
             <span className={styles.nextTitle}>
-              <span className={styles.nextTitleText}>{next.title}</span>
+              <span className={styles.nextTitleText} data-title>{next.title}</span>
               <ArrowUpRight className={styles.nextArrow} aria-hidden="true" strokeWidth={1.1} />
             </span>
+            {nextCover && (
             <span className={styles.nextFrame} aria-hidden="true">
               <span className={styles.nextMedia}>
                 <span className={styles.nextPoster} data-parallax="0.06">
                   <Image
                     className={styles.nextImg}
-                    src={next.media.poster.src}
+                    src={nextCover.src}
                     alt=""
                     fill
                     sizes="100vw"
@@ -223,6 +272,7 @@ export function CaseStudy({ project: p, next, Body }: Props) {
                 </span>
               </span>
             </span>
+            )}
           </Link>
         </nav>
       </article>

@@ -1,0 +1,13 @@
+## Context
+
+Restaurant bills are harder to split than a total: people order different things, share dishes, and get card discounts and tax on different bases. Splitr follows the receipt's own calculation instead of one formula.
+
+## What I built
+
+- Receipt scanning on the phone with ML Kit OCR, and a parser for Pakistani receipts tested against real ones.
+- Item assignment with shared dishes, then per-person totals with discounts, tax and service charges, shared as text.
+- A directory of 39 Lahore card dining offers from official bank sources.
+
+## Stack notes
+
+Expo and React Native in a Turborepo monorepo, with the calculation engine and parser as tested packages. Local-only, single-user and in beta.

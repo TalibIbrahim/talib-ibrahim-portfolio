@@ -2,12 +2,17 @@
 // llms.txt markdown. Built from src/data only, so they can never say more than the pages do.
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
-import type { Project } from '@/data/types';
-import { getProjects } from '@/data/projects';
+import type { SourcedFact, Project } from '@/data/types';
+import { coverOf, getProjects } from '@/data/projects';
 import { site } from '@/data/site';
 
 const PERSON_ID = `${site.url}/#person`;
 const caseUrl = (p: Project) => `${site.url}/work/${p.slug}`;
+const absolute = (src: string) => (src.startsWith('/') ? `${site.url}${src}` : src);
+
+/** "About 40 users, grown organically through Reddit (self-reported)" */
+const factLine = (m: SourcedFact) =>
+  `${m.value ? `${m.value} ` : ''}${m.text} (${m.source.kind === 'owner' ? 'self-reported' : m.source.href})`;
 
 export function personLd() {
   return {
@@ -27,8 +32,29 @@ export function personLd() {
   };
 }
 
+/** /work: every project as an ItemList, in display order. */
+export function workLd() {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: site.workIndex.title,
+    description: site.workIndex.description,
+    url: `${site.url}/work`,
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListElement: getProjects().map((p, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        url: caseUrl(p),
+        name: p.title,
+      })),
+    },
+  };
+}
+
 export function projectLd(p: Project) {
   const links = [p.links.live, p.links.repo].filter(Boolean);
+  const cover = coverOf(p);
   return {
     '@context': 'https://schema.org',
     '@type': 'CreativeWork',
@@ -37,7 +63,7 @@ export function projectLd(p: Project) {
     description: p.summary,
     genre: p.kind,
     url: caseUrl(p),
-    image: p.media.poster.src,
+    ...(cover ? { image: absolute(cover.src) } : {}),
     keywords: p.stack.join(', '),
     ...(p.year ? { dateCreated: String(p.year) } : {}),
     ...(links.length ? { sameAs: links } : {}),
@@ -51,15 +77,19 @@ export const ldScript = (data: object) => JSON.stringify(data).replace(/</g, '\\
 async function caseBody(slug: string): Promise<string | null> {
   try {
     const src = await readFile(path.join(process.cwd(), 'src', 'content', 'projects', `${slug}.mdx`), 'utf8');
-    // Demote the MDX `##` headings one level so they nest under the project's own heading.
-    return src.trim().replace(/^(#+) /gm, '#$1 ');
+    // Demote the MDX `##` headings one level so they nest under the project's own heading, and
+    // drop <Facts /> (the project listing above the body already prints them from data).
+    return src
+      .trim()
+      .replace(/^(#+) /gm, '#$1 ')
+      .replace(/^<Facts\s*\/>\r?\n?/gm, '');
   } catch {
     return null;
   }
 }
 
 function projectLinks(p: Project) {
-  return [p.links.live && `Live: ${p.links.live}`, p.links.repo && `Code: ${p.links.repo}`].filter(Boolean);
+  return [p.links.live && `Live: ${p.links.live}`, p.links.repo && `Code: ${p.links.repo}`, p.links.client && `Client: ${p.links.client}`].filter(Boolean);
 }
 
 /** llms.txt (https://llmstxt.org): a summary with links. `full` inlines every case study. */
@@ -80,6 +110,7 @@ export async function llmsTxt({ full = false } = {}): Promise<string> {
 
   push('## Pages', '');
   push(`- [Home](${site.url}/): about, selected work, stack, experience and contact`);
+  push(`- [${site.workIndex.title}](${site.url}/work): every project with its stack, year and links`);
   push(`- [Recruiter mode](${site.url}/recruiter): projects, experience, education and stack on one page`);
   if (!full) push(`- [Full text](${site.url}/llms-full.txt): this file with every case study inlined`);
   push('');
@@ -94,7 +125,7 @@ export async function llmsTxt({ full = false } = {}): Promise<string> {
     if (p.role) push(`- Role: ${p.role}`);
     if (p.year) push(`- Year: ${p.year}`);
     push(`- Stack: ${p.stack.join(', ')}`, `- Case study: ${caseUrl(p)}`, ...projectLinks(p).map((l) => `- ${l}`), '');
-    push(...p.highlights.map((h) => `- ${h}`), '');
+    push(...p.highlights.map((h) => `- ${h}`), ...(p.facts ?? []).map((m) => `- ${factLine(m)}`), '');
     const body = await caseBody(p.slug);
     if (body) push(body, '');
   }

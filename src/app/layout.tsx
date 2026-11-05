@@ -7,7 +7,7 @@ import { Header } from '@/components/chrome/Header';
 import { Curtain } from '@/components/chrome/Curtain';
 import { RecruiterToggle } from '@/components/chrome/RecruiterToggle';
 import { Motion } from '@/components/Motion';
-import { azeret, clash, general } from './fonts';
+import { clash, general, mono } from './fonts';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -25,13 +25,13 @@ export const metadata: Metadata = {
     url: site.url,
     title: `${site.name} | ${site.role}`,
     description: site.description,
-    images: [{ url: '/og.png', width: 1200, height: 630, alt: `${site.name}, ${site.role}` }],
+    images: [{ url: site.ogImage.src, width: site.ogImage.width, height: site.ogImage.height, alt: site.ogImage.alt }],
   },
   twitter: {
     card: 'summary_large_image',
     title: `${site.name} | ${site.role}`,
     description: site.description,
-    images: ['/og.png'],
+    images: [site.ogImage.src],
   },
   verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
     ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
@@ -45,7 +45,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
-    <html lang="en" className={`${clash.variable} ${general.variable} ${azeret.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${clash.variable} ${general.variable} ${mono.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: BOOT_SCRIPT }} />
       </head>

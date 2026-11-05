@@ -1,113 +1,230 @@
-'use client';
-// Landing: portrait + name. "Talib" sits behind the photo, "Ibrahim" in front of it, on a paper
-// card the photo breaks out of. Scrolling pulls the name apart and shrinks the card into a single
-// blue ink dot at the centre: the exact point where the pen touches down in the Signature section.
-import { useRef } from 'react';
+// Landing. Server-rendered: the base layout IS the first frame (portrait on its cream card, the giant
+// name, role and a featured project), real HTML + an eager <img>, readable with no JS.
+// html.motion: HeroMotion scrubs one timeline over a sticky stage:
+//   1. the card lifts off the bottom edge and closes into a centred frame; the portrait drops into it
+//   2. "Talib" and "Ibrahim" shrink into the heads of two marquee rows that run behind the card
+//      ("Ibrahim" hands over to a pixel-mono row and decodes into the stack)
+//   3. the portrait turns black and white while a tilted signature writes over the card; the header
+//      reads "// MUHAMMAD TALIB IBRAHIM  SIGNED <hash>" (the hash is the real SHA-1 of the strokes)
+//   4. the signed card grows to full bleed and becomes the paper the About section is printed on.
+// Colour rule for the giant words (no blend modes): cream on the desk, desk-ink where a word crosses
+// the cream card, cream again over the person. Three stacked copies: the h1 (cream), a copy clipped
+// to the card (ink), a copy masked to the cut-out (cream). Only the h1 is in the accessibility tree.
+import { createHash } from 'node:crypto';
+import type { CSSProperties } from 'react';
 import Image from 'next/image';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowDown } from 'lucide-react';
+import Link from 'next/link';
+import { ArrowDown, ArrowUpRight } from 'lucide-react';
 import { site } from '@/data/site';
-import { usePage } from '@/engine/next';
-import { ease, isMobile, isTouch, prefersReducedMotion } from '@/engine';
+import { getFeatured, getProject } from '@/data/projects';
+import { DOTS, SIGNATURE_VIEWBOX, STROKES } from './signature-paths';
+import { HeroMotion } from './hero/HeroMotion';
 import styles from './Hero.module.css';
 
-const PHOTO = { src: '/headshot-no-bg.png', width: 476, height: 820 };
+const PHOTO = { src: '/headshot-cutout.png', mask: '/headshot-mask.png', width: 476, height: 820 };
+/** The broad-nib second pass: the same stroke, offset, so downstrokes read heavier than hairlines. */
+const NIB = 'translate(5 1.4)';
+
+const first = site.shortName.split(' ')[0];
+const last = site.name.split(' ').at(-1) ?? '';
+const given = site.name.split(' ')[0];
+const hash = createHash('sha1').update(STROKES.map((s) => s.d).join('|')).digest('hex').slice(0, 7);
+
+/** Row text, from site.hero. The stack row is set lower-case. */
+const nameRow = site.hero.nameRow ?? [];
+const stackRow = (site.hero.stackRow ?? []).map((t) => t.toLowerCase());
+const stackHead = stackRow[0] ?? '';
+/** The pixel row's head starts as the surname and decodes into the first tool (equal width, mono). */
+const width = Math.max(stackHead.length, last.length);
+const headFrom = last.toLowerCase().padStart(width);
+const headTo = stackHead.padStart(width);
+
+function Word({ which }: { which: 'first' | 'last' }) {
+  return (
+    <span className={`${styles.word} ${which === 'first' ? styles.first : styles.last}`} data-word={which}>
+      <span className={which === 'first' ? styles.rise : styles.drop}>{which === 'first' ? first : last}</span>
+    </span>
+  );
+}
+
+const chars = (s: string, cls?: string) =>
+  [...s].map((c, i) => (
+    <span key={i} className={cls} data-ch>
+      {c === ' ' ? ' ' : c}
+    </span>
+  ));
 
 export function Hero() {
-  const hero = useRef<HTMLElement>(null);
-  const stage = useRef<HTMLDivElement>(null);
-  const card = useRef<HTMLDivElement>(null);
-  const photo = useRef<HTMLDivElement>(null);
-  const dot = useRef<HTMLDivElement>(null);
-  const first = useRef<HTMLSpanElement>(null);
-  const last = useRef<HTMLSpanElement>(null);
-  const given = useRef<HTMLSpanElement>(null);
-  const meta = useRef<HTMLDivElement>(null);
-
-  // The intro (card opens, photo rises, name settles) is pure CSS (Hero.module.css): it starts on
-  // the first paint, so the name never waits for JavaScript. GSAP only adds the scroll story.
-  usePage(() => {
-    if (prefersReducedMotion() || !hero.current) return;
-    const mobile = isMobile();
-
-    // Scroll: the name pulls apart, the card collapses into the ink dot.
-    const tl = gsap.timeline({
-      defaults: { ease: 'none' },
-      scrollTrigger: { trigger: hero.current, start: 'top top', end: 'bottom bottom', scrub: 0.8, invalidateOnRefresh: true },
-    });
-    tl.to(first.current, { xPercent: mobile ? -110 : -125, ease: ease.inOut, duration: 0.6 }, 0)
-      .to(last.current, { xPercent: mobile ? 110 : 125, ease: ease.inOut, duration: 0.6 }, 0)
-      .fromTo([given.current, meta.current], { autoAlpha: 1 }, { autoAlpha: 0, duration: 0.2 }, 0)
-      .fromTo(photo.current, { scale: 1, yPercent: 0, autoAlpha: 1 }, { scale: 0.7, yPercent: 10, autoAlpha: 0, duration: 0.42, ease: ease.inOut }, 0.05)
-      .fromTo(card.current, { clipPath: 'inset(0% 0% 0% 0% round 0%)' }, { clipPath: 'inset(46% 46% 46% 46% round 50%)', duration: 0.55, ease: ease.inOut }, 0.15)
-      .fromTo(dot.current, { scale: 0, autoAlpha: 0 }, { scale: 1, autoAlpha: 1, duration: 0.2, ease: ease.out }, 0.55)
-      .to(card.current, { autoAlpha: 0, duration: 0.15 }, 0.62)
-      .to({}, { duration: 0.23 }); // hold on the dot so the handoff reads
-
-    // Handoff: the moment the landing ends, the Signature stage (same frame: one dot, centred)
-    // takes over. Hide this stage so it doesn't scroll up over the pen.
-    ScrollTrigger.create({
-      trigger: hero.current,
-      start: 'bottom bottom',
-      onEnter: () => gsap.set(stage.current, { autoAlpha: 0 }),
-      onLeaveBack: () => gsap.set(stage.current, { autoAlpha: 1 }),
-    });
-
-    // Pointer: the photo and the name drift apart a little, so the depth reads before scrolling.
-    let off = () => {};
-    if (!isTouch()) {
-      const px = gsap.quickTo(photo.current, 'x', { duration: 1, ease: ease.soft });
-      const nx = gsap.quickTo([first.current, last.current], 'x', { duration: 1.2, ease: ease.soft });
-      const move = (e: PointerEvent) => {
-        const k = e.clientX / innerWidth - 0.5;
-        px(k * -14);
-        nx(k * 22);
-      };
-      addEventListener('pointermove', move, { passive: true });
-      off = () => removeEventListener('pointermove', move);
-    }
-
-    return () => off();
-  });
+  const project = (site.hero.featured && getProject(site.hero.featured)) || getFeatured()[0];
+  const sig = {
+    '--sig-w': SIGNATURE_VIEWBOX.w,
+    '--sig-h': SIGNATURE_VIEWBOX.h,
+  } as CSSProperties;
 
   return (
-    <section ref={hero} id="top" className={styles.hero} aria-labelledby="hero-name">
-      <div ref={stage} className={styles.stage}>
-        <h1 id="hero-name" className={styles.name}>
-          <span ref={given} className={styles.given}>Muhammad</span>{' '}
-          <span ref={first} className={`${styles.word} ${styles.first}`}><span className={styles.rise}>Talib</span></span>{' '}
-          <span ref={last} className={`${styles.word} ${styles.last}`}><span className={styles.drop}>Ibrahim</span></span>
-        </h1>
+    <section id="top" className={styles.hero} aria-labelledby="hero-name" data-hero>
+      <div className={styles.stage} data-hero-stage>
+        <canvas className={styles.bg} aria-hidden="true" data-bg />
 
-        <div className={styles.portrait} data-drop>
-          <div ref={card} className={styles.card} />
-          <div ref={photo} className={styles.photo}>
-              <Image
-                src={PHOTO.src}
-                alt={`Portrait of ${site.name} in a dark suit`}
-                width={PHOTO.width}
-                height={PHOTO.height}
-                sizes="(max-width: 767px) 70vw, 30vw"
-                loading="eager"
-                fetchPriority="high"
-                className={styles.img}
-              />
+        <div className={styles.rows} aria-hidden="true" data-drop>
+          <div className={`${styles.row} ${styles.rowName}`} data-row="name">
+            <div className={styles.track} data-track>
+              {[0, 1, 2].map((i) => (
+                <span key={i} className={styles.copy} data-copy-n>
+                  <span data-head={i === 1 ? 'name' : undefined}>{first}</span>
+                  {nameRow.map((t) => (
+                    <span key={t}>
+                      <i> · </i>
+                      {t}
+                    </span>
+                  ))}
+                  <i> · </i>
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className={`${styles.row} ${styles.rowStack}`} data-row="stack">
+            <div className={styles.track} data-track>
+              {[0, 1, 2].map((i) => (
+                <span key={i} className={styles.copy} data-copy-s>
+                  {i === 2 ? (
+                    <span data-head="stack" data-from={headFrom} data-to={headTo}>
+                      {headFrom}
+                    </span>
+                  ) : (
+                    <span>{headTo}</span>
+                  )}
+                  {stackRow.slice(1).map((t) => (
+                    <span key={t}>
+                      <i> / </i>
+                      {t}
+                    </span>
+                  ))}
+                  <i> / </i>
+                </span>
+              ))}
+            </div>
           </div>
         </div>
-        <div ref={dot} className={styles.dot} aria-hidden="true" />
 
-        <div ref={meta} className={styles.meta} data-drop>
+        <div className={styles.card} data-card data-drop />
+
+        <h1 id="hero-name" className={styles.name} data-drop>
+          <span className={styles.given} data-given>
+            {given}
+          </span>{' '}
+          <Word which="first" /> <Word which="last" />
+        </h1>
+        {/* the colour rule: ink where the name crosses the card */}
+        <div className={`${styles.name} ${styles.inkCopy}`} aria-hidden="true" data-copy="card" data-drop>
+          <Word which="first" />
+          <Word which="last" />
+        </div>
+
+        <div className={styles.photoLayer} data-photo-layer data-drop>
+          <div className={styles.photo} data-photo>
+            <Image
+              src={PHOTO.src}
+              alt={`Portrait of ${site.name} in a dark suit`}
+              width={PHOTO.width}
+              height={PHOTO.height}
+              sizes="(max-width: 767px) 86vw, 32vw"
+              loading="eager"
+              fetchPriority="high"
+              className={styles.img}
+            />
+            {/* black and white while the signature writes: a static filter on a copy, crossfaded */}
+            <Image
+              src={PHOTO.src}
+              alt=""
+              aria-hidden="true"
+              width={PHOTO.width}
+              height={PHOTO.height}
+              sizes="(max-width: 767px) 86vw, 32vw"
+              className={`${styles.img} ${styles.bw}`}
+              data-bw
+            />
+          </div>
+        </div>
+        {/* the colour rule: cream again over the person */}
+        <div
+          className={`${styles.name} ${styles.creamCopy}`}
+          aria-hidden="true"
+          data-copy="photo"
+          data-drop
+          style={{ '--mask': `url(${PHOTO.mask})` } as CSSProperties}
+        >
+          <Word which="first" />
+          <Word which="last" />
+        </div>
+
+        <p className={styles.header} aria-hidden="true" data-header>
+          <span className={styles.label}>
+            <span className={styles.slash}>{chars('// ')}</span>
+            <span data-core>{given}</span>
+            {chars(` ${first} ${last}`)}
+          </span>
+          <span className={styles.signed}>
+            {chars('signed ')}
+            <span className={styles.hash}>{chars(hash)}</span>
+          </span>
+        </p>
+
+        <svg
+          className={styles.sig}
+          viewBox={`0 0 ${SIGNATURE_VIEWBOX.w} ${SIGNATURE_VIEWBOX.h}`}
+          style={sig}
+          aria-hidden="true"
+          data-sig
+        >
+          {STROKES.map((s) => (
+            <g key={s.id}>
+              <path d={s.d} data-stroke />
+              <path d={s.d} transform={NIB} data-nib />
+            </g>
+          ))}
+          {DOTS.map(([x, y]) => (
+            <circle key={`${x}-${y}`} cx={x} cy={y} r={6} data-dot />
+          ))}
+        </svg>
+
+        {/* first frame: the recruiter test (who, what, where, one piece of work) */}
+        <div className={styles.meta} data-caption="start" data-drop>
           <p className={styles.role}>
-            {site.role}
-            <br />
-            {site.location}
+            <span>{site.role}</span>
+            <span>{site.location}</span>
           </p>
-          <p className={styles.cue} aria-hidden="true">
-            Scroll <ArrowDown size={14} strokeWidth={1.5} />
+          {project && (
+            <Link href={`/work/${project.slug}`} className={styles.work} data-transition-title={project.title}>
+              <span className={styles.path}>
+                work/{project.slug}
+                <ArrowUpRight aria-hidden="true" size={13} strokeWidth={1.75} />
+              </span>
+              <span className={styles.tagline}>{project.tagline}</span>
+            </Link>
+          )}
+        </div>
+        <p className={styles.cue} aria-hidden="true" data-cue>
+          Scroll <ArrowDown size={14} strokeWidth={1.5} />
+        </p>
+
+        {/* the signed card: one line under the frame, then the same project */}
+        <div className={styles.end} data-caption="end">
+          <p className={styles.endRole} aria-hidden="true">
+            {site.role} · {site.location}
           </p>
+          {project && (
+            <Link href={`/work/${project.slug}`} className={styles.work} data-transition-title={project.title}>
+              <span className={styles.path}>
+                work/{project.slug}
+                <ArrowUpRight aria-hidden="true" size={13} strokeWidth={1.75} />
+              </span>
+              <span className={styles.tagline}>{project.tagline}</span>
+            </Link>
+          )}
         </div>
       </div>
+      <HeroMotion />
     </section>
   );
 }

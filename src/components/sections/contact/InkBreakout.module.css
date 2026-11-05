@@ -44,6 +44,9 @@
 
 /* The one real control: Play / Pause / Resume / Try again / Play again */
 .btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -60,17 +63,35 @@
   border: 1px solid var(--p-fg);
   transition: background-color 0.4s var(--ease-soft), color 0.4s var(--ease-soft), border-color 0.4s var(--ease-soft);
 }
-.btn:hover {
-  background: var(--c-accent);
+.btn:hover,
+.btn:focus-visible {
   border-color: var(--c-accent);
   color: #fff;
 }
+/* hover / focus: an accent fill wipes in from the left (transform only), the label turns white */
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--c-accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.5s var(--ease-out);
+}
+.btn:not([data-playing]):not(:disabled):hover::before,
+.btn:not([data-playing]):not(:disabled):focus-visible::before { transform: scaleX(1); }
+.btn svg { flex: none; transition: translate 0.5s var(--ease-out); }
+.btn:not(:disabled):hover svg,
+.btn:not(:disabled):focus-visible svg { translate: 3px 0; }
+
 .btn[data-playing] {
   color: var(--p-fg);
   background: transparent;
   border-color: var(--p-line);
 }
-.btn[data-playing]:hover { border-color: var(--p-fg); background: transparent; color: var(--p-fg); }
+.btn[data-playing]:hover,
+.btn[data-playing]:focus-visible { border-color: var(--p-fg); background: transparent; color: var(--p-fg); }
 .btn:focus-visible { outline: 2px solid var(--c-accent); outline-offset: 2px; }
 .btn:disabled { opacity: 0.45; cursor: default; }
 .btn:disabled:hover { background: var(--p-fg); border-color: var(--p-fg); color: var(--p-bg); }
@@ -174,5 +195,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .win { animation: none; }
-  .btn { transition: none; }
+  .btn,
+  .btn::before,
+  .btn svg { transition: none; }
 }

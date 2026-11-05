@@ -15,7 +15,7 @@
 /* Frosted chip: legible on the dark desk, the paper sections and over the reels alike. */
 .chip {
   pointer-events: auto;
-  background: rgb(18 18 20 / 0.66);
+  background: rgb(18 18 20 / 0.94); /* near-opaque: headlines passing under it never show through on paper */
   -webkit-backdrop-filter: blur(14px) saturate(140%);
   backdrop-filter: blur(14px) saturate(140%);
   border: 1px solid rgb(236 232 223 / 0.14);

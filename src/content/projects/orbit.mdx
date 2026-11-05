@@ -1,0 +1,13 @@
+## Context
+
+Immich's own docs say it is not a backup. Orbit runs around an Immich photo library, keeps copies in more than one place and checks that they actually work.
+
+## What I built
+
+- An agent on every device and a hub that polls them every 60 seconds and caches the last good answer in SQLite.
+- Phone backup checks: every upload is compared with each copy before the phone is called safe to free up.
+- One-button failover that starts Immich on an Oracle Cloud standby from the newest dump.
+
+## Stack notes
+
+A Next.js 16 hub and a Node 22 agent, driving Syncthing, Docker and restic over Tailscale with no public ports. The screenshots use demo data.

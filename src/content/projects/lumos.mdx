@@ -1,0 +1,18 @@
+## Context
+
+Tuya and Smart Life Wi-Fi lights are usually controlled through the vendor's phone app. Lumos is a Windows desktop app that controls them directly over the local network, with no cloud at runtime, and brings them into Apple Home.
+
+## Today
+
+<Facts />
+
+## What it does
+
+- Power, brightness from 1 to 100%, colour temperature from 2200K to 6500K and a full colour wheel, with rooms, scenes and automations such as a sleep timer and a sunrise alarm.
+- An Apple HomeKit bridge, so Siri, the Home app and automations can control the lights.
+- Effects that follow the screen, the music, the album art and game events in Rocket League, Counter-Strike 2 and League of Legends.
+- A flash limiter for photosensitivity and an optional Bulb protection mode that caps commands per second.
+
+## How it's built
+
+Electron, React and Tailwind CSS in TypeScript. The main process talks to the bulbs over the LAN with TuyAPI and publishes them to HomeKit with HAP-NodeJS. A small C# helper reads the Windows media session and output level; track titles stay inside it and only a hash comes out. Hidden in the tray it uses about 0.01% CPU. It ships as a Windows installer that checks GitHub Releases for updates.
