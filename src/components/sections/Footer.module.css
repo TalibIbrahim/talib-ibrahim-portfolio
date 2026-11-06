@@ -117,16 +117,16 @@
 }
 .rise { display: block; }
 
-/* written over the name like a hand over print: tilted, crossing the first line */
+/* signed across the first line like a hand over print: tilted, covering "TALIB" (owner's call) */
 .sig {
   position: absolute;
   left: 50%;
-  top: 0;
-  width: clamp(14rem, 6rem + 18vw, 24rem);
+  top: calc(var(--t-xl) * 0.45); /* the middle of the first line's caps */
+  width: clamp(16rem, 8rem + 22vw, 30rem);
   height: auto;
   aspect-ratio: var(--sig-ar);
   z-index: 4;
-  translate: -46% -104%; /* the flourish's lowest point clears the name's caps by ~0.2em */
+  translate: -48% -55%;
   rotate: -7deg;
   overflow: visible;
   pointer-events: none;
@@ -421,7 +421,7 @@
     margin-top: calc(var(--u) * 6);
   }
   .title { font-size: var(--ft); }
-  .sig { width: min(78vw, 20rem); }
+  .sig { width: min(86vw, 22rem); top: calc(var(--ft) * 0.45); }
   .portrait {
     position: relative;
     grid-column: 1 / -1;
