@@ -6,6 +6,8 @@
 //   Boundary 4   About ends on its paper; the Work section's stage starts on the same paper and
 //                its bent card pulls the page into ink (showreel/ShowreelMotion.tsx).
 //   Globe        an ink-dot globe facing Lahore with its local time (AboutGlobe, lazy OGL) beside the text.
+//   Pen line     desktop: one blue line from a commit node beside the tagline down the left margin into
+//                the Work stage's git graph, drawn by scroll (about/line.ts); fully drawn under reduced motion.
 // Reduced motion / no JS / Recruiter Mode: a calm paper section.
 import { useRef, type ReactNode } from 'react';
 import { gsap } from 'gsap';
@@ -16,6 +18,7 @@ import { usePage } from '@/engine/next';
 import { AboutGlobe } from './AboutGlobe';
 import { withFx } from './about/fx';
 import { initText } from './about/text';
+import { initLine } from './about/line';
 import styles from './About.module.css';
 
 gsap.registerPlugin(ScrollTrigger, SplitText);
@@ -54,6 +57,12 @@ export function About() {
         return initText(root, styles);
       },
     );
+    // the pen line: desktop only; static (fully drawn) under reduced motion
+    mm.add('(min-width: 768px)', () => {
+      const motion =
+        document.documentElement.classList.contains('motion') && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+      return initLine(root, motion);
+    });
     return () => mm.revert();
   });
 
@@ -61,7 +70,11 @@ export function About() {
 
   return (
     <section ref={section} id="about" className={styles.about} aria-labelledby="about-title">
-      <div className={styles.text}>
+      <svg className={styles.pen} aria-hidden="true" focusable="false" data-pen>
+        <path d="" />
+        <circle r="4.5" />
+      </svg>
+      <div className={styles.text} data-text>
         <h2 id="about-title" className={styles.label} data-drop>
           About
         </h2>

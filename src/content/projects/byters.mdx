@@ -1,20 +1,15 @@
-## Context
+## The problem
 
-Byters is a food review platform. People rate restaurants, write reviews and keep a profile of their own, and the platform helps them discover where to eat next.
+In Pakistan, finding somewhere to eat mostly means Facebook food groups, Instagram reels shaped by free tastings and paid promotion, and Google Maps listings with thin ratings. Diners trust the hype and get a bad meal. Byters gives them structured reviews from real diners instead.
 
-We were a team of three. I did most of the work, one teammate worked on the front end, and I built Where to Eat, the solo and group restaurant recommender, with the other.
+## The hard call
 
-## Today
-
-<Facts />
+Once a restaurant has at least five reviews, Byters writes an AI summary of what people recommend and what they say to avoid. Feeding the model the latest reviews would mostly repeat the loudest mood, so it gets a fixed mix: 10 recent positive reviews (4 stars and up), 5 mixed and 5 negative. That keeps a well-loved place's real weak spots in the summary.
 
 ## What I built
 
-- A full-stack review platform where users rate restaurants, write reviews and manage dynamic profiles.
-- Secure authentication for user accounts.
-- AI-powered restaurant discovery using vector embeddings.
-- A group decision feature to facilitate collaborative choices.
+We were a team of three and I led it. Reviews are rated on taste, service, ambience and value, with dish tags and photos. Search understands queries like "crispy burger in gulberg". I also built Where to Eat with a teammate: restaurant suggestions for one person or a group, using vector embeddings.
 
-## Stack notes
+## Outcome
 
-Built with Next.js and MongoDB, with Redux and Tailwind CSS on the front end, and deployed on Vercel.
+<Facts />

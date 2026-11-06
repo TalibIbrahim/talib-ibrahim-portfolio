@@ -1,8 +1,9 @@
-// Contact: the finale and the page footer. Server-rendered and complete without JS.
+// Contact: the finale. Server-rendered and complete without JS.
 // Boundary 10 is a reveal from underneath: the Timeline sheet slides off while this section waits
 // beneath it (ContactMotion holds it in place, scales it .92 -> 1 and lifts the dim).
 // The finale is a sheet of paper you can write on (InkPad: pointer = draw anywhere, touch = the
-// pad block), and the page ends with a game: Ink breakout, the stack as bricks (InkBreakout).
+// pad block), and it ends with a game: Ink breakout, the stack as bricks (InkBreakout). The framed
+// footer (Footer.tsx) follows it.
 import type { CSSProperties } from 'react';
 import { ArrowUpRight, PenLine } from 'lucide-react';
 import { site } from '@/data/site';
@@ -11,24 +12,18 @@ import { ContactMotion } from './contact/ContactMotion';
 import { InkPad } from './contact/InkPad';
 import { CopyEmail } from './contact/CopyEmail';
 import { LocalTime } from './contact/LocalTime';
-import { BackToTop } from './contact/BackToTop';
 import { InkBreakout } from './contact/InkBreakout';
 import styles from './Contact.module.css';
 
 const FINALE_COPY = site.contact.finale;
 
 export function Contact() {
-  const { contact, email, links, name, location } = site;
+  const { contact, email, links, location } = site;
   const C = FINALE_COPY;
   const words = contact.heading.split(' ');
   let n = 0; // running character index for the hover stagger
 
   const elsewhere = [links.github, links.linkedin];
-  const footerLinks = [
-    { label: links.github.label, href: links.github.href, external: true },
-    { label: links.linkedin.label, href: links.linkedin.href, external: true },
-    { label: 'Email', href: `mailto:${email}`, external: false },
-  ];
 
   return (
     <section id="contact" className={styles.section} aria-labelledby="contact-title" data-contact>
@@ -143,34 +138,6 @@ export function Contact() {
         </div>
 
         <InkBreakout />
-
-        <footer className={styles.foot}>
-          <div className={styles.footRow} data-drop>
-            <p className={styles.copy}>
-              <span aria-hidden="true">&copy;</span>
-              <span className="sr-only">Copyright</span> {new Date().getFullYear()} {name}
-            </p>
-            <ul className={styles.links} role="list">
-              {footerLinks.map((l) => (
-                <li key={l.label}>
-                  <a
-                    className={styles.link}
-                    href={l.href}
-                    {...(l.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                  >
-                    <span className={styles.linkText}>{l.label}</span>
-                    {l.external && <ArrowUpRight size={14} strokeWidth={1.5} aria-hidden="true" />}
-                    {l.external && <span className="sr-only"> (opens in a new tab)</span>}
-                  </a>
-                </li>
-              ))}
-            </ul>
-            <div className={styles.topCol}>
-              <BackToTop label={C.backToTop} />
-            </div>
-            <p className={styles.colophon}>{C.colophon}</p>
-          </div>
-        </footer>
 
         <div className={styles.dim} aria-hidden="true" data-dim />
       </div>

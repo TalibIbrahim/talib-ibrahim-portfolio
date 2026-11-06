@@ -1,13 +1,15 @@
-## Context
+## The problem
 
-JARVIS controls a Windows PC without touching it: gesture at the webcam or talk to it. A Dynamic Island shows media, calendar, weather and hardware.
+I use Siri a lot, and I wanted the same kind of assistant on my PC and laptop for small things: turn the volume down, raise the brightness, open an app, set a reminder or an alarm. I also wanted to work the laptop from across the room at night with my hand, without getting up.
+
+## The hard call
+
+Where the work runs. Hand tracking, the wake word and intent matching all run on the machine. MediaPipe tracks the hand and openWakeWord listens locally. A local intent engine decides most commands in under a millisecond, and maths runs locally too. Only speech-to-text and AI replies go to Groq, and a privacy log records every cloud request. So the cursor never waits on the network, and with no internet the island says speech is unavailable while gestures keep working.
 
 ## What I built
 
-- Hand tracking with MediaPipe and OpenCV for the cursor, one-handed zoom, a listen gesture and flicks to switch windows.
-- A voice pipeline: an openWakeWord wake word, Silero voice detection, Groq for speech recognition and replies, and Piper for speech.
-- A native PySide6 Dynamic Island at 60 FPS that is click-through when idle and never takes focus.
+Gesture control with one-handed zoom, a listen gesture and flicks to switch windows. A voice pipeline with Silero speech detection and ducking of other apps' audio. A native PySide6 Dynamic Island at 60 FPS that is click-through and never takes focus. Crashed workers restart on their own.
 
-## Stack notes
+## Outcome
 
-Python with PySide6, MediaPipe and the WinRT media controls. Hand tracking runs on the machine; speech goes through the Groq API.
+Version 2.6.0 is on GitHub Releases, with over 1,000 tests, including pixel-exact checks of every island page. Memory levels off around 150 MB.

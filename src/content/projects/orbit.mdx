@@ -1,13 +1,15 @@
-## Context
+## The problem
 
-Immich's own docs say it is not a backup. Orbit runs around an Immich photo library, keeps copies in more than one place and checks that they actually work.
+Immich is a good self-hosted photo app, but its own docs say it is not a backup. People who want three copies, one of them offsite, end up wiring Syncthing, cron jobs and manual checks together. The worst moment is deleting photos from a phone without knowing they are really safe.
+
+## The hard call
+
+Checking that a copy is good means hashing files, and hashing a whole library every time would bury the disks in I/O. Orbit hashes recent uploads plus a random 2% of older files, and checks size and database freshness on every copy. The phone only reads "safe to offload" once all of that passes.
 
 ## What I built
 
-- An agent on every device and a hub that polls them every 60 seconds and caches the last good answer in SQLite.
-- Phone backup checks: every upload is compared with each copy before the phone is called safe to free up.
-- One-button failover that starts Immich on an Oracle Cloud standby from the newest dump.
+A hub that polls an agent on each device every 60 seconds and caches the last good answer in SQLite, so an offline device shows "last seen", not an error. Everything binds to Tailscale with no public ports. Database dumps run nightly to every copy, and one button promotes an Oracle Cloud Always Free standby.
 
-## Stack notes
+## Outcome
 
-A Next.js 16 hub and a Node 22 agent, driving Syncthing, Docker and restic over Tailscale with no public ports. The screenshots use demo data.
+Checked against Immich v3.3.0 and Syncthing v2.1.6. It has an agent test suite and a written restore-test checklist, and it updates itself nightly. I run it on my own photo library. The screenshots use demo data.

@@ -327,7 +327,7 @@
 .line {
   fill: none;
   stroke: var(--c-accent);
-  stroke-width: clamp(3px, 0.32vw, 5px);
+  stroke-width: clamp(3px, 0.35vw, 6px); /* = About's pen line, which it continues */
   stroke-linecap: round;
   stroke-linejoin: round;
 }

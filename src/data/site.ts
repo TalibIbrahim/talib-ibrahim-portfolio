@@ -235,6 +235,16 @@ export const site: Site = {
       },
     },
   },
+  footer: {
+    pagesLabel: 'Pages',
+    stackLabel: 'Stack',
+    pages: [
+      { label: 'Work', href: '/#work' },
+      { label: 'About', href: '/#about' },
+      { label: 'Contact', href: '/#contact' },
+    ],
+    // closing: owner to write (two short lines). Until then the footer signs over the name.
+  },
   recruiter: {
     toggle: 'Recruiter mode',
     back: 'Back to the full site',

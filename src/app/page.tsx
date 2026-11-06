@@ -5,6 +5,7 @@ import { Split } from '@/components/sections/Split';
 import { Stack } from '@/components/sections/Stack';
 import { Timeline } from '@/components/sections/Timeline';
 import { Contact } from '@/components/sections/Contact';
+import { Footer } from '@/components/sections/Footer';
 import { departure, fraunces } from './fonts';
 
 export default function Home() {
@@ -19,6 +20,7 @@ export default function Home() {
         <Stack />
         <Timeline />
         <Contact />
+        <Footer />
       </div>
     </>
   );

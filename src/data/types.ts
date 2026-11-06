@@ -225,6 +225,14 @@ export type Site = {
       };
     };
   };
+  /** The framed footer (the page's last screen). Its page list is these links, then All projects and Recruiter mode. */
+  footer: {
+    pagesLabel: string; // small mono label over the page links
+    stackLabel: string; // accessible name of the stack row (its two halves are labelled with layers.sides[].layer)
+    pages: Link[]; // the home sections
+    /** The two-line closing statement over the portrait. Unset = the name, set like a signature block. */
+    closing?: [string, string];
+  };
   recruiter: {
     toggle: string; // the persistent button on the full site
     back: string; // returns to the full site

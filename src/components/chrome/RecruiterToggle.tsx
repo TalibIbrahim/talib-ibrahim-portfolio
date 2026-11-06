@@ -18,7 +18,7 @@ export function RecruiterToggle() {
   const [busy, setBusy] = useState(false);
   const ref = useRef<HTMLAnchorElement>(null);
 
-  // Never on top of content that needs the corner: hidden while the contact form is on screen, and on
+  // Never on top of content that needs the corner: hidden while the contact form or the footer is on screen, and on
   // phones while the landing is (its first screen already carries the role and a project).
   usePage(() => {
     const el = ref.current;
@@ -31,6 +31,9 @@ export function RecruiterToggle() {
     };
     const contact = document.getElementById('contact');
     if (contact) zones.push(ScrollTrigger.create({ trigger: contact, start: 'top 85%', end: 'bottom top', onToggle: sync }));
+    // the framed footer carries its own Recruiter mode link, and its bottom-right tab needs the corner
+    const footer = document.querySelector<HTMLElement>('[data-footer]');
+    if (footer) zones.push(ScrollTrigger.create({ trigger: footer, start: 'top bottom', end: 'bottom top', onToggle: sync }));
     const hero = document.querySelector<HTMLElement>('[data-hero]');
     if (hero && matchMedia('(max-width: 767px)').matches)
       zones.push(ScrollTrigger.create({ trigger: hero, start: 'top bottom', end: 'bottom 85%', onToggle: sync }));

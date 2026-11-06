@@ -1,18 +1,17 @@
-## Context
+## The problem
 
-Tuya and Smart Life Wi-Fi lights are usually controlled through the vendor's phone app. Lumos is a Windows desktop app that controls them directly over the local network, with no cloud at runtime, and brings them into Apple Home.
+Tuya and Smart Life Wi-Fi bulbs are cheap and everywhere, but you control them through the vendor's phone app, and every command goes through Tuya's cloud. There is no Apple Home support, no proper Windows app and nothing that reacts to what's on screen.
 
-## Today
+## The hard call
+
+I chose local LAN control over the cloud API. Commands go straight to the bulb over the home network: no server in the path, and a light answers in about 30 to 100 ms. The cost is setup. Each bulb's local key has to be pulled once through a Tuya developer project and TinyTuya. A bulb also accepts only one local controller at a time.
+
+## What I built
+
+A Windows desktop app with rooms, scenes, automations, a HomeKit bridge so Siri can control the lights, and effects that follow the screen, music, album art and game events. A flash limiter protects people with photosensitivity, and an optional Bulb protection mode caps commands per second.
+
+## Outcome
 
 <Facts />
 
-## What it does
-
-- Power, brightness from 1 to 100%, colour temperature from 2200K to 6500K and a full colour wheel, with rooms, scenes and automations such as a sleep timer and a sunrise alarm.
-- An Apple HomeKit bridge, so Siri, the Home app and automations can control the lights.
-- Effects that follow the screen, the music, the album art and game events in Rocket League, Counter-Strike 2 and League of Legends.
-- A flash limiter for photosensitivity and an optional Bulb protection mode that caps commands per second.
-
-## How it's built
-
-Electron, React and Tailwind CSS in TypeScript. The main process talks to the bulbs over the LAN with TuyAPI and publishes them to HomeKit with HAP-NodeJS. A small C# helper reads the Windows media session and output level; track titles stay inside it and only a hash comes out. Hidden in the tray it uses about 0.01% CPU. It ships as a Windows installer that checks GitHub Releases for updates.
+It ships as a Windows installer on GitHub Releases, now at version 2.1.9, and checks for its own updates. Hidden in the tray it uses about 0.01% CPU.

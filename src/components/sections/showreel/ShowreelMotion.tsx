@@ -12,6 +12,11 @@
 //             One onUpdate drives everything from cached offsets: the focus band at .4vw (scale,
 //             duotone, the head node), parallax inside each frame, captions typing in as items cross
 //             85%, and the git-graph line, whose head runs a little ahead of the focus band.
+//   pen lead  the git-graph line no longer starts at the stage's left edge: it comes down from the stage's
+//             top edge at About's pen-line x (half a gutter), so About's line (about/line.ts) runs on into
+//             it, and turns into project 01's node. Its vertical draws with the pen's head on the same
+//             viewport line as About's (PEN_HEAD), from the section top at that line until the corner; the
+//             turn to the node still draws as the card lands.
 // Phones (html.motion): stacked; project 01 un-skews from a polygon and its colour comes in; each
 // cover fades duotone -> colour as it reaches the middle; a rail draws down the left with a node per
 // project. Reduced motion / no JS / Recruiter Mode: the static grid, nothing here runs.
@@ -24,6 +29,7 @@ import { usePage } from '@/engine/next';
 import { webglOK } from '@/lib/webgl';
 import { holdGL } from '@/lib/gl-hold';
 import type { EntranceScene, Rect } from './entrance-scene';
+import { PEN_HEAD } from '../about/line';
 
 gsap.registerPlugin(ScrollTrigger, SplitText, ScrambleTextPlugin);
 
@@ -189,6 +195,7 @@ function initStrip(section: HTMLElement) {
     step: 1,
     nodeX: [] as number[],
     allX: 0,
+    lead: 0, // length of the pen lead (down from the stage top, round the corner)
   };
 
   function measure() {
@@ -261,7 +268,14 @@ function initStrip(section: HTMLElement) {
     m.nodeX = pts.map((p) => p.nx);
     m.allX = ax;
 
-    let d = `M 0 ${pts[0].ny.toFixed(1)} H ${pts[0].nx.toFixed(1)}`;
+    // the pen lead: down from the stage's top edge at About's line x, round a corner, into node 01
+    const px = (parseFloat(getComputedStyle(head!).paddingLeft) || 0) / 2;
+    const y0 = pts[0].ny;
+    const r = Math.max(4, Math.min(28, (pts[0].nx - px) / 2, y0 / 2));
+    let d = `M ${px.toFixed(1)} 0 V ${(y0 - r).toFixed(1)} Q ${px.toFixed(1)} ${y0.toFixed(1)} ${(px + r).toFixed(1)} ${y0.toFixed(1)}`;
+    line!.setAttribute('d', d);
+    m.lead = line!.getTotalLength();
+    d += ` H ${pts[0].nx.toFixed(1)}`;
     const curve = (fromX: number, fromY: number, toX: number, toY: number, endX: number) => {
       const gs = fromX + 6;
       const ge = Math.max(gs + 24, toX - 22);
@@ -273,17 +287,27 @@ function initStrip(section: HTMLElement) {
     curve(last.right, last.ny, ax, ay, ax);
     line!.setAttribute('d', d);
 
+    // samples of x along the line after the lead (monotonic in x), for drawing up to a track x
     const total = line!.getTotalLength();
     const N = 600;
     m.total = total;
-    m.step = total / N;
+    m.step = (total - m.lead) / N;
     m.xs = new Float32Array(N + 1);
-    for (let i = 0; i <= N; i++) m.xs[i] = line!.getPointAtLength(i * m.step).x;
+    for (let i = 0; i <= N; i++) m.xs[i] = line!.getPointAtLength(m.lead + i * m.step).x;
     line!.style.strokeDasharray = `${total} ${total + 10}`;
     line!.style.strokeDashoffset = `${total}`;
     drawn = -1;
+    paint();
   }
   let drawn = -1;
+  let leadP = 0; // the pen lead's progress (scroll, before the stage sticks)
+  let headLen = 0; // drawn length past the lead, from a track x
+  function paint() {
+    const len = leadP < 1 ? leadP * m.lead : m.lead + headLen;
+    if (Math.abs(len - drawn) < 0.5) return;
+    drawn = len;
+    line!.style.strokeDashoffset = `${(m.total - len).toFixed(1)}`;
+  }
   /** Draw the line up to track-x `hx` (the samples are monotonic in x). */
   function drawTo(hx: number) {
     const xs = m.xs;
@@ -296,10 +320,8 @@ function initStrip(section: HTMLElement) {
         if (xs[mid] <= hx) lo = mid;
         else hi = mid - 1;
       }
-    const len = Math.min(m.total, hi * m.step);
-    if (Math.abs(len - drawn) < 0.5) return;
-    drawn = len;
-    line!.style.strokeDashoffset = `${(m.total - len).toFixed(1)}`;
+    headLen = Math.min(m.total - m.lead, hi * m.step);
+    paint();
   }
 
   /* ---------- entrance ---------- */
@@ -389,6 +411,22 @@ function initStrip(section: HTMLElement) {
       invalidateOnRefresh: true,
     },
     onUpdate: () => applyEntrance(state.p),
+  });
+
+  /* ---------- the pen lead: About's line runs on down the stage ---------- */
+  const leadST = ScrollTrigger.create({
+    trigger: section,
+    start: `top ${PEN_HEAD * 100}%`,
+    end: () => `top ${Math.round(innerHeight * PEN_HEAD - m.lead)}px`,
+    invalidateOnRefresh: true,
+    onUpdate: (st) => {
+      leadP = st.progress;
+      paint();
+    },
+    onRefresh: (st) => {
+      leadP = st.progress;
+      paint();
+    },
   });
 
   /* ---------- travel ---------- */
@@ -540,6 +578,7 @@ function initStrip(section: HTMLElement) {
     ScrollTrigger.removeEventListener('refreshInit', onRefreshInit);
     ScrollTrigger.removeEventListener('refresh', onRefresh);
     pre.kill();
+    leadST.kill();
     entrance.scrollTrigger?.kill();
     entrance.kill();
     travel?.scrollTrigger?.kill();

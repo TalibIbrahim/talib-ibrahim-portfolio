@@ -1,5 +1,5 @@
 /* ============================================================
-   CONTACT (finale, the Ink breakout game, footer)
+   CONTACT (finale, the Ink breakout game; the framed footer follows in Footer.module.css)
    The finale is paper again: the dark Timeline sheet slides off it, and you can write on it.
    Base (no JS, reduced motion): plain flow under the Timeline, everything visible, no ink layer
    and no pad. The game block has its own module (contact/InkBreakout.module.css).
@@ -41,8 +41,7 @@
 /* Content sits above the ink */
 .lead,
 .pad,
-.write,
-.foot {
+.write {
   position: relative;
   z-index: 1;
 }
@@ -386,46 +385,6 @@
 }
 .formCol { grid-column: 5 / span 8; min-width: 0; }
 
-/* ---------- footer ---------- */
-.foot { border-top: 1px solid var(--p-line); }
-
-.footRow {
-  display: grid;
-  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
-  column-gap: var(--gutter);
-  row-gap: calc(var(--u) * 2);
-  align-items: center;
-  /* keep the fixed "Recruiter mode" button's corner clear at the page end */
-  padding: calc(var(--u) * 2.5) var(--gutter) calc(var(--gutter) + 2.75rem + var(--u) * 3);
-  font-size: var(--t-s);
-}
-.copy { grid-column: 1 / span 3; color: var(--p-muted); }
-.links {
-  grid-column: 4 / span 4;
-  list-style: none;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0 calc(var(--u) * 2.5);
-}
-.topCol { grid-column: 8 / span 2; }
-.colophon {
-  grid-column: 10 / span 3;
-  color: var(--p-muted);
-  font-size: var(--t-xs);
-}
-
-.top {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5em;
-  min-height: 2.75rem;
-  font-size: var(--t-s);
-}
-.topIcon { transition: translate 0.6s var(--ease-out); }
-.top:hover .topIcon,
-.top:focus-visible .topIcon { translate: 0 -3px; }
-
 /* Utility links: the underline draws */
 .link {
   display: inline-flex;
@@ -462,21 +421,15 @@
 @media (max-width: 767px) {
   /* content height on phones: the heading starts ~96px down instead of under a screen of empty paper */
   .lead { min-height: 0; align-content: start; gap: calc(var(--u) * 4); padding-top: 6rem; }
-  .body, .details, .writeHead, .formCol, .copy, .links, .topCol, .colophon { grid-column: 1 / -1; }
+  .body, .details, .writeHead, .formCol { grid-column: 1 / -1; }
   .detail { grid-template-columns: 5.75rem minmax(0, 1fr); gap: 0 1rem; }
   .write { padding-block: calc(var(--u) * 8) calc(var(--u) * 10); }
-  /* room for the Recruiter mode button in the bottom-right corner */
-  .footRow { padding-bottom: calc(var(--gutter) + 2.75rem + var(--u) * 5); }
 }
 @media (min-width: 768px) and (max-width: 1099px) {
   .body { grid-column: 1 / span 12; }
   .details { grid-column: 1 / span 12; }
   .writeHead { grid-column: 1 / -1; }
   .formCol { grid-column: 1 / -1; }
-  .copy { grid-column: 1 / span 6; }
-  .links { grid-column: 7 / span 6; }
-  .topCol { grid-column: 1 / span 6; }
-  .colophon { grid-column: 7 / span 6; }
 }
 
 @media (prefers-reduced-motion: reduce) {
