@@ -10,23 +10,28 @@ export function SellSlider() {
   const sell = useSell();
   const { less, more, levels } = site.recruiter;
   const step = (v: number) => setSell(Math.max(0, Math.min(3, v)) as Sell);
+  const dock = useRef<HTMLDivElement>(null);
   const ref = useRef<HTMLDivElement>(null);
-  // Fold to a bar once the top of the page has scrolled away (an observer, not a scroll listener).
+  // The slider sits in the page flow under the contact buttons, so it never lies on the copy. On
+  // desktop, once its dock has scrolled above the viewport it folds into a small fixed tab in the
+  // label column (an observer, not a scroll listener); the dock keeps its height, so nothing shifts.
+  // Phones keep it docked only: no fixed bar over a one-column page.
   useEffect(() => {
+    const holder = dock.current;
     const el = ref.current;
-    if (!el) return;
-    const probe = document.createElement('span');
-    probe.setAttribute('aria-hidden', 'true');
-    probe.style.cssText = 'position:absolute;top:0;left:0;width:1px;height:120px;pointer-events:none';
-    document.body.prepend(probe);
-    const io = new IntersectionObserver(([e]) => el.toggleAttribute('data-compact', !e.isIntersecting));
-    io.observe(probe);
-    return () => {
-      io.disconnect();
-      probe.remove();
-    };
+    if (!holder || !el) return;
+    const wide = matchMedia('(min-width: 768px)');
+    const io = new IntersectionObserver(([e]) => {
+      const fold = wide.matches && !e.isIntersecting && e.boundingClientRect.top < 0;
+      if (fold === el.hasAttribute('data-compact')) return;
+      holder.style.height = fold ? `${holder.offsetHeight}px` : '';
+      el.toggleAttribute('data-compact', fold);
+    });
+    io.observe(holder);
+    return () => io.disconnect();
   }, []);
   return (
+    <div ref={dock} className={styles.dock}>
     <div ref={ref} className={styles.slider} role="group" aria-label="How hard should this page sell">
       <button type="button" className={styles.end} onClick={() => step(sell - 1)} tabIndex={-1} aria-hidden="true">
         {less}
@@ -57,6 +62,7 @@ export function SellSlider() {
       <p className={styles.level} aria-hidden="true">
         {levels[sell]}
       </p>
+    </div>
     </div>
   );
 }

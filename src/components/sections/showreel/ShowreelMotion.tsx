@@ -187,6 +187,7 @@ function initStrip(section: HTMLElement) {
   const line = q<SVGPathElement>(section, '[data-line]');
   const cover = q(section, '[data-cover]');
   const allEl = q(section, '[data-all]');
+  const leadNode = q(section, '[data-lead-node]');
   const wordEls = qa(section, '[data-word]');
   if (!stage || !ground || !glHost || !head || !track || !chip || !line || !cover || !allEl) return;
 
@@ -266,14 +267,16 @@ function initStrip(section: HTMLElement) {
     // The card waits under the title (never under the letters: the title is difference-blended).
     const tw = gsap.utils.clamp(220, 340, m.W * 0.22);
     const th = (tw * sh) / sw;
-    const startCy = m.H * 0.4;
+    // The title waits a short rise below its band (not mid-screen), so before the stage sticks it sits
+    // close under About's bio instead of leaving an empty screen of paper above it.
+    const wordsCy = head!.offsetTop + head!.offsetHeight / 2;
+    const startCy = wordsCy + fs * 0.3;
     m.thumb = { cx: m.W / 2, cy: startCy + fs * 0.45 + m.H * 0.05 + th / 2, w: tw, h: th };
     if (a && b) {
       const gap = b.offsetLeft - (a.offsetLeft + a.offsetWidth);
       m.shift = Math.max(0, (gap - fs * 0.24) / 2);
     }
     m.chipW = chip!.offsetWidth;
-    const wordsCy = head!.offsetTop + head!.offsetHeight / 2;
     m.rise = startCy - wordsCy;
 
     buildLine();
@@ -315,13 +318,13 @@ function initStrip(section: HTMLElement) {
     m.nodeX = pts.map((p) => p.nx);
     m.allX = ax;
 
-    // the pen lead: down from the stage's top edge at About's line x, round a corner, into node 01
+    // the pen lead: straight down from the stage's top edge at About's line x to a commit node level
+    // with node 01 (the line ends on a node, never a hook), then branches right into node 01
     const px = (parseFloat(getComputedStyle(head!).paddingLeft) || 0) / 2;
     const y0 = pts[0].ny;
-    const r = Math.max(4, Math.min(28, (pts[0].nx - px) / 2, y0 / 2));
-    let d = `M ${px.toFixed(1)} 0 V ${(y0 - r).toFixed(1)} Q ${px.toFixed(1)} ${y0.toFixed(1)} ${(px + r).toFixed(1)} ${y0.toFixed(1)}`;
-    line!.setAttribute('d', d);
-    m.lead = line!.getTotalLength();
+    let d = `M ${px.toFixed(1)} 0 V ${y0.toFixed(1)}`;
+    m.lead = y0;
+    if (leadNode) Object.assign(leadNode.style, { left: `${px}px`, top: `${y0}px` });
     d += ` H ${pts[0].nx.toFixed(1)}`;
     // under a caption to its frame's right edge, then one smooth S through the gap (horizontal
     // tangents at both ends, so it stays monotonic in x and never kinks) into the next node
@@ -368,6 +371,7 @@ function initStrip(section: HTMLElement) {
     // landed: the line is drawn in full once and the cover slides off it (transform only)
     const len = viaCover ? m.total : leadP < 1 ? leadP * m.lead : m.lead + headLen;
     if (viaCover) setCoverX(Math.max(hxNow, m.xs[0] ?? 0));
+    leadNode?.toggleAttribute('data-on', leadP >= 0.98);
     if (Math.abs(len - drawn) < 0.5) return;
     drawn = len;
     line!.style.strokeDashoffset = `${(m.total - len).toFixed(1)}`;
@@ -679,6 +683,8 @@ function initStrip(section: HTMLElement) {
     allNode?.removeAttribute('data-head');
     line.removeAttribute('style');
     cover.removeAttribute('style');
+    leadNode?.removeAttribute('style');
+    leadNode?.removeAttribute('data-on');
     line.setAttribute('d', '');
     section.style.removeProperty('--travel');
     delete section.dataset.strip;

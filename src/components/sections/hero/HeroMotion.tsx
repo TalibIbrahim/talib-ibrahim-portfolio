@@ -310,7 +310,10 @@ export function HeroMotion() {
     tl.set(signCh, { visibility: 'visible', stagger: 0.035 }, t + 0.5);
     // 4. hold the signed card, then it grows into the page
     const E = t + 1.4;
-    tl.to([photo, sig, header, endCap], { autoAlpha: 0, duration: 0.7, ease: soft }, E)
+    // the portrait and the signature leave by a wipe (the bottom edge rises), never a fade: every
+    // mid-frame keeps a hard edge on the cream instead of a washed-out ghost of the card
+    tl.fromTo([photo, sig], { clipPath: 'inset(0% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 100% 0%)', duration: 0.7, ease: ease.wipe, stagger: 0.08, immediateRender: false }, E)
+      .to([header, endCap], { autoAlpha: 0, duration: 0.5, ease: soft }, E)
       .fromTo(drv, { e: 0 }, { e: 1, duration: 2, ease: ease.wipe, onUpdate: apply, immediateRender: false }, E)
       .to({}, { duration: 0.3 });
 
@@ -401,6 +404,7 @@ export function HeroMotion() {
       gsap.set([stage, card, photo, bw, given, header, sig, startCap, endCap, cue, rowsLayer, rowName, rowStack, trackN, trackS, creamCopy, ...words, ...chars, ...strokes, ...nibs, ...dots], {
         clearProps: 'transform,opacity,visibility,width,height,display',
       });
+      gsap.set([photo, sig], { clearProps: 'clipPath' });
     };
   });
 

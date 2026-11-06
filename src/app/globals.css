@@ -5,7 +5,7 @@
   --c-bg: #0b0b0c;
   --c-bg-2: #131315;
   --c-fg: #ece8df;
-  --c-muted: #8f8a80;
+  --c-muted: #a29d93; /* 7.2:1 on --c-bg: grey captions on dark stay clearly readable */
   --c-line: rgb(236 232 223 / 0.12);
   --c-accent: #4d6bff;
   --c-accent-text: #8094ff;

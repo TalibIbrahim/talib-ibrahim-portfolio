@@ -283,11 +283,12 @@
 .next {
   margin-top: calc(var(--u) * 16);
   border-top: 1px solid var(--c-line);
+  padding-inline: var(--gutter); /* the link's hit area is what it shows, not the gutters around it */
 }
 .nextLink {
   display: grid;
   gap: calc(var(--u) * 2);
-  padding: calc(var(--u) * 3) var(--gutter) calc(var(--u) * 6);
+  padding: calc(var(--u) * 3) 0 calc(var(--u) * 6);
 }
 .nextLabel {
   display: flex;
@@ -368,21 +369,21 @@
 }
 
 .nextLink:focus-visible { outline-offset: -6px; }
-/* Hover and keyboard focus answer the same way: the title steps 8px right, the blue underline draws
+/* Hover and keyboard focus answer the same way (the shared moving response): the title slides 12px right, the blue underline draws
    to full width, the preview un-dims and scales to 1.03. */
 .nextLink { transition: color 0.4s var(--ease-soft); }
 .nextLink:hover .nextLabel,
 .nextLink:focus-visible .nextLabel { color: var(--c-fg); }
 .nextLabel { transition: color 0.4s var(--ease-soft), translate 0.6s var(--ease-out); }
 .nextLink:hover .nextLabel,
-.nextLink:focus-visible .nextLabel { translate: 8px 0; }
-.nextLink:active .nextTitleText { translate: 4px 0; }
+.nextLink:focus-visible .nextLabel { translate: 12px 0; }
+.nextLink:active .nextTitleText { translate: 6px 0; }
 .nextLink:hover .nextTitle::after,
 .nextLink:focus-visible .nextTitle::after { transform: scaleX(1); }
 .nextLink:hover .nextTitleText,
-.nextLink:focus-visible .nextTitleText { translate: 8px 0; }
+.nextLink:focus-visible .nextTitleText { translate: 12px 0; }
 .nextLink:hover .nextArrow,
-.nextLink:focus-visible .nextArrow { translate: calc(8px + 0.06em) -0.06em; }
+.nextLink:focus-visible .nextArrow { translate: calc(12px + 0.06em) -0.06em; }
 .nextLink:hover .nextMedia,
 .nextLink:focus-visible .nextMedia { clip-path: inset(2% 2% 2% 2%); }
 .nextLink:hover .nextPoster,

@@ -348,6 +348,21 @@
   stroke-linejoin: round;
 }
 .cover { display: none; }
+.leadNode { display: none; }
+.section[data-strip] .leadNode {
+  display: block;
+  position: absolute;
+  z-index: 1;
+  width: calc(clamp(3px, 0.35vw, 6px) * 3);
+  height: calc(clamp(3px, 0.35vw, 6px) * 3);
+  translate: -50% -50%;
+  border-radius: 50%; /* documented exception: a commit node */
+  background: var(--c-accent);
+  scale: 0;
+  transition: scale 0.45s var(--ease-out);
+  pointer-events: none;
+}
+.section[data-strip] .leadNode[data-on] { scale: 1; }
 .section[data-strip] .cover {
   display: block;
   position: absolute;

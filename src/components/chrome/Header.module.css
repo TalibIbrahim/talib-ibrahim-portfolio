@@ -12,12 +12,11 @@
 :global(html.frame-away) .header { translate: 0 -140%; }
 .header:focus-within { translate: 0 0 !important; }
 
-/* Frosted chip: legible on the dark desk, the paper sections and over the reels alike. */
+/* Solid chip: legible on the dark desk, the paper sections and over the reels alike. Fully opaque, so a
+   row of text passing under it (a date line, a headline) is hidden, never half-seen through it. */
 .chip {
   pointer-events: auto;
-  background: rgb(18 18 20 / 0.94); /* near-opaque: headlines passing under it never show through on paper */
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
-  backdrop-filter: blur(14px) saturate(140%);
+  background: var(--c-bg-2);
   border: 1px solid rgb(236 232 223 / 0.14);
   border-radius: 999px;
   box-shadow: 0 8px 24px -12px rgb(0 0 0 / 0.5);
