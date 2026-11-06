@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Analytics } from '@vercel/analytics/next';
 import { site } from '@/data/site';
 import { BOOT_SCRIPT } from '@/lib/mode-script';
-import { alternates, ldScript, personLd } from '@/lib/agents';
+import { alternates, ldScript, personLd } from '@/lib/structured-data';
 import { Header } from '@/components/chrome/Header';
 import { Curtain } from '@/components/chrome/Curtain';
 import { Loader } from '@/components/chrome/Loader';

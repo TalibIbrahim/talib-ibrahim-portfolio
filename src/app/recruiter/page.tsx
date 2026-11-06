@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { alternates } from '@/lib/agents';
+import { alternates } from '@/lib/structured-data';
 import { RecruiterHome } from '@/components/recruiter/RecruiterHome';
 import { site } from '@/data/site';
 

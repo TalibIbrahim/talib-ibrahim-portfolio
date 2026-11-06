@@ -1,4 +1,4 @@
-import { llmsTxt } from '@/lib/agents';
+import { llmsTxt } from '@/lib/structured-data';
 
 export const dynamic = 'force-static';
 

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { CaseStudy } from '@/components/case/CaseStudy';
 import { coverOf, descriptionOf, getNext, getProject, getProjects } from '@/data/projects';
 import { site } from '@/data/site';
-import { alternates, ldScript, projectLd } from '@/lib/agents';
+import { alternates, ldScript, projectLd } from '@/lib/structured-data';
 import { loadCaseStudy } from '@/lib/mdx';
 
 export const dynamicParams = false;

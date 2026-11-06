@@ -59,3 +59,7 @@ CLAUDE.local.md
 /.next-qa/
 .shots-*/
 /.next-*/
+
+# Agent instruction files (Next writes AGENTS.md on dev)
+AGENTS.md
+CLAUDE.md

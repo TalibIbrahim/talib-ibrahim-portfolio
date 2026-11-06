@@ -11,7 +11,7 @@ import { ArrowRight, ArrowUpRight } from "lucide-react";
 import type { Project } from "@/data/types";
 import { coverOf, getFeatured, getProjects, getRest } from "@/data/projects";
 import { site } from "@/data/site";
-import { alternates, ldScript, workLd } from "@/lib/agents";
+import { alternates, ldScript, workLd } from "@/lib/structured-data";
 import styles from "./page.module.css";
 
 const copy = site.workIndex;
