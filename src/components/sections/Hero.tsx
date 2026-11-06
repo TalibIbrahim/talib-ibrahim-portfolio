@@ -4,9 +4,12 @@
 //   1. the card lifts off the bottom edge and closes into a centred frame; the portrait drops into it
 //   2. "Talib" and "Ibrahim" shrink into the heads of two marquee rows that run behind the card
 //      ("Ibrahim" hands over to a pixel-mono row and decodes into the stack)
-//   3. the portrait turns black and white while a tilted signature writes over the card; the header
-//      reads "// MUHAMMAD TALIB IBRAHIM  SIGNED <hash>" (the hash is the real SHA-1 of the strokes)
-//   4. the signed card grows to full bleed and becomes the paper the About section is printed on.
+//   3. the portrait turns black and white while a tilted signature writes over the card
+//   4. desktop: the card steps aside, the signature straightens and its last stroke runs on into a commit
+//      graph of the owner's journey (education on the trunk, a branch per role, HEAD now), signed with
+//      the real SHA-1 of the strokes; from HEAD the line runs on down to About's margin (hero/git.ts).
+//      Phones: the header reads "// MUHAMMAD TALIB IBRAHIM  SIGNED <hash>" and the signed card grows to
+//      full bleed, the paper the About section is printed on.
 // Colour rule for the giant words (no blend modes): cream on the desk, desk-ink where a word crosses
 // the cream card, cream again over the person. Three stacked copies: the h1 (cream), a copy clipped
 // to the card (ink), a copy masked to the cut-out (cream). Only the h1 is in the accessibility tree.
@@ -18,7 +21,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowDown, ArrowUpRight } from 'lucide-react';
 import { site } from '@/data/site';
-import { getFeatured, getProject } from '@/data/projects';
+import { getFeatured, getProject, type ProjectSlug } from '@/data/projects';
 import { DOTS, SIGNATURE_VIEWBOX, STROKES } from './signature-paths';
 import { HeroMotion } from './hero/HeroMotion';
 import styles from './Hero.module.css';
@@ -54,11 +57,42 @@ function Word({ which, deco }: { which: 'first' | 'last'; deco?: boolean }) {
   );
 }
 
+/** "Jun 2024" -> a sortable month index. */
+const month = (d: string) => {
+  const t = Date.parse(`1 ${d}`);
+  return Number.isNaN(t) ? 0 : t;
+};
+/** "Jun to Aug 2024" in one year, "Nov 2024 to Aug 2025" across two. */
+const span = (a: string, b: string) => {
+  const [ma, ya] = a.split(' ');
+  const [, yb] = b.split(' ');
+  return ya && ya === yb ? `${ma} to ${b}` : `${a} to ${b}`;
+};
+
+type Commit = { lane: 0 | 1; branch: number; kind: 'edu' | 'exp' | 'proj'; date: string; title: string; sub: string };
+
+/** The hero graph's commits, from data: the first education on the trunk, then one branch per role in
+ *  date order, with a project on the branch named by site.hero.graph.onBranch. */
+function commits(): Commit[] {
+  const out: Commit[] = [];
+  const edu = site.education[0];
+  if (edu) out.push({ lane: 0, branch: -1, kind: 'edu', date: edu.start, title: edu.short ?? edu.school, sub: edu.degree });
+  const on = site.hero.graph?.onBranch;
+  const roles = [...site.experience].sort((a, b) => month(a.start) - month(b.start));
+  roles.forEach((e, i) => {
+    out.push({ lane: 1, branch: i, kind: 'exp', date: span(e.start, e.end), title: e.short ?? e.org, sub: e.role });
+    const p = on && on.org === e.org ? getProject(on.project as ProjectSlug) : null;
+    if (p) out.push({ lane: 1, branch: i, kind: 'proj', date: p.year !== null ? String(p.year) : '', title: p.title, sub: p.kind });
+  });
+  return out;
+}
+
 const chars = (s: string, cls?: string) =>
   [...s].map((c, i) => <span key={i} className={cls} data-ch data-deco={c} />);
 
 export function Hero() {
   const project = (site.hero.featured && getProject(site.hero.featured)) || getFeatured()[0];
+  const graph = site.hero.graph;
   const sig = {
     '--sig-w': SIGNATURE_VIEWBOX.w,
     '--sig-h': SIGNATURE_VIEWBOX.h,
@@ -171,6 +205,45 @@ export function Hero() {
             <span className={styles.hash}>{chars(hash)}</span>
           </span>
         </p>
+
+        {graph && (
+          // the end state's commit graph (desktop, motion and reduced motion): placed and drawn by hero/git.ts
+          <div className={styles.git} aria-hidden="true" data-git data-drop>
+            <svg className={styles.gsvg} />
+            <p className={styles.gcmd} data-git-cmd data-deco={graph.command} />
+            <p className={styles.gsigned} data-git-signed data-deco={`${graph.signed} ${hash}`} />
+            <ol className={styles.glist}>
+              {commits().map((c) => (
+                <li
+                  key={`${c.kind}-${c.title}`}
+                  className={styles.glbl}
+                  data-git-label
+                  data-lane={c.lane}
+                  data-branch={c.branch}
+                  data-kind={c.kind}
+                >
+                  <span className={styles.gd} data-git-date data-deco={c.date} />
+                  <span className={styles.gmk}>
+                    <span className={styles.gt} data-mi data-deco={c.title} />
+                  </span>
+                  <span className={styles.gmk}>
+                    <span className={styles.gs} data-mi data-deco={c.sub} />
+                  </span>
+                </li>
+              ))}
+              <li className={`${styles.glbl} ${styles.ghead}`} data-git-head>
+                <span className={styles.gref} data-git-ref data-deco={graph.ref} />
+                <span className={styles.gcaret} />
+                <span className={styles.gmk}>
+                  <span className={styles.gnow} data-mi data-deco={graph.head} />
+                </span>
+                <span className={styles.gmk}>
+                  <span className={styles.gs} data-mi data-deco={graph.note} />
+                </span>
+              </li>
+            </ol>
+          </div>
+        )}
 
         <svg
           className={styles.sig}

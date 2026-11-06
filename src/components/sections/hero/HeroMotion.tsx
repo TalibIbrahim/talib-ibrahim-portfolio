@@ -3,13 +3,21 @@
 // name progress q) place every layer through apply() / placeNames(), so the card, portrait, name
 // copies, header, signature and captions can never drift apart. One scrubbed timeline sets them.
 // Clock: the hero ScrollTrigger (scrub) + the GSAP ticker for the idle row drift and the contours
-// (30 fps, only while the hero is on screen). Reduced motion: the landing stays still, contours drawn once.
+// (30 fps, only while the hero is on screen). Reduced motion: the landing stays still, contours drawn once,
+// and on desktop the commit graph sits drawn on the desk under it.
+// Desktop end state: after the signature the card steps aside (g), the signature straightens, and its last
+// stroke runs on into the commit graph (hero/git.ts), whose line runs on down to About's margin. Phones keep
+// the signed header and the card that grows into the About paper (e). The breakpoint is read at init; the
+// whole hero re-initialises when it is crossed.
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
 import { usePage } from '@/engine/next';
 import { ease, prefersReducedMotion, scrollState } from '@/engine';
 import { makeContours } from './contours';
+import { makeGit } from './git';
+import { STROKES, SIGNATURE_VIEWBOX } from '../signature-paths';
+import styles from '../Hero.module.css';
 
 gsap.registerPlugin(ScrollTrigger, DrawSVGPlugin);
 
@@ -20,25 +28,62 @@ const TILT = -10;
 const SIG = { desk: 1.34, phone: 1.12 };
 /** The rows stop this far short of the card on both sides. */
 const GAP = 24;
+/** Desktop end state: the signed card's scale once it has stepped aside, and the signature's on it. */
+const GS = 0.62;
+const SIG_GS = 0.85;
+/** Where the pen lifts at the end of the last stroke, as a share of the signature box. */
+const LIFT = (() => {
+  const [x, y] = STROKES[STROKES.length - 1].end;
+  return { x: x / SIGNATURE_VIEWBOX.w - 0.5, y: y / SIGNATURE_VIEWBOX.h - 0.5 };
+})();
+const GIT_CLS = { gl: styles.gl, gnode: styles.gnode, fill: styles.fill, merge: styles.merge, gring: styles.gring };
 
 type Box = { x: number; y: number; w: number; h: number };
 
-export function HeroMotion() {
-  usePage(() => {
+function initHero(desk: boolean): (() => void) | undefined {
+  {
     const hero = document.querySelector<HTMLElement>('[data-hero]');
     const stage = hero?.querySelector<HTMLElement>('[data-hero-stage]');
     const canvas = hero?.querySelector<HTMLCanvasElement>('[data-bg]');
     if (!hero || !stage || !canvas) return;
     const bg = makeContours(canvas);
 
+    const gitEl = stage.querySelector<HTMLElement>('[data-git]');
     if (prefersReducedMotion() || !document.documentElement.classList.contains('motion')) {
       bg.draw(); // a still survey sheet
+      // desktop: the commit graph, drawn, on a band of desk under the landing; its line runs on into About
+      const still = desk && gitEl ? makeGit(gitEl, GIT_CLS) : null;
+      const place = () => {
+        if (!still || !gitEl) return;
+        const W = gitEl.clientWidth, H = gitEl.clientHeight;
+        const gut = parseFloat(getComputedStyle(gitEl).getPropertyValue('--gutter')) || 24;
+        const aboutText = document.querySelector<HTMLElement>('#about [data-text]');
+        const lx = aboutText ? (parseFloat(getComputedStyle(aboutText).paddingLeft) || 0) / 2 : gut / 2;
+        const my = Math.round(H * 0.56);
+        still.layout({ x0: gut + 4, lead: 0, my, hx: W - gut - 22, lane: Math.min(130, H * 0.26), ret: { y: H - 28, x: lx, bottom: H } });
+        still.setStatic();
+      };
+      if (still && gitEl) {
+        hero.append(gitEl);
+        gitEl.dataset.static = '';
+        hero.dataset.gitStatic = '';
+        place();
+      }
       const onResize = () => {
         bg.size();
         bg.draw();
+        place();
       };
       addEventListener('resize', onResize);
-      return () => removeEventListener('resize', onResize);
+      return () => {
+        removeEventListener('resize', onResize);
+        if (still && gitEl) {
+          still.revert();
+          delete gitEl.dataset.static;
+          delete hero.dataset.gitStatic;
+          stage.insertBefore(gitEl, stage.querySelector('[data-sig]'));
+        }
+      };
     }
 
     const q = <T extends Element = HTMLElement>(s: string) => stage.querySelector<T>(s)!;
@@ -78,7 +123,10 @@ export function HeroMotion() {
     const dots = qa<SVGCircleElement>('[data-dot]', sig);
 
     /* ------------------------------------------------------------ geometry */
-    const drv = { r: 0, s: 0, e: 0, live: 0, shift: 0 };
+    const drv = { r: 0, s: 0, e: 0, g: 0, live: 0, shift: 0 };
+    const git = desk && gitEl ? makeGit(gitEl, GIT_CLS) : null;
+    const gp = { p: 0, q: 0 }; // the graph's pen (main line) and its run-on to About
+    const gitDraw = () => git?.draw(gp.p, gp.q);
     const clipCache = { n: '', s: '', ink: '', photo: '', cream: '' };
     let bgLive = false;
     const nm = { q: 0 };
@@ -91,6 +139,7 @@ export function HeroMotion() {
       first: { x0: 0, y0: 0, x1: 0, y1: 0, s1: 1, f: 1, l: 0, t: 0, w: 0 }, last: { x0: 0, y0: 0, x1: 0, y1: 0, s1: 1, f: 1, l: 0, t: 0, w: 0 },
       hN: { x: 0, w: 0 }, hS: { x: 0, w: 0 }, baseN: 0, baseS: 0, wN: 1, wS: 1,
       hdr: { w: 0, h: 0 }, end: { w: 0, h: 0 }, sigW: 0, sigH: 0,
+      gcx: 0, sgx: 0, // desktop end state: the stepped-aside card's centre x, the signature's centre x
     };
     const card0: Box = { x: 0, y: 0, w: 0, h: 0 };
 
@@ -145,7 +194,27 @@ export function HeroMotion() {
         hN, hS, baseN, baseS, wN, wS,
         hdr: { w: header.offsetWidth, h: header.offsetHeight }, end: { w: endW, h: endH },
         sigW, sigH: (sigW * 340) / 1100,
+        gcx: 0, sgx: 0,
       };
+      if (git && gitEl) {
+        // the signed card steps aside to the left gutter; the signature stays whole inside the stage
+        const kE = 0.9 * GS, wE = c1.w * kE;
+        G.gcx = gut + wE / 2 + 16;
+        G.sgx = Math.max(G.gcx, gut + (G.sigW * kE * SIG_GS) / 2 + 4);
+        const sw = G.sigW * kE * SIG_GS, sh = G.sigH * kE * SIG_GS;
+        const sgy = cy + 0.16 * c1.h * kE;
+        const lift = { x: G.sgx + LIFT.x * sw, y: sgy + LIFT.y * sh };
+        const aboutText = document.querySelector<HTMLElement>('#about [data-text]');
+        const lx = aboutText ? (parseFloat(getComputedStyle(aboutText).paddingLeft) || 0) / 2 : gut / 2;
+        git.layout({
+          x0: lift.x,
+          my: lift.y,
+          hx: W - gut - 22,
+          lane: Math.min(130, H * 0.14),
+          ret: { y: H - Math.max(32, H * 0.06), x: lx, bottom: H },
+        });
+        gitDraw();
+      }
       gsap.set(sig, { width: G.sigW, height: G.sigH });
       Object.assign(clipCache, { n: '', s: '', ink: '', photo: '', cream: '' });
       apply();
@@ -160,9 +229,11 @@ export function HeroMotion() {
     function apply() {
       const { p0, p1, c0, c1, cx, cy, W, H } = G;
       if (!W) return;
-      const r = drv.r, k = 1 - 0.1 * drv.s, e = drv.e;
+      const r = drv.r, e = drv.e, g = drv.g;
+      // k: the frame's scale about the stage centre (settle, then the desktop step-aside); dx: its shift
+      const k = (1 - 0.1 * drv.s) * lerp(1, GS, g), dx = (G.gcx - cx) * g;
       const about = (v: number, o: number) => o + (v - o) * k;
-      let x = about(lerp(c0.x, c1.x, r), cx), y = about(lerp(c0.y, c1.y, r), cy);
+      let x = about(lerp(c0.x, c1.x, r), cx) + dx, y = about(lerp(c0.y, c1.y, r), cy);
       let w = lerp(c0.w, c1.w, r) * k, h = lerp(c0.h, c1.h, r) * k;
       // expand: the signed card grows to full bleed (the About paper)
       x = lerp(x, 0, e); y = lerp(y, 0, e); w = lerp(w, W, e); h = lerp(h, H, e);
@@ -176,7 +247,7 @@ export function HeroMotion() {
       // clip-path writes re-raster the layer: only when the card has actually moved a pixel
       if (open !== clipCache.photo) photoLayer.style.clipPath = clipCache.photo = open;
       const pTop = about(lerp(p0.y, p1.y, r), cy), pH = lerp(p0.h, p1.h, r) * k;
-      gsap.set(photo, { y: pTop - p0.y, scale: pH / p0.h });
+      gsap.set(photo, { x: dx, y: pTop - p0.y, scale: pH / p0.h });
       // the colour copies only exist until the names hand over to the rows: stop repainting them after
       if (nm.q < 1) {
         if (open !== clipCache.cream) creamCopy.style.clipPath = clipCache.cream = open;
@@ -189,14 +260,15 @@ export function HeroMotion() {
       }
       // header rides the frame's top edge, the end caption its bottom edge (both centred)
       const top = about(c1.y, cy), bottom = about(c1.y + c1.h, cy);
-      gsap.set(header, { x: cx - G.hdr.w / 2, y: top - (G.mob ? 14 : 22) - G.hdr.h });
-      gsap.set(endCap, { x: G.mob ? G.gut : cx - G.end.w / 2, y: bottom + 16 });
-      // signature: centred on the frame, in its lower third, tilted, scaled with it
+      gsap.set(header, { x: cx + dx - G.hdr.w / 2, y: top - (G.mob ? 14 : 22) - G.hdr.h });
+      gsap.set(endCap, { x: G.mob ? G.gut : cx + dx - G.end.w / 2, y: bottom + 16 });
+      // signature: centred on the frame, in its lower third, tilted, scaled with it; on the desktop
+      // step-aside it straightens and settles a little smaller, so its last stroke can run on as a line
       gsap.set(sig, {
-        x: cx - G.sigW / 2,
+        x: lerp(cx, G.sgx, g) - G.sigW / 2,
         y: cy + 0.16 * (c1.h * k) - G.sigH / 2,
-        scale: k,
-        rotation: TILT,
+        scale: k * lerp(1, SIG_GS, g),
+        rotation: lerp(TILT, 0, g),
         transformOrigin: '50% 50%',
       });
       clipRows();
@@ -307,15 +379,29 @@ export function HeroMotion() {
     dots.forEach((d, i) =>
       tl.set(d, { visibility: 'visible' }, t + i * 0.18).to(d, { scale: 1, duration: 0.25, ease: 'back.out(3)' }, t + i * 0.18),
     );
-    tl.set(signCh, { visibility: 'visible', stagger: 0.035 }, t + 0.5);
-    // 4. hold the signed card, then it grows into the page
-    const E = t + 1.4;
-    // the portrait and the signature leave by a wipe (the bottom edge rises), never a fade: every
-    // mid-frame keeps a hard edge on the cream instead of a washed-out ghost of the card
-    tl.fromTo([photo, sig], { clipPath: 'inset(0% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 100% 0%)', duration: 0.7, ease: ease.wipe, stagger: 0.08, immediateRender: false }, E)
-      .to([header, endCap], { autoAlpha: 0, duration: 0.5, ease: soft }, E)
-      .fromTo(drv, { e: 0 }, { e: 1, duration: 2, ease: ease.wipe, onUpdate: apply, immediateRender: false }, E)
-      .to({}, { duration: 0.3 });
+    if (git && gitEl) {
+      // 4. desktop: the card steps aside and the pen keeps going: the last stroke runs on into the
+      // commit graph (the signature's hash prints over HEAD, so the header's "signed" never types)
+      const G0 = t + 0.9;
+      tl.to([header, endCap], { autoAlpha: 0, duration: 0.5, ease: soft }, G0)
+        .to(rowsLayer, { opacity: 0.06, duration: 1.2, ease: soft }, G0)
+        .fromTo(drv, { g: 0 }, { g: 1, duration: 1.6, ease: ease.inOut, onUpdate: apply, immediateRender: false }, G0)
+        .fromTo(gitEl, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2 }, G0 + 1.3)
+        .add(git.printTween(), G0 + 1.3)
+        .fromTo(gp, { p: 0 }, { p: 1, duration: 3.2, onUpdate: gitDraw }, G0 + 1.5)
+        .fromTo(gp, { q: 0 }, { q: 1, duration: 0.8, onUpdate: gitDraw, immediateRender: false }, G0 + 4.8)
+        .to({}, { duration: 0.2 });
+    } else {
+      tl.set(signCh, { visibility: 'visible', stagger: 0.035 }, t + 0.5);
+      // 4. hold the signed card, then it grows into the page
+      const E = t + 1.4;
+      // the portrait and the signature leave by a wipe (the bottom edge rises), never a fade: every
+      // mid-frame keeps a hard edge on the cream instead of a washed-out ghost of the card
+      tl.fromTo([photo, sig], { clipPath: 'inset(0% 0% 0% 0%)' }, { clipPath: 'inset(0% 0% 100% 0%)', duration: 0.7, ease: ease.wipe, stagger: 0.08, immediateRender: false }, E)
+        .to([header, endCap], { autoAlpha: 0, duration: 0.5, ease: soft }, E)
+        .fromTo(drv, { e: 0 }, { e: 1, duration: 2, ease: ease.wipe, onUpdate: apply, immediateRender: false }, E)
+        .to({}, { duration: 0.3 });
+    }
 
     measure();
     const st = ScrollTrigger.create({
@@ -330,13 +416,16 @@ export function HeroMotion() {
         bg.state.scroll = self.progress * 160;
       },
     });
-    // handoff: once the card is paper, the stage steps away and About (already underneath) is the page
-    ScrollTrigger.create({
-      trigger: hero,
-      start: 'bottom bottom',
-      onEnter: () => gsap.set(stage, { autoAlpha: 0 }),
-      onLeaveBack: () => gsap.set(stage, { autoAlpha: 1 }),
-    });
+    // handoff (phones): once the card is paper, the stage steps away and About (already underneath) is
+    // the page. Desktop: the stage simply scrolls on with About under it, the line crossing the edge.
+    const handoff = git
+      ? null
+      : ScrollTrigger.create({
+          trigger: hero,
+          start: 'bottom bottom',
+          onEnter: () => gsap.set(stage, { autoAlpha: 0 }),
+          onLeaveBack: () => gsap.set(stage, { autoAlpha: 1 }),
+        });
     const onRefreshInit = () => measure();
     ScrollTrigger.addEventListener('refreshInit', onRefreshInit);
     document.fonts?.ready.then(() => ScrollTrigger.refresh());
@@ -354,6 +443,7 @@ export function HeroMotion() {
     addEventListener('pointermove', poke, { passive: true });
     const tick = (_time: number, dt: number) => {
       const visible = st.isActive || scrollY < (st.start || 0) + 4;
+      git?.idle(visible);
       if (!visible || drv.e >= 0.999) return;
       idle += 0.045 * dt * (1 + Math.min(Math.abs(vel) / 700, 4));
       vel *= 0.92;
@@ -394,7 +484,10 @@ export function HeroMotion() {
       gsap.ticker.remove(tick);
       ScrollTrigger.removeEventListener('refreshInit', onRefreshInit);
       st.kill();
+      handoff?.kill();
       tl.kill();
+      git?.revert();
+      if (gitEl) gsap.set(gitEl, { clearProps: 'all' });
       for (const el of [inkCopy, photoLayer, rowName, rowStack]) el.style.removeProperty('clip-path');
       for (const p of ['clip-path', '-webkit-mask-position', 'mask-position', '-webkit-mask-size', 'mask-size'])
         creamCopy.style.removeProperty(p);
@@ -405,6 +498,23 @@ export function HeroMotion() {
         clearProps: 'transform,opacity,visibility,width,height,display',
       });
       gsap.set([photo, sig], { clearProps: 'clipPath' });
+    };
+  }
+}
+
+export function HeroMotion() {
+  usePage(() => {
+    const wide = matchMedia('(min-width: 768px)');
+    let off = initHero(wide.matches);
+    const onChange = () => {
+      off?.();
+      off = initHero(wide.matches);
+      ScrollTrigger.refresh();
+    };
+    wide.addEventListener('change', onChange);
+    return () => {
+      wide.removeEventListener('change', onChange);
+      off?.();
     };
   });
 
