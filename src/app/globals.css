@@ -133,6 +133,37 @@ html.lenis, html.lenis body { height: auto; }
 [data-split] > *, [data-split] > * > * { text-indent: 0; }
 [data-split] > :first-child, [data-split] > :first-child > :first-child { text-indent: inherit; }
 
+/* Boot screen (src/components/chrome/Loader.tsx, src/motion/loader.ts): first landing of a session only.
+   Shown only while html.loading (set pre-paint by the boot script); the page loads underneath. */
+#loader {
+  display: none;
+  position: fixed; inset: 0; z-index: var(--z-dialog);
+  background: var(--c-bg); color: var(--c-fg);
+  padding: var(--gutter);
+  align-items: flex-end;
+  clip-path: inset(0 0 0 0);
+}
+html.loading #loader { display: flex; }
+html.loaded #loader { opacity: 0; transition: opacity 0.35s var(--ease-soft); } /* the hard-cap fallback */
+.loader__term {
+  display: grid; gap: 0.35em;
+  padding-bottom: calc(var(--u) * 2);
+  font-family: var(--f-mono); font-size: var(--t-s); line-height: 1.5; letter-spacing: 0.02em;
+  white-space: pre;
+}
+.loader__cmd { color: var(--c-muted); }
+.loader__status { color: var(--c-muted); }
+.loader__line[data-state='ok'] [data-boot-status] { color: var(--c-accent-text); }
+.loader__line[data-state='skip'] [data-boot-status] { color: var(--c-muted); }
+.loader__prompt { color: var(--c-accent-text); }
+.loader__caret {
+  display: inline-block; width: 0.6em; height: 1.1em; margin-left: 0.3em; vertical-align: -0.2em;
+  background: var(--c-accent);
+  animation: loaderBlink 1s steps(1) infinite;
+}
+@keyframes loaderBlink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .loader__caret { animation: none; } }
+
 /* Curtain: an ink brush stroke (src/components/chrome/Curtain.tsx, src/engine/transition.ts) */
 #curtain {
   position: fixed; inset: 0; z-index: var(--z-curtain);

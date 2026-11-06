@@ -2,16 +2,20 @@
 // Work motion. Renders nothing; wires the server-rendered #work section on every page load.
 //
 // Desktop (>= 768px, html.motion): the section gets data-strip; CSS makes a sticky 100svh stage over
-// 180svh + --travel of scroll. Two scrubbed drivers, one after the other:
+// 180svh + --travel of scroll. One scrubbed driver (scrub .6), split in two phases:
 //   entrance  p 0 -> 1 over the first 80svh after the stage sticks (scrub .6). Project 01's cover is a
 //             small tilted duotone card under the title; it pulls flat into its slot (OGL plane, the
 //             top-left corner leads, the sheet sags; DOM FLIP when there is no GL). Meanwhile the
 //             paper ground fades to ink (.4 -> .75), the title rises into its band and parts around
 //             the chip as the chip opens (.3 -> 1), and the title decodes once at p >= .9.
-//   travel    the track slides sideways by its overflow O over O / 1.7 of scroll (ease none, scrub .6).
+//   travel    the track slides sideways by its overflow O over O / 1.5 of scroll (ease none).
+//             As each project reaches the focus band its description rises by masked lines (SplitText)
+//             and its key-fact line types in, once.
 //             One onUpdate drives everything from cached offsets: the focus band at .4vw (scale,
-//             duotone, the head node), parallax inside each frame, captions typing in as items cross
-//             85%, and the git-graph line, whose head runs a little ahead of the focus band.
+//             duotone, the head node), captions typing in as items cross
+//             85%, and the git-graph line, whose head runs a little ahead of the focus band. The line
+//             runs just under the captions through a node at each, and curves through the gaps between
+//             covers (never over one). Covers are whole: no in-frame parallax or crop.
 //   pen lead  the git-graph line no longer starts at the stage's left edge: it comes down from the stage's
 //             top edge at About's pen-line x (half a gutter), so About's line (about/line.ts) runs on into
 //             it, and turns into project 01's node. Its vertical draws with the pen's head on the same
@@ -40,7 +44,7 @@ const fit = (p: number, a: number, b: number) => clamp01((p - a) / (b - a));
 const NOISE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
 const ENTRANCE = 0.8; // screens of scroll for the entrance
-const RATIO = 1.7; // sideways px per px of scroll
+const RATIO = 1.5; // sideways px per px of scroll (eased from 1.7 when the gaps widened)
 const BAND = 0.4; // focus band, share of the stage width
 const THUMB_ROT = -4; // degrees
 
@@ -111,6 +115,44 @@ function typeIn(cap: HTMLElement) {
     .to(caret, { opacity: 0, duration: 0.01, repeat: 3, yoyo: true, repeatDelay: 0.22 }, d + 0.1)
     .set(caret, { visibility: 'hidden' });
 }
+/** The description rises by masked lines and the fact line types in, once, when the project reaches
+ *  the focus band. Until then the lines wait under their masks (motion only; the HTML is final). */
+function makeCopy(item: HTMLElement) {
+  const desc = q(item, '[data-desc]');
+  const fact = q(item, '[data-fact-text]');
+  let played = false;
+  let tl: gsap.core.Timeline | null = null;
+  const split = desc
+    ? SplitText.create(desc, {
+        type: 'lines',
+        mask: 'lines',
+        linesClass: 'work-line',
+        autoSplit: true,
+        onSplit(self) {
+          gsap.set(self.lines, { yPercent: played ? 0 : 105 });
+        },
+      })
+    : null;
+  if (fact) gsap.set(fact, { clipPath: 'inset(-10% 100% -10% 0%)' });
+  return {
+    play() {
+      if (played) return;
+      played = true;
+      tl = gsap.timeline();
+      if (split) tl.to(split.lines, { yPercent: 0, duration: 0.9, ease: ease.out, stagger: 0.06 }, 0);
+      if (fact) {
+        const n = Math.max(1, (fact.textContent ?? '').length);
+        tl.to(fact, { clipPath: 'inset(-10% 0% -10% 0%)', ease: `steps(${n})`, duration: Math.min(0.9, n * 0.028) }, 0.25);
+      }
+    },
+    revert() {
+      tl?.progress(1).kill();
+      split?.revert();
+      if (fact) gsap.set(fact, { clearProps: 'clipPath' });
+    },
+  };
+}
+
 const hideCaption = (cap: HTMLElement) => {
   const text = q(cap, '[data-cap-text]');
   if (text) gsap.set(text, { clipPath: 'inset(-10% 100% -10% 0%)' });
@@ -130,9 +172,9 @@ type Item = {
   w: number;
   setScale: (v: number) => void;
   setDuo: (v: number) => void;
-  setPar: (v: number) => void;
   lit: boolean;
   head: boolean;
+  copy: ReturnType<typeof makeCopy>;
 };
 
 function initStrip(section: HTMLElement) {
@@ -167,9 +209,9 @@ function initStrip(section: HTMLElement) {
       w: 1,
       setScale: gsap.quickSetter(media, 'scale') as (v: number) => void,
       setDuo: duo ? (gsap.quickSetter(duo, 'opacity') as (v: number) => void) : () => {},
-      setPar: gsap.quickSetter(par, 'x', 'px') as (v: number) => void,
       lit: false,
       head: false,
+      copy: makeCopy(el),
     };
   });
   if (!items.length) return;
@@ -254,17 +296,21 @@ function initStrip(section: HTMLElement) {
 
   /* ---------- the git-graph line: through every frame's middle, curving in the gaps ---------- */
   function buildLine() {
+    // every point from the nodes' boxes, relative to the track (measure() has reset its x to 0)
+    const tr = track!.getBoundingClientRect();
+    const centre = (el: Element) => {
+      const r = el.getBoundingClientRect();
+      return { x: r.left + r.width / 2 - tr.left, y: r.top + r.height / 2 - tr.top };
+    };
     const pts = items.map((it) => {
+      const c = it.node ? centre(it.node) : { x: it.x0 - 16, y: 0 };
+      // offsets, not the box: project 01's frame carries the entrance transform while this runs
       const art = it.frame.offsetParent as HTMLElement;
-      const node = it.node;
-      const nx = art.offsetLeft + it.frame.offsetLeft + (node ? node.offsetLeft + node.offsetWidth / 2 : -16);
-      const ny = art.offsetTop + it.frame.offsetTop + it.frame.offsetHeight / 2;
-      return { nx, ny, right: art.offsetLeft + it.frame.offsetLeft + it.frame.offsetWidth };
+      return { nx: c.x, ny: c.y, right: art.offsetLeft + it.frame.offsetLeft + it.frame.offsetWidth };
     });
-    // the link is positioned (it holds the node), so its offsetParent is the track
-    const link = (allEl!.firstElementChild as HTMLElement | null) ?? allEl!;
-    const ax = link.offsetLeft + (allNode ? allNode.offsetLeft + allNode.offsetWidth / 2 : 0);
-    const ay = link.offsetTop + (allNode ? allNode.offsetTop + allNode.offsetHeight / 2 : link.offsetHeight / 2);
+    const a = allNode ? centre(allNode) : centre(allEl!);
+    const ax = a.x;
+    const ay = a.y;
     m.nodeX = pts.map((p) => p.nx);
     m.allX = ax;
 
@@ -276,11 +322,17 @@ function initStrip(section: HTMLElement) {
     line!.setAttribute('d', d);
     m.lead = line!.getTotalLength();
     d += ` H ${pts[0].nx.toFixed(1)}`;
+    // under a caption to its frame's right edge, then one smooth S through the gap (horizontal
+    // tangents at both ends, so it stays monotonic in x and never kinks) into the next node
     const curve = (fromX: number, fromY: number, toX: number, toY: number, endX: number) => {
-      const gs = fromX + 6;
-      const ge = Math.max(gs + 24, toX - 22);
-      const mid = (gs + ge) / 2;
-      d += ` H ${gs.toFixed(1)} C ${mid.toFixed(1)} ${fromY.toFixed(1)} ${mid.toFixed(1)} ${toY.toFixed(1)} ${ge.toFixed(1)} ${toY.toFixed(1)} H ${endX.toFixed(1)}`;
+      const gs = fromX + 4;
+      const ge = Math.max(gs + 24, toX - 12);
+      if (Math.abs(toY - fromY) < 1) {
+        d += ` H ${endX.toFixed(1)}`;
+        return;
+      }
+      const k = (ge - gs) * 0.5;
+      d += ` H ${gs.toFixed(1)} C ${(gs + k).toFixed(1)} ${fromY.toFixed(1)} ${(ge - k).toFixed(1)} ${toY.toFixed(1)} ${ge.toFixed(1)} ${toY.toFixed(1)} H ${endX.toFixed(1)}`;
     };
     for (let i = 0; i < pts.length - 1; i++) curve(pts[i].right, pts[i].ny, pts[i + 1].nx, pts[i + 1].ny, pts[i + 1].nx);
     const last = pts[pts.length - 1];
@@ -335,7 +387,6 @@ function initStrip(section: HTMLElement) {
   const others = items.slice(1);
 
   let glScene: EntranceScene | null = null;
-  let travel: gsap.core.Tween | null = null;
   let release: (() => void) | null = null;
   let landed = false;
   let lastP = -1;
@@ -385,8 +436,13 @@ function initStrip(section: HTMLElement) {
     if (nowLanded !== landed) {
       landed = nowLanded;
       p1Text.forEach((el) => gsap.to(el, { opacity: landed ? 1 : 0, duration: 0.4, ease: ease.soft, overwrite: true }));
+      if (!landed)
+        items.forEach((it) => {
+          it.lit = false; // the nodes go dark with the captions when the card lifts back off
+          it.node?.removeAttribute('data-on');
+        });
       if (landed) {
-        applyTravel(travel?.progress() ?? 0);
+        applyTravel(state.q);
         items.forEach((it) => {
           if (it.cap && it.x0 < m.W * 0.85) {
             const tw = typeIn(it.cap);
@@ -399,20 +455,25 @@ function initStrip(section: HTMLElement) {
     if (p < 1) drawTo(fit(p, 0.9, 1) * (m.nodeX[0] ?? 0));
   }
 
-  const state = { p: 0 };
-  const entrance = gsap.to(state, {
-    p: 1,
-    ease: 'none',
-    scrollTrigger: {
-      trigger: section,
-      start: 'top top',
-      end: () => `+=${innerHeight * ENTRANCE}`,
-      scrub: 0.6,
-      invalidateOnRefresh: true,
-    },
-    onUpdate: () => applyEntrance(state.p),
-  });
-
+  // ONE scrubbed driver for the entrance and the travel, so the card has always landed (p = 1) before
+  // the track moves (q > 0), at any scroll speed and in both directions: P 0 -> split is the entrance,
+  // split -> 1 the travel. (Two scrubbed tweens lagged independently, so the track could start sliding
+  // while the GL plane was still mid-flight, and the plane drifted off its slot.)
+  const state = { p: 0, q: 0, P: 0 };
+  let split = 0.5; // the entrance's share of the driver's scroll; measured on refresh
+  const setSplit = () => {
+    const travelPx = parseFloat(section.style.getPropertyValue('--travel')) || 0;
+    const e = innerHeight * ENTRANCE;
+    split = e / Math.max(1, e + travelPx);
+  };
+  function drive() {
+    const p = fit(state.P, 0, split);
+    const qv = state.P <= split ? 0 : fit(state.P, split, 1);
+    state.p = p;
+    state.q = qv;
+    applyEntrance(p);
+    applyTravel(qv);
+  }
   /* ---------- the pen lead: About's line runs on down the stage ---------- */
   const leadST = ScrollTrigger.create({
     trigger: section,
@@ -438,7 +499,7 @@ function initStrip(section: HTMLElement) {
   late.push(
     gsap.delayedCall(0.3, () => {
       armed = true;
-      applyTravel(travel?.progress() ?? 0);
+      applyTravel(state.q);
     }),
   );
   const power2 = gsap.parseEase('power2.out');
@@ -457,10 +518,8 @@ function initStrip(section: HTMLElement) {
         if (armed) it.setScale(0.86 + 0.14 * f);
         it.setDuo(1 - f);
       }
-      // parallax: 2rem each way across the stage
-      const u = clamp01((W - left) / (W + it.w));
-      it.setPar(32 - 64 * u);
       const isHead = f > 0.6;
+      if (isHead && landed) it.copy.play();
       if (isHead !== it.head) {
         it.head = isHead;
         it.node?.toggleAttribute('data-head', isHead);
@@ -486,32 +545,28 @@ function initStrip(section: HTMLElement) {
     }
   }
 
-  travel = gsap.to(
-    { q: 0 },
-    {
-      q: 1,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: section,
-        start: () => `top+=${innerHeight * ENTRANCE} top`,
-        end: 'bottom bottom',
-        scrub: 0.6,
-        invalidateOnRefresh: true,
-      },
-      onUpdate() {
-        applyTravel(this.targets()[0].q);
-      },
+  const driver = gsap.to(state, {
+    P: 1,
+    ease: 'none',
+    scrollTrigger: {
+      trigger: section,
+      start: 'top top',
+      end: 'bottom bottom',
+      scrub: 0.6,
+      invalidateOnRefresh: true,
     },
-  );
+    onUpdate: drive,
+  });
 
-  const onRefreshInit = () => measure();
-  const onRefresh = () => {
-    applyEntrance(state.p);
-    applyTravel(travel?.progress() ?? 0);
+  const onRefreshInit = () => {
+    measure();
+    setSplit();
   };
+  const onRefresh = () => drive();
   ScrollTrigger.addEventListener('refreshInit', onRefreshInit);
   ScrollTrigger.addEventListener('refresh', onRefresh);
   measure();
+  setSplit();
   applyEntrance(0);
   applyTravel(0);
 
@@ -558,7 +613,7 @@ function initStrip(section: HTMLElement) {
   /* ---------- keyboard: bring a focused project (or the end card) into the focus band ---------- */
   const onFocus = (e: FocusEvent) => {
     const target = e.target as Element;
-    const st = travel?.scrollTrigger;
+    const st = driver.scrollTrigger;
     if (!st) return;
     let qv: number | null = null;
     const art = target.closest('[data-item]');
@@ -567,7 +622,7 @@ function initStrip(section: HTMLElement) {
       if (it) qv = m.O > 0 ? clamp01((it.x0 + it.w / 2 - BAND * m.W) / m.O) : 0;
     } else if (allEl.contains(target)) qv = 1;
     if (qv === null) return;
-    const y = st.start + qv * (st.end - st.start);
+    const y = st.start + (split + qv * (1 - split)) * (st.end - st.start);
     if (Math.abs(scrollY - y) > 4) scrollToTarget(y, { immediate: true });
   };
   section.addEventListener('focusin', onFocus);
@@ -579,10 +634,8 @@ function initStrip(section: HTMLElement) {
     ScrollTrigger.removeEventListener('refresh', onRefresh);
     pre.kill();
     leadST.kill();
-    entrance.scrollTrigger?.kill();
-    entrance.kill();
-    travel?.scrollTrigger?.kill();
-    travel?.kill();
+    driver.scrollTrigger?.kill();
+    driver.kill();
     late.forEach((t) => t.kill());
     release?.();
     glScene?.destroy();
@@ -590,6 +643,7 @@ function initStrip(section: HTMLElement) {
     gsap.set([track, head, ...wordEls, ground, ...p1Text, glHost], { clearProps: 'all' });
     chip.style.clipPath = '';
     items.forEach((it) => {
+      it.copy.revert();
       // only what this module wrote: the cells carry React's slot variables inline
       it.cell.style.removeProperty('clip-path');
       gsap.set([it.frame, it.media, it.par], { clearProps: 'transform,visibility' });

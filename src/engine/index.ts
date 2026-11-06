@@ -30,6 +30,13 @@ let intro: gsap.core.Timeline | null = null;
 let ready = false;
 let booted = false;
 let running = false;
+// The first page intro waits for this (the first-landing loader); later pages never wait.
+let gate: Promise<unknown> | null = null;
+
+/** Hold the first intro until `p` settles (call from boot's setup). */
+export function holdIntro(p: Promise<unknown>) {
+  gate = p;
+}
 
 
 /** Run fn on every page load (and now, if a page is ready). Returns an unsubscribe. */
@@ -89,7 +96,10 @@ function start() {
   initScroll();
   initCursor();
   initPage();
-  intro?.play();
+  const play = () => intro?.play();
+  if (gate) gate.finally(play);
+  else play();
+  gate = null;
 }
 
 /** First load. `setup` runs once on the client before the first page initializes. */

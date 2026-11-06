@@ -1,7 +1,11 @@
 // Global motion: runs once on the client, before the first page initializes.
-import { onScroll } from '@/engine';
+import { holdIntro, onScroll } from '@/engine';
+import { runLoader } from './loader';
 
 export function setupMotion() {
+  // First landing of the session: the boot screen runs its checks, then the first intro plays.
+  holdIntro(runLoader());
+
   // Header (and the Recruiter mode button) step aside on scroll down and return on a deliberate scroll
   // up. Hysteresis (40px down / 96px up) keeps small corrections and smooth-scroll overshoot from
   // bringing them back over the content; always visible near the top. Runs on every page.

@@ -5,6 +5,7 @@ import { BOOT_SCRIPT } from '@/lib/mode-script';
 import { ldScript, personLd } from '@/lib/agents';
 import { Header } from '@/components/chrome/Header';
 import { Curtain } from '@/components/chrome/Curtain';
+import { Loader } from '@/components/chrome/Loader';
 import { RecruiterToggle } from '@/components/chrome/RecruiterToggle';
 import { Motion } from '@/components/Motion';
 import { clash, general, mono } from './fonts';
@@ -52,6 +53,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
       <body>
         <a className="skip-link" href="#main">Skip to content</a>
         <Curtain />
+        <Loader />
         <div id="cursor" aria-hidden="true">
           <span className="cursor__dot" />
           <span className="cursor__label" data-cursor-label />

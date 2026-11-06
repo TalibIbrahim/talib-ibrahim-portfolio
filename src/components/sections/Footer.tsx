@@ -11,6 +11,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight } from 'lucide-react';
 import { site } from '@/data/site';
+import { getNowBuilding } from '@/lib/github';
 import { RollText } from '@/components/chrome/RollText';
 import { DOTS, SIGNATURE_VIEWBOX, STROKES } from './signature-paths';
 import { BackToTop } from './footer/BackToTop';
@@ -21,10 +22,11 @@ import styles from './Footer.module.css';
 const PHOTO = { src: '/headshot-cutout.png', width: 476, height: 820 };
 const NIB = 'translate(5 1.4)'; // the broad-nib second pass, as in the hero
 
-export function Footer() {
+export async function Footer() {
   const { footer, links, email, name, contact, layers, workIndex, recruiter } = site;
   const [first, ...rest] = site.shortName.split(' ');
-  const closing = footer.closing ?? [first, rest.join(' ')];
+  const closing = [first, rest.join(' ')]; // the name, set like the printed name under a signature
+  const now = await getNowBuilding();
   const pages = [
     ...footer.pages,
     { label: workIndex.homeLink, href: '/work' },
@@ -37,6 +39,8 @@ export function Footer() {
   return (
     <footer className={styles.footer} aria-labelledby="footer-title" data-footer>
       <div className={styles.panel} data-panel>
+        {/* the ground: small polka dots that drift and breathe while you move (footer/dots.ts) */}
+        <canvas className={styles.bg} aria-hidden="true" data-bg />
         <div className={styles.statement} data-drop>
           <h2 id="footer-title" className={styles.title}>
             {closing.map((l) => (
@@ -116,6 +120,24 @@ export function Footer() {
             ))}
           </ul>
         </div>
+
+        {now && (
+          <p className={styles.now}>
+            <span className={styles.slash}>{footer.nowBuilding}</span>{' '}
+            {now.href.startsWith('/') ? (
+              <Link href={now.href} className={styles.nowLink}>
+                {now.name}
+              </Link>
+            ) : (
+              <a href={now.href} className={styles.nowLink} target="_blank" rel="noopener noreferrer">
+                {now.name}
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
+            )}
+            <span aria-hidden="true"> · </span>
+            {footer.lastCommit} <time dateTime={now.dateTime}>{now.date}</time>
+          </p>
+        )}
 
         <p className={styles.colophon}>{contact.finale.colophon}</p>
 

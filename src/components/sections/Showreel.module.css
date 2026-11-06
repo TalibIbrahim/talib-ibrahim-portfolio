@@ -170,8 +170,7 @@
   inset: 0;
 }
 .img {
-  object-fit: cover;
-  scale: var(--zoom, 1);
+  object-fit: cover; /* the slot has the cover's own aspect, so nothing is cropped */
 }
 .duo {
   display: none;
@@ -191,13 +190,27 @@
 .node[data-on] { scale: 1; }
 .node[data-head] { background: var(--c-accent); }
 
+/* The description reads at body size in full ink (the cover never dims it) */
 .tagline {
-  margin-top: calc(var(--u) * 1.25);
-  max-width: 34ch;
-  font-size: var(--t-s);
+  margin-top: calc(var(--u) * 1.5);
+  max-width: 36ch;
+  font-family: var(--f-body);
+  font-weight: 400;
+  font-size: clamp(1.125rem, 1rem + 0.3vw, 1.25rem);
   line-height: 1.45;
-  color: var(--c-muted);
+  color: var(--c-fg);
 }
+/* one line of real facts, where the data has them */
+.fact {
+  margin-top: calc(var(--u) * 1);
+  max-width: 40ch;
+  font-family: var(--f-mono);
+  font-size: var(--t-s);
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+  color: var(--c-accent-text);
+}
+.factText { display: inline-block; }
 
 /* ---------- hover / focus: the frame tightens, the title leads ---------- */
 @media (hover: hover) and (pointer: fine) {
@@ -345,21 +358,21 @@
 }
 .section[data-strip] .cell[data-at='top'] { justify-content: flex-start; padding-top: calc(var(--off) * 1svh); }
 .section[data-strip] .cell[data-at='bottom'] { justify-content: flex-end; padding-bottom: calc(var(--off) * 1svh); }
-.section[data-strip] .par { inset: 0 -2rem; }
 /* Promoted: the focus scale and the parallax stay on the compositor. The motion paints them at
    scale 1 first, so the frozen raster is the sharp one. */
 .section[data-strip] .media,
 .section[data-strip] .par { will-change: transform; }
 .section[data-strip] .duo { display: block; will-change: opacity; }
 .section[data-strip] .tagline { min-height: 2.9em; }
+/* the node sits just under its caption, left of it: the line runs under the captions, never over a cover */
 .section[data-strip] .node {
   display: block;
   left: -1.15rem;
-  top: 50%;
+  top: calc(100% + 0.45rem);
   margin-top: -0.28rem;
 }
 .section[data-strip] .all {
-  margin-left: 10svh;
+  margin-left: 18svh;
   padding-left: 1.6rem;
   align-self: center;
 }
@@ -373,7 +386,8 @@
 
 /* The entrance hides what is not on stage yet (motion sets these back as the card lands). */
 .section[data-strip] .cell[data-first] .text,
-.section[data-strip] .cell[data-first] .tagline { opacity: 0; }
+.section[data-strip] .cell[data-first] .tagline,
+.section[data-strip] .cell[data-first] .fact { opacity: 0; }
 
 /* ============================================================
    PHONES: a stacked composition. Title on the paper, project 01 full bleed across the paper/ink
@@ -405,7 +419,7 @@
   .cell[data-first] {
     width: auto;
     margin-inline: calc(-1 * (var(--gutter) + 1.25rem)) calc(-1 * var(--gutter));
-    background: linear-gradient(to bottom, var(--c-fg) 0 28.125vw, var(--c-bg) 28.125vw);
+    background: linear-gradient(to bottom, var(--c-fg) 0 calc(50vw / var(--ar)), var(--c-bg) calc(50vw / var(--ar)));
   }
   .cell[data-first] .item { display: flex; flex-direction: column; }
   .cell[data-first] .frame { order: 0; }

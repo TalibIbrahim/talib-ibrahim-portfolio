@@ -317,6 +317,14 @@
 :global(html.motion) .given,
 :global(html.motion) .meta,
 :global(html.motion) .cue { animation: heroFade 0.6s var(--ease-soft) 0.4s backwards; }
+/* the first landing's boot screen holds the intro at its first frame; it plays once the screen has gone */
+:global(html.loading) .card,
+:global(html.loading) .inkCopy,
+:global(html.loading) .photo,
+:global(html.loading) .creamCopy,
+:global(html.loading) .given,
+:global(html.loading) .meta,
+:global(html.loading) .cue { animation-play-state: paused; }
 @keyframes heroCardBox { from { clip-path: inset(100% 0 0 0); } }
 @keyframes heroCard { from { clip-path: inset(100% calc(50% - var(--cw) / 2) 0 calc(50% - var(--cw) / 2)); } }
 @keyframes heroPhoto { from { translate: 0 10%; } }

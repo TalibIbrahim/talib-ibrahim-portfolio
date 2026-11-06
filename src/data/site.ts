@@ -243,7 +243,16 @@ export const site: Site = {
       { label: 'About', href: '/#about' },
       { label: 'Contact', href: '/#contact' },
     ],
-    // closing: owner to write (two short lines). Until then the footer signs over the name.
+    nowBuilding: '// now building:',
+    lastCommit: 'last commit',
+  },
+  loader: {
+    command: '$ talib boot',
+    checks: { fonts: 'fonts loaded', images: 'portrait decoded', scroll: 'scroll timeline measured' },
+    ok: 'ok',
+    skip: 'skip',
+    pending: '..',
+    ready: 'ready',
   },
   recruiter: {
     toggle: 'Recruiter mode',

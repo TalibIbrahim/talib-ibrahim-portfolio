@@ -1,8 +1,9 @@
 // Work. Server-rendered markup that is a complete, readable list without JS.
 //   Head    "SELECTED / WORK" (site.workIndex.featuredHeading) around a mono chip:
 //           `git log --featured · 05` (site.workIndex.log + the featured count).
-//   Strip   the featured covers at mixed sizes, each slot shaped from SLOTS (ratio, height, top or
-//           bottom, offset, gap before), with a commit node on the git-graph line that runs through it.
+//   Strip   the featured covers whole, at their own aspect and mixed heights (SLOTS: height, top or
+//           bottom, offset, gap before); the git-graph line runs under the captions through a commit
+//           node at each one, and curves in the gaps, never over a cover.
 //   End     the "All projects" card (a branch off the line) to /work.
 // Desktop + motion: ShowreelMotion sets data-strip and drives the bent-card entrance (OGL), the
 // sticky sideways travel, the focus band and the line. Phones: a stacked composition with a rail.

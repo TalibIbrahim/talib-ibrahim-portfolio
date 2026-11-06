@@ -57,6 +57,8 @@ type ProjectBase<S extends string = string> = {
   facts?: SourcedFact[];
   /** Extra stills shown after the case-study body. */
   gallery?: Img[];
+  /** One short line of real facts for the home Work strip, from `facts` or the case study. Unset = no line. */
+  keyFact?: string;
   /** Optional tint for the reel's timecode and hover; defaults to the site accent. */
   accent?: string;
 };
@@ -230,8 +232,17 @@ export type Site = {
     pagesLabel: string; // small mono label over the page links
     stackLabel: string; // accessible name of the stack row (its two halves are labelled with layers.sides[].layer)
     pages: Link[]; // the home sections
-    /** The two-line closing statement over the portrait. Unset = the name, set like a signature block. */
-    closing?: [string, string];
+    nowBuilding: string; // prefix of the live line: the most recently pushed public repo (src/lib/github.ts)
+    lastCommit: string; // label before its push date
+  };
+  /** The first-landing boot screen: one line per real readiness check. */
+  loader: {
+    command: string; // the prompt line
+    checks: { fonts: string; images: string; scroll: string };
+    ok: string; // status when a check passed
+    skip: string; // status when it ran out of time (the site goes on anyway)
+    pending: string; // status while waiting
+    ready: string; // the last line
   };
   recruiter: {
     toggle: string; // the persistent button on the full site

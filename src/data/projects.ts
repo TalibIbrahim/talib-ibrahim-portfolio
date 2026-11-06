@@ -49,6 +49,7 @@ const list = define([
       { value: '120+', text: 'restaurants listed', source: { kind: 'owner' } },
       { value: '100+', text: 'reviews written', source: { kind: 'owner' } },
     ],
+    keyFact: '~40 users · 120+ restaurants · 100+ reviews', // from the owner facts above
     media: {
       kind: 'poster',
       motion: 'pan',
@@ -81,6 +82,7 @@ const list = define([
       'Ships as a Windows installer that checks GitHub Releases for updates.',
     ],
     facts: [{ text: 'I use it every day.', source: { kind: 'owner' } }],
+    keyFact: 'Used daily · v2.1.9', // the owner fact above; the version is in the case study (lumos.mdx)
     gallery: [
       {
         src: '/work/lumos/light-detail.webp',
