@@ -8,7 +8,7 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
 import { usePage } from '@/engine/next';
-import { ease, prefersReducedMotion } from '@/engine';
+import { ease, prefersReducedMotion, scrollState } from '@/engine';
 import { makeContours } from './contours';
 
 gsap.registerPlugin(ScrollTrigger, DrawSVGPlugin);
@@ -360,6 +360,11 @@ export function HeroMotion() {
       const target = performance.now() - lastInput < 2500 ? 1 : 0;
       act += (target - act) * Math.min(1, dt / 600);
       acc += dt;
+      // fast scroll: the scrub owns the frame; the sheet waits (and does not jump when it resumes)
+      if (Math.abs(scrollState().velocity) > 4) {
+        acc = 0;
+        return;
+      }
       if (frame++ % every) return;
       const moved = Math.abs(bg.state.scroll - drawnScroll) > 0.5;
       if (act < 0.01 && !moved) {

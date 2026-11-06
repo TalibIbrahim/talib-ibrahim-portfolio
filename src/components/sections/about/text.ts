@@ -1,7 +1,7 @@
 // About text motion (motion only; the server HTML is the final text). One reveal voice per block:
 //   Headline   (the tagline) each line is wiped by a blue block, scrubbed to its own position: the
 //              block crosses the line between 85% and 65% of the viewport, the text appears under it.
-//   Lead, body each line rises out of its mask, scrubbed (92% -> 70%); the mask opens once the line
+//   Lead, body each line rises out of its mask once (0.7 s) as it crosses 92%; the mask opens once the line
 //              is home, so no line is ever left clipped. A key word on a line resolves as soon as
 //              that line comes into view (92%) (time-based and short, finished long before mid-screen):
 //                decode  glyph noise resolves into the phrase (<= 0.4 s); common phrases only
@@ -184,15 +184,18 @@ export function initText(root: HTMLElement, styles: Classes) {
         const done = new Set<gsap.core.Timeline>();
         self.lines.forEach((line, i) => {
           const mask = (self.masks?.[i] as HTMLElement | undefined) ?? line.parentElement;
+          // Time-based, once (0.7 s, ease.out) as the line crosses 92%: a scrubbed rise left the lowest
+          // lines of the screen part-risen, so the paragraph read as if its leading jumped.
           const rise = gsap.fromTo(
             line,
             { yPercent: 110 },
             {
               yPercent: 0,
-              ease: 'none',
-              scrollTrigger: { trigger: mask ?? line, start: 'top 92%', end: 'top 70%', scrub: 0.5 },
-              onUpdate() {
-                if (mask) mask.style.overflow = this.progress() >= 1 ? 'visible' : '';
+              duration: 0.7,
+              ease: ease.out,
+              scrollTrigger: { trigger: mask ?? line, start: 'top 92%', toggleActions: 'play none none none' },
+              onComplete() {
+                if (mask) mask.style.overflow = 'visible';
               },
             },
           );

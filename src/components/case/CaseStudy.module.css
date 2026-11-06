@@ -373,7 +373,10 @@
 .nextLink { transition: color 0.4s var(--ease-soft); }
 .nextLink:hover .nextLabel,
 .nextLink:focus-visible .nextLabel { color: var(--c-fg); }
-.nextLabel { transition: color 0.4s var(--ease-soft); }
+.nextLabel { transition: color 0.4s var(--ease-soft), translate 0.6s var(--ease-out); }
+.nextLink:hover .nextLabel,
+.nextLink:focus-visible .nextLabel { translate: 8px 0; }
+.nextLink:active .nextTitleText { translate: 4px 0; }
 .nextLink:hover .nextTitle::after,
 .nextLink:focus-visible .nextTitle::after { transform: scaleX(1); }
 .nextLink:hover .nextTitleText,
@@ -390,6 +393,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .nextLink:hover .nextTitleText,
+  .nextLink:hover .nextLabel,
   .nextLink:hover .nextArrow { translate: none; }
   .nextLink:hover .nextPoster { scale: none; }
 }

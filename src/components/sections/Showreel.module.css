@@ -308,6 +308,9 @@
   mix-blend-mode: difference;
   pointer-events: none;
 }
+/* Once the card has landed the ground is ink, where difference and normal look the same: the head
+   drops the blend so the travelling title is not re-blended over the whole stage every frame. */
+.section[data-strip][data-landed] .head { mix-blend-mode: normal; }
 .section[data-strip] .words {
   flex-wrap: nowrap;
   justify-content: center;
@@ -344,6 +347,21 @@
   stroke-linecap: round;
   stroke-linejoin: round;
 }
+.cover { display: none; }
+.section[data-strip] .cover {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--c-bg);
+  visibility: hidden;
+  pointer-events: none;
+  will-change: transform;
+}
+.section[data-strip] .list,
+.section[data-strip] .all { position: relative; z-index: 1; }
 .section[data-strip] .list {
   flex-wrap: nowrap;
   align-items: stretch;

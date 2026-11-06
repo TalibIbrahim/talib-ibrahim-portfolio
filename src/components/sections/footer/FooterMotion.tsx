@@ -77,6 +77,10 @@ export function FooterMotion() {
         const target = performance.now() - last < 2500 ? 1 : 0;
         act += (target - act) * Math.min(1, dt / 600);
         acc += dt;
+        if (Math.abs(scrollState().velocity) > 4) {
+          acc = 0; // fast scroll: skip the ground, it catches up when the page slows
+          return;
+        }
         if (frame++ % 3) return; // 20 fps
         if (act < 0.01) {
           acc = 0;

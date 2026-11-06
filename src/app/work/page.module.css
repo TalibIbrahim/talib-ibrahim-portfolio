@@ -180,6 +180,17 @@
 }
 .links a:hover,
 .links a:focus-visible { text-decoration-color: currentColor; }
+/* every link in the row moves: a nudge right, its arrow leads a little further */
+.links a { gap: 0.35em; transition: text-decoration-color 0.3s var(--ease-soft), translate 0.5s var(--ease-out); }
+.links a:hover,
+.links a:focus-visible { translate: 3px 0; }
+.linkArrow { flex: none; transition: translate 0.5s var(--ease-out); }
+.links a:hover .linkArrow,
+.links a:focus-visible .linkArrow { translate: 3px 0; }
+.links a:active { translate: 1px 0; }
+@media (prefers-reduced-motion: reduce) {
+  .links a:hover, .links a:focus-visible, .links a:hover .linkArrow, .links a:focus-visible .linkArrow { translate: none; }
+}
 
 /* ---------- the row answers ---------- */
 @media (hover: hover) and (pointer: fine) {

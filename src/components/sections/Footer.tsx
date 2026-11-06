@@ -39,6 +39,7 @@ export async function Footer() {
   return (
     <footer className={styles.footer} aria-labelledby="footer-title" data-footer>
       <div className={styles.panel} data-panel>
+        <span className={styles.tabR} aria-hidden="true" />
         {/* the ground: small polka dots that drift and breathe while you move (footer/dots.ts) */}
         <canvas className={styles.bg} aria-hidden="true" data-bg />
         <div className={styles.statement} data-drop>

@@ -7,7 +7,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowRight, ArrowUpRight } from "lucide-react";
 import type { Project } from "@/data/types";
 import { coverOf, getFeatured, getProjects, getRest } from "@/data/projects";
 import { site } from "@/data/site";
@@ -116,6 +116,7 @@ function ProjectRow({
                 aria-label={`${copy.caseStudy}: ${p.title}`}
               >
                 {copy.caseStudy}
+                <ArrowRight className={styles.linkArrow} size={14} strokeWidth={1.5} aria-hidden="true" />
               </Link>
             </li>
             {p.links.live && (

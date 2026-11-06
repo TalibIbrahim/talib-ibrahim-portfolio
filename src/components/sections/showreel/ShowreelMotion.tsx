@@ -185,9 +185,10 @@ function initStrip(section: HTMLElement) {
   const track = q(section, '[data-track]');
   const chip = q(section, '[data-chip]');
   const line = q<SVGPathElement>(section, '[data-line]');
+  const cover = q(section, '[data-cover]');
   const allEl = q(section, '[data-all]');
   const wordEls = qa(section, '[data-word]');
-  if (!stage || !ground || !glHost || !head || !track || !chip || !line || !allEl) return;
+  if (!stage || !ground || !glHost || !head || !track || !chip || !line || !cover || !allEl) return;
 
   section.dataset.strip = '';
   const late: gsap.core.Animation[] = [];
@@ -354,8 +355,19 @@ function initStrip(section: HTMLElement) {
   let drawn = -1;
   let leadP = 0; // the pen lead's progress (scroll, before the stage sticks)
   let headLen = 0; // drawn length past the lead, from a track x
+  let hxNow = 0; // the head's track x
+  let travelling = false; // the card has landed: the cover draws the line from here on
+  let coverOn = false;
+  const setCoverX = gsap.quickSetter(cover, 'x', 'px') as (v: number) => void;
   function paint() {
-    const len = leadP < 1 ? leadP * m.lead : m.lead + headLen;
+    const viaCover = travelling && leadP >= 1;
+    if (viaCover !== coverOn) {
+      coverOn = viaCover;
+      cover!.style.visibility = viaCover ? 'visible' : 'hidden';
+    }
+    // landed: the line is drawn in full once and the cover slides off it (transform only)
+    const len = viaCover ? m.total : leadP < 1 ? leadP * m.lead : m.lead + headLen;
+    if (viaCover) setCoverX(Math.max(hxNow, m.xs[0] ?? 0));
     if (Math.abs(len - drawn) < 0.5) return;
     drawn = len;
     line!.style.strokeDashoffset = `${(m.total - len).toFixed(1)}`;
@@ -373,6 +385,7 @@ function initStrip(section: HTMLElement) {
         else hi = mid - 1;
       }
     headLen = Math.min(m.total - m.lead, hi * m.step);
+    hxNow = hx;
     paint();
   }
 
@@ -471,6 +484,8 @@ function initStrip(section: HTMLElement) {
     const qv = state.P <= split ? 0 : fit(state.P, split, 1);
     state.p = p;
     state.q = qv;
+    if (p >= 1 !== travelling) section.toggleAttribute('data-landed', p >= 1);
+    travelling = p >= 1;
     applyEntrance(p);
     applyTravel(qv);
   }
@@ -624,6 +639,11 @@ function initStrip(section: HTMLElement) {
     if (qv === null) return;
     const y = st.start + (split + qv * (1 - split)) * (st.end - st.start);
     if (Math.abs(scrollY - y) > 4) scrollToTarget(y, { immediate: true });
+    // land at once (no scrub lag), so the focus ring is drawn on a visible, landed card
+    st.update();
+    st.getTween()?.progress(1);
+    state.P = split + qv * (1 - split);
+    drive();
   };
   section.addEventListener('focusin', onFocus);
 
@@ -658,9 +678,11 @@ function initStrip(section: HTMLElement) {
     allNode?.removeAttribute('data-on');
     allNode?.removeAttribute('data-head');
     line.removeAttribute('style');
+    cover.removeAttribute('style');
     line.setAttribute('d', '');
     section.style.removeProperty('--travel');
     delete section.dataset.strip;
+    section.removeAttribute('data-landed');
   };
 }
 

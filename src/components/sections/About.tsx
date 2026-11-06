@@ -70,10 +70,10 @@ export function About() {
 
   return (
     <section ref={section} id="about" className={styles.about} aria-labelledby="about-title">
-      <svg className={styles.pen} aria-hidden="true" focusable="false" data-pen>
-        <path d="" />
-        <circle r="4.5" />
-      </svg>
+      <span className={styles.pen} aria-hidden="true" data-pen>
+        <span className={styles.penLine} data-pen-line />
+        <span className={styles.penNode} data-pen-node />
+      </span>
       <div className={styles.text} data-text>
         <h2 id="about-title" className={styles.label} data-drop>
           About

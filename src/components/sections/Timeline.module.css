@@ -218,3 +218,9 @@
   .layerA { grid-column: 1 / span 7; }
   .layerB { grid-column: 8 / span 5; }
 }
+
+/* Desktop motion: the sheet is its own layer, so its scrubbed clip-path edge never repaints the
+   whole sheet's content each frame (measured: ~40 -> ~47 fps through this section). */
+@media (min-width: 768px) {
+  :global(html.motion) .sheet { will-change: transform; }
+}

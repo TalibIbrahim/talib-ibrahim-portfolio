@@ -1,6 +1,6 @@
 /* ============================================================
    FOOTER (the framed last screen)
-   The section is the pen-blue frame; the panel is the desk inside it, cut by clip-path:
+   The section is the pen-blue frame; the panel is the desk inside it, notched by blue tabs:
      top     a tab dips into the panel's top edge, centred between the header chips (45deg sides)
      bottom  two tabs rise into its bottom corners and carry the copyright and back to top
    Radius stays 0: every notch is a straight 45deg chamfer.
@@ -39,20 +39,40 @@
   min-height: calc(100svh - var(--f) * 2);
   padding: calc(var(--header-h) + var(--u) * 2) var(--gutter) calc(var(--band) + var(--u) * 1.5);
   background: var(--c-bg);
-  clip-path: polygon(
-    0 0,
-    calc(50% - var(--tab-w) / 2 - var(--tab-t)) 0,
-    calc(50% - var(--tab-w) / 2) var(--tab-t),
-    calc(50% + var(--tab-w) / 2) var(--tab-t),
-    calc(50% + var(--tab-w) / 2 + var(--tab-t)) 0,
-    100% 0,
-    100% calc(100% - var(--band)),
-    calc(100% - var(--tr)) calc(100% - var(--band)),
-    calc(100% - var(--tr) - var(--band)) 100%,
-    calc(var(--tl) + var(--band)) 100%,
-    var(--tl) calc(100% - var(--band)),
-    0 calc(100% - var(--band))
-  );
+}
+
+/* The notches: blue tabs laid over the panel's corners (small static shapes) rather than a clip-path
+   on the panel itself, which made every frame of the frame lock repaint the whole panel. */
+.panel::before,
+.panel::after,
+.tabR {
+  content: '';
+  position: absolute;
+  z-index: 5;
+  background: var(--c-accent);
+  pointer-events: none;
+}
+.panel::before {
+  top: 0;
+  left: 50%;
+  width: calc(var(--tab-w) + var(--tab-t) * 2);
+  height: var(--tab-t);
+  translate: -50% 0;
+  clip-path: polygon(0 0, 100% 0, calc(100% - var(--tab-t)) 100%, var(--tab-t) 100%);
+}
+.panel::after {
+  left: 0;
+  bottom: 0;
+  width: calc(var(--tl) + var(--band));
+  height: var(--band);
+  clip-path: polygon(0 0, var(--tl) 0, 100% 100%, 0 100%);
+}
+.tabR {
+  right: 0;
+  bottom: 0;
+  width: calc(var(--tr) + var(--band));
+  height: var(--band);
+  clip-path: polygon(var(--band) 0, 100% 0, 100% 100%, 0 100%);
 }
 
 /* the ground: polka dots (footer/dots.ts), under everything in the panel */
@@ -102,11 +122,11 @@
   position: absolute;
   left: 50%;
   top: 0;
-  width: clamp(15rem, 8rem + 22vw, 30rem);
+  width: clamp(14rem, 6rem + 18vw, 24rem);
   height: auto;
   aspect-ratio: var(--sig-ar);
   z-index: 4;
-  translate: -46% -58%;
+  translate: -46% -104%; /* the flourish's lowest point clears the name's caps by ~0.2em */
   rotate: -7deg;
   overflow: visible;
   pointer-events: none;
@@ -136,6 +156,7 @@
   width: 100%;
   height: 100%;
 }
+:global(html.motion) .photo { will-change: transform; } /* the filtered portrait is rastered once, not per frame of the frame lock */
 .photo img {
   object-fit: contain;
   object-position: 50% 100%;
@@ -230,6 +251,10 @@
   color: var(--c-muted);
 }
 .nowLink {
+  /* a 24px+ hit area around a short word, without moving the line */
+  display: inline-block;
+  padding: 0.35rem 0.25rem;
+  margin: -0.35rem -0.25rem;
   color: var(--c-fg);
   text-decoration: underline;
   text-decoration-color: rgb(236 232 223 / 0.35);
@@ -303,6 +328,7 @@
 /* ---------- on the frame: the top tab and the bottom tabs ---------- */
 .tab {
   position: absolute;
+  z-index: 6;
   top: var(--f);
   left: 50%;
   height: var(--tab-t);
@@ -319,6 +345,7 @@
 }
 .band {
   position: absolute;
+  z-index: 6;
   left: var(--f);
   right: var(--f);
   bottom: var(--f);
@@ -374,6 +401,8 @@
     --tab-t: 1rem;
     --ft: clamp(3rem, 15vw, 4.5rem); /* the statement's size on phones */
   }
+  .panel::after,
+  .tabR { display: none; }
   .panel {
     grid-template-columns: repeat(4, minmax(0, 1fr));
     grid-template-rows: none;
@@ -381,16 +410,6 @@
     min-height: 0;
     margin-bottom: var(--band);
     padding: calc(var(--header-h) + var(--u) * 5) var(--gutter) calc(var(--u) * 6);
-    clip-path: polygon(
-      0 0,
-      calc(50% - var(--tab-w) / 2 - var(--tab-t)) 0,
-      calc(50% - var(--tab-w) / 2) var(--tab-t),
-      calc(50% + var(--tab-w) / 2) var(--tab-t),
-      calc(50% + var(--tab-w) / 2 + var(--tab-t)) 0,
-      100% 0,
-      100% 100%,
-      0 100%
-    );
   }
   .statement {
     position: relative;
@@ -433,6 +452,14 @@
   .stackR { grid-column: 1 / -1; grid-row: 6; justify-content: flex-start; }
   .stackR .layer { order: -1; }
   .tab { display: none; }
+  /* two rows on phones: the copyright, then back to top */
+  .footer { --band: 5.5rem; }
+  .band {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0;
+  }
   .copy { white-space: normal; }
 }
 

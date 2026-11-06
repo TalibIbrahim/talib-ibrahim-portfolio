@@ -148,7 +148,7 @@ html.lenis, html.lenis body { height: auto; }
 }
 html.loading #loader { display: flex; }
 #loader:not([data-run]) [data-final]::before { content: attr(data-final); } /* until loader.ts copies the text in */
-html.loaded #loader { opacity: 0; transition: opacity 0.35s var(--ease-soft); } /* the hard-cap fallback */
+html.loaded #loader { opacity: 0; transition: opacity 0.25s var(--ease-soft); } /* the hard-cap fallback */
 .loader__term {
   display: grid; gap: 0.35em;
   padding-bottom: calc(var(--u) * 2);

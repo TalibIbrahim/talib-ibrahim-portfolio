@@ -35,6 +35,7 @@
 .toggle[data-hide]:not(:focus-visible) { opacity: 0; visibility: hidden; translate: 0 calc(100% + var(--gutter) + 8px); }
 
 @media (max-width: 767px) {
+  .toggle[data-down]:not(:focus-visible) { opacity: 0; visibility: hidden; translate: 0 calc(100% + var(--gutter) + 8px); }
   .toggle {
     min-height: 2.5rem;
     padding: 0 0.85em;

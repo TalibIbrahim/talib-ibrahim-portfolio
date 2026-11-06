@@ -17,28 +17,37 @@
 .about ::selection { background: var(--c-bg); color: var(--c-fg); }
 
 /* The pen line (about/line.ts, desktop): one stroke down the left margin into the Work stage's git
-   graph (same width as that line). Hidden until the script has measured it. */
+   graph (same width as that line). A straight rule, so it draws with scaleY only (compositor, no
+   repaint per frame). Placed by the script on refresh; hidden until then. */
 .pen {
   display: none;
   position: absolute;
   inset: 0;
   z-index: 1;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
   pointer-events: none;
 }
 .pen[data-on] { display: block; }
-.pen path {
-  fill: none;
-  stroke: var(--c-accent);
-  stroke-width: clamp(3px, 0.35vw, 6px);
-  stroke-linecap: round;
+.penLine {
+  --w: clamp(3px, 0.35vw, 6px);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: var(--w);
+  margin-left: calc(var(--w) / -2);
+  background: var(--c-accent);
+  transform-origin: 50% 0;
 }
-.pen circle {
-  fill: var(--c-fg);
-  stroke: var(--c-accent);
-  stroke-width: 2.5;
+/* the first commit node: a dot (documented radius exception), like the Work strip's */
+.penNode {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 0.5625rem;
+  height: 0.5625rem;
+  margin: -0.28rem 0 0 -0.28rem;
+  border: 2px solid var(--c-accent);
+  border-radius: 50%;
+  background: var(--c-fg);
 }
 
 /* 12-col grid; text hangs from col 1, col 5 and col 9. */

@@ -59,6 +59,9 @@ export function Showreel() {
           <svg className={styles.graph} aria-hidden="true" focusable="false" data-graph>
             <path className={styles.line} data-line d="" />
           </svg>
+          {/* during the travel the line is drawn in full and this desk-black cover slides off it
+              (a transform), so drawing it costs no repaint per frame */}
+          <span className={styles.cover} aria-hidden="true" data-cover />
           <ol className={styles.list} role="list">
             {projects.map((p, i) => (
               <Reel key={p.slug} project={p} index={all.indexOf(p)} slot={SLOTS[i % SLOTS.length]} first={i === 0} />
