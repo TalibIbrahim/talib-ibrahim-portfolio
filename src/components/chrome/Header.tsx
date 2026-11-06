@@ -1,6 +1,7 @@
 'use client';
 // Site header: two frosted chips (name, nav) that stay legible over the desk, the paper and the
-// reels. A highlight pill glides to the hovered/focused link; an accent dot marks the section in view.
+// reels. A highlight pill glides to the hovered/focused link and its label letter-rolls (the nav
+// treatment in DESIGN.md); an accent dot marks the section in view.
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -77,7 +78,7 @@ export function Header() {
                 onBlur={() => point(null)}
               >
                 <span className={styles.dot} aria-hidden="true" />
-                {item.label}
+                <RollText>{item.label}</RollText>
               </Link>
             </li>
           ))}

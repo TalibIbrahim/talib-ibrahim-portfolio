@@ -1,6 +1,6 @@
 'use client';
 // /recruiter: the same facts as the full site, in the site's own type and palette, with no scroll
-// theatre. A separate route, so the main site never ships it. A slider at the bottom sets how hard the page sells, after getcoleman.com:
+// theatre. A separate route, so the main site never ships it. A slider under the contact buttons sets how hard the page sells, after getcoleman.com:
 //   3 Hard sell (default): everything     2 Firm: projects + roles, no bullet points
 //   1 Soft: short bio, a few projects     0 Barely selling: one paragraph and an email address
 // Server render = hard sell, so crawlers and no-JS visitors get every fact.
@@ -67,6 +67,7 @@ export function RecruiterHome() {
                 </li>
               ))}
           </ul>
+          <SellSlider />
         </div>
         <Link href="/" className={`${styles.pill} ${styles.back}`}>
           <Sparkles aria-hidden="true" size={16} strokeWidth={1.5} />
@@ -130,13 +131,15 @@ export function RecruiterHome() {
                   <p className={styles.links}>
                     {p.links.live && (
                       <a className={styles.link} href={p.links.live} target="_blank" rel="noopener noreferrer">
-                        Live: {bare(p.links.live)}
+                        <span className={styles.linkText}>Live: {bare(p.links.live)}</span>
+                        <ArrowUpRight className={styles.linkArrow} aria-hidden="true" strokeWidth={1.5} />
                         <span className="sr-only"> (opens in a new tab)</span>
                       </a>
                     )}
                     {p.links.repo && (
                       <a className={styles.link} href={p.links.repo} target="_blank" rel="noopener noreferrer">
-                        Code: {bare(p.links.repo)}
+                        <span className={styles.linkText}>Code: {bare(p.links.repo)}</span>
+                        <ArrowUpRight className={styles.linkArrow} aria-hidden="true" strokeWidth={1.5} />
                         <span className="sr-only"> (opens in a new tab)</span>
                       </a>
                     )}
@@ -226,7 +229,6 @@ export function RecruiterHome() {
       <p className={styles.footer}>
         &copy; {new Date().getFullYear()} {site.name}
       </p>
-      <SellSlider />
     </div>
   );
 }

@@ -1,12 +1,15 @@
 'use client';
-// Stack: a page that turns in, then the site's only horizontal moment.
-//   Boundary 6   "rotate": the paper panel turns in from -8deg around its top-left corner as the
+// Stack: a page that turns in, then one pinned screen with every group on it.
+//   Boundary 8   "rotate": the paper panel turns in from -8deg around its top-left corner as the
 //                section enters (scrubbed). Phones: -4deg over a shorter distance.
-//   Desktop      the section pins (top top) and the type strip pans left over its own scrollWidth.
-//                Each group arrives as it enters the horizontal viewport (containerAnimation), each
-//                from its own direction with its own ease: below/out, above/soft, right/inOut, scale/wipe.
-// Phones: a native overflow-x scroll-snap row of group cards, no pin.
-// Reduced motion / no JS / Recruiter Mode: no rotate, no pin; desktop shows a 2x2 grid of groups.
+//   Desktop      (>= 1100px) the section pins (top top) for one screen of scroll. The four groups sit
+//                as four columns under the title; each arrives in turn, from its own direction with its
+//                own ease (below/out, above/soft, right/inOut, scale/wipe), and the progress rule fills.
+//                If the screen is too short for the whole composition it does not pin: the groups
+//                arrive as the section scrolls in.
+// Tablets: the same columns as a 2x2 grid, rotate only. Phones: a native overflow-x scroll-snap row of
+// group cards sized to their content, no pin.
+// Reduced motion / no JS / Recruiter Mode: no rotate, no pin; the static columns.
 import { useRef } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -43,14 +46,14 @@ export function Stack() {
     const mm = gsap.matchMedia();
     mm.add(
       {
-        desktop: '(min-width: 768px) and (prefers-reduced-motion: no-preference)',
-        phone: '(max-width: 767px) and (prefers-reduced-motion: no-preference)',
+        wide: '(min-width: 1100px) and (prefers-reduced-motion: no-preference)',
+        narrow: '(max-width: 1099px) and (prefers-reduced-motion: no-preference)',
       },
       (c) => {
         if (!document.documentElement.classList.contains('motion')) return;
-        const phone = !!c.conditions?.phone;
+        const phone = matchMedia('(max-width: 767px)').matches;
 
-        // Boundary 6: the page turns in around its top-left corner.
+        // Boundary 8: the page turns in around its top-left corner.
         gsap.fromTo(
           panel,
           { rotation: phone ? -4 : -8, transformOrigin: '0% 0%' },
@@ -60,60 +63,31 @@ export function Stack() {
             scrollTrigger: { trigger: root, start: 'top bottom', end: phone ? 'top 55%' : 'top top', scrub: 0.6 },
           },
         );
-        if (phone) return;
+        if (!c.conditions?.wide) return;
 
-        root.dataset.pan = '';
-        const dist = () => Math.max(0, row.scrollWidth - innerWidth);
-        const pan = gsap.to(row, {
-          x: () => -dist(),
-          ease: 'none',
-          scrollTrigger: {
-            trigger: root,
-            start: 'top top',
-            end: () => `+=${dist()}`,
-            pin: true,
-            scrub: 0.8,
-            invalidateOnRefresh: true,
-          },
+        // One screen of pin, only when the whole composition fits the viewport.
+        const fits = row.offsetHeight <= innerHeight;
+        if (fits) root.dataset.pin = '';
+        const tl = gsap.timeline({
+          defaults: { duration: 1 },
+          scrollTrigger: fits
+            ? { trigger: root, start: 'top top', end: '+=100%', pin: true, scrub: 0.6, invalidateOnRefresh: true }
+            : { trigger: row, start: 'top 75%', end: 'bottom 85%', scrub: 0.6, invalidateOnRefresh: true },
         });
-        if (bar.current) {
-          gsap.fromTo(bar.current, { scaleX: 0 }, {
-            scaleX: 1,
-            ease: 'none',
-            scrollTrigger: { trigger: root, start: 'top top', end: () => `+=${dist()}`, scrub: 0.8, invalidateOnRefresh: true },
-          });
-        }
-
-        // Arrivals. A group already inside the viewport when the pin starts arrives while the
-        // page turns in; the rest arrive as the strip carries them in from the right.
         gsap.utils.toArray<HTMLElement>('[data-group]', row).forEach((g, i) => {
           const a = ARRIVALS[i % ARRIVALS.length];
           const body = g.querySelector<HTMLElement>('[data-arrive]');
           const chips = gsap.utils.toArray<HTMLElement>('[data-chip]', g);
           if (!body) return;
-          const visibleAtStart = g.offsetLeft < innerWidth * 0.9;
-          const st: ScrollTrigger.Vars = visibleAtStart
-            ? { trigger: root, start: 'top 70%', end: 'top top', scrub: 0.6 }
-            : { trigger: g, containerAnimation: pan, start: 'left 100%', end: 'left 66%', scrub: 0.6 };
-          const tl = gsap.timeline({ scrollTrigger: st });
-          tl.from(body, { ...a.from, ease: a.ease, duration: 1 }, 0);
-          tl.from(chips, { ...a.chips, autoAlpha: 0, ease: a.ease, duration: 0.6, stagger: 0.4 / Math.max(1, chips.length) }, 0.3);
-          // Exit: a group fades as the strip carries it off the left edge, so only the group in front
-          // reads (no orphan letters of the last title at the edge).
-          gsap.fromTo(
-            g,
-            { autoAlpha: 1 },
-            {
-              autoAlpha: 0,
-              ease: 'none',
-              immediateRender: false,
-              scrollTrigger: { trigger: g, containerAnimation: pan, start: 'right 62%', end: 'right 30%', scrub: 0.4 },
-            },
-          );
+          const at = i * 0.35;
+          tl.from(body, { ...a.from, ease: a.ease }, at);
+          tl.from(chips, { ...a.chips, autoAlpha: 0, ease: a.ease, duration: 0.6, stagger: 0.4 / Math.max(1, chips.length) }, at + 0.3);
         });
+        tl.to({}, { duration: 0.25 }); // a short hold with everything in place before the pin lets go
+        if (bar.current) tl.fromTo(bar.current, { scaleX: 0 }, { scaleX: 1, ease: 'none', duration: tl.duration() }, 0);
 
         return () => {
-          delete root.dataset.pan;
+          delete root.dataset.pin;
         };
       },
     );

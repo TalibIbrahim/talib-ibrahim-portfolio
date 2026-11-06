@@ -17,7 +17,8 @@ import { BOOT_KEY } from '@/lib/mode-script';
 gsap.registerPlugin(ScrollTrigger, ScrambleTextPlugin);
 
 const MIN = 0.8; // s, from navigation start
-const MAX = 1.5; // hard cap, exit included: fonts or images may finish under the hero
+// hard cap, exit included (fonts or images may finish under the hero); the boot script's cap, same values
+const MAX = typeof matchMedia !== 'undefined' && matchMedia('(max-width: 767px), (pointer: coarse)').matches ? 1.2 : 1.5;
 const NOISE = '01{}/=_;$#<>';
 
 const wait = (s: number) => new Promise<void>((r) => gsap.delayedCall(Math.max(0, s), r));

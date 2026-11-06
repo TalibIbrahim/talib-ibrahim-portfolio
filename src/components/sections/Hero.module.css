@@ -223,6 +223,126 @@
 }
 .sig circle { fill: var(--c-accent); visibility: hidden; }
 
+/* ---------- the end state's commit graph (desktop; hero/git.ts places and draws it) */
+.git {
+  display: none;
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  pointer-events: none;
+  visibility: hidden;
+}
+@media (min-width: 768px) {
+  :global(html.motion) .git { display: block; }
+  /* reduced motion: the graph sits drawn on the desk under the landing (HeroMotion moves it there) */
+  .git[data-static] {
+    display: block;
+    position: relative;
+    inset: auto;
+    height: max(26rem, 52svh);
+    background: var(--c-bg);
+    visibility: visible;
+  }
+  .hero[data-git-static] { height: auto; }
+}
+.gsvg {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.gl {
+  fill: none;
+  stroke: var(--c-accent);
+  stroke-width: clamp(3px, 0.35vw, 6px); /* = About's pen line, which it runs on into */
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+/* the commit nodes are dots: the documented radius exception */
+.gnode { fill: var(--c-bg); stroke: var(--c-accent); stroke-width: 2.5; }
+.fill { fill: var(--c-accent); }
+.merge { fill: var(--c-accent); stroke: none; }
+.gring { fill: none; stroke: var(--c-accent); stroke-width: 1.5; opacity: 0.5; }
+.gcmd,
+.gsigned {
+  position: absolute;
+  margin: 0;
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  line-height: 1.4;
+  letter-spacing: 0.02em;
+  color: var(--c-fg);
+  white-space: pre;
+}
+.gsigned { translate: -100% 0; color: var(--c-accent-text); }
+.glist { list-style: none; margin: 0; padding: 0; }
+.glbl {
+  position: absolute;
+  width: max-content;
+}
+.glbl[data-up] { translate: 0 -100%; }
+.gd {
+  display: block;
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  line-height: 1.5;
+  letter-spacing: 0.02em;
+  color: var(--c-accent-text);
+  white-space: nowrap;
+}
+.gmk {
+  display: block;
+  overflow: clip;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+.gmk > span { display: block; }
+.gt {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: clamp(1.05rem, 0.6rem + 0.7vw, 1.35rem);
+  line-height: 1.1;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  color: var(--c-fg);
+}
+.gs {
+  max-width: 12rem;
+  margin-top: 0.2em;
+  font-size: var(--t-s);
+  line-height: 1.35;
+  color: var(--c-muted);
+}
+/* HEAD's label hangs under the main line, left of the line that runs on down from HEAD */
+.ghead { text-align: right; translate: -100% 0; }
+.gref {
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--c-accent-text);
+  white-space: pre;
+}
+.gcaret {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.05em;
+  margin-left: 2px;
+  vertical-align: -0.18em;
+  background: var(--c-accent-text);
+}
+.gnow {
+  font-family: var(--f-display);
+  font-weight: 600;
+  font-size: clamp(1.4rem, 0.8rem + 1vw, 1.85rem);
+  line-height: 1.05;
+  color: var(--c-fg);
+}
+.ghead .gs { max-width: none; white-space: nowrap; }
+.git [data-text]::before { content: none; } /* hero/git.ts writes this text itself */
+
 /* ---------- captions */
 .meta {
   position: absolute;
@@ -305,7 +425,8 @@
 .end .work { justify-items: center; align-items: center; grid-auto-flow: column; gap: 1em; }
 
 /* ---------- motion on: a sticky stage scrubbed over 3.6 screens */
-:global(html.motion) .hero { height: 460svh; }
+/* desktop: the commit graph adds ~3 screens of scrub after the signature; About follows the stage */
+:global(html.motion) .hero { height: 560svh; }
 /* Intro: pure CSS on first paint (no JS wait); "backwards" leaves GSAP the only owner afterwards. */
 /* Intro, ~1 s, CSS on first paint. The name (the LCP) is painted in place on the first frame and never
    hidden; the card wipes up and the portrait rises (transform only) around it. */

@@ -69,9 +69,24 @@ export function withFx(text: string): ReactNode {
     // separates (or rebuilds) them: "Next.js," stays one piece
     const end = at + fx.phrase.length;
     const glue = text.slice(end).match(/^[^\s]*/)?.[0] ?? '';
+    // a slot that ends the paragraph takes the word before it along, so it never sits alone on the
+    // last line (a widow): "for real-time systems." wraps as one piece
+    const before = text.slice(i, at);
+    // and the two words before that hold together too ("soft spot"), so no single word is left alone
+    const last = !text.slice(end + glue.length).trim();
+    const lead = last ? (before.match(/\S+\s+$/)?.[0] ?? '') : '';
+    const rest = before.slice(0, before.length - lead.length);
+    const pair = last ? (rest.match(/\S+\s+\S+\s+$/)?.[0] ?? '') : '';
     out.push(
-      text.slice(i, at),
+      rest.slice(0, rest.length - pair.length),
+      pair && (
+        <span key={`${fx.kind}-pair`} className={styles.fxUnit} data-fx-unit>
+          {pair.trimEnd()}
+        </span>
+      ),
+      pair && ' ',
       <span key={fx.kind} className={styles.fxUnit} data-fx-unit>
+        {lead}
         <Slot fx={fx} />
         {glue}
       </span>,

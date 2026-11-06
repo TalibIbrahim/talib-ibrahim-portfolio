@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# muhammad-talib.dev
 
-## Getting Started
+The portfolio of **Muhammad Talib Ibrahim**, a full-stack developer in Lahore (BS Computer Science, UMT).
 
-First, run the development server:
+**→ [www.muhammad-talib.dev](https://www.muhammad-talib.dev)**
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Recruiter? Hit **Recruiter mode** on the site for the quick, scannable version.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## What's in it
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- A hero where the name compiles into my stack and gets signed (`SIGNED <hash>` is a real SHA-1 of the signature's paths).
+- About copy with code-flavoured key words: they type in, decode, diff and select.
+- A horizontal Work strip. A WebGL card flattens into place, and a git-graph line runs through the projects.
+- Case studies for 12 projects, from Byters (live, real users) to Lumos (which I use every day).
+- A stack you can play: Breakout, where the bricks are the tools I use.
+- A footer that reads my latest GitHub push at build time.
+- Recruiter Mode, with a sell slider from "Barely selling" to "Hard sell".
+- Reduced-motion and no-JS versions of everything, plus `llms.txt` and JSON-LD so AI tools and résumé scanners can read it cleanly.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Built with
 
-## Learn More
+Next.js 16 · React 19 · TypeScript · GSAP (ScrollTrigger, SplitText, ScrambleText, DrawSVG) · Lenis · OGL (WebGL) · MDX · Upstash (contact rate limiting) · Vercel
 
-To learn more about Next.js, take a look at the following resources:
+Type: Clash Display, General Sans, JetBrains Mono, Departure Mono and Fraunces.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Notes to self
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- All copy and facts live in `src/data/`. Adding a project takes one entry in `src/data/projects.ts`, its images in `public/work/<slug>/`, and an optional `src/content/projects/<slug>.mdx`.
+- The design system and section timeline are in `DESIGN.md`.
+- `npm run dev` to run locally, `npm run build` to check before pushing.
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+© Muhammad Talib Ibrahim. The code is here for reading; please don't redeploy it as your own portfolio.

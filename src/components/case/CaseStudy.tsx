@@ -191,6 +191,7 @@ export function CaseStudy({ project: p, next, Body }: Props) {
                   fill
                   sizes="100vw"
                   loading="eager"
+                  decoding="async"
                   fetchPriority="high"
                 />
               )}
@@ -268,6 +269,7 @@ export function CaseStudy({ project: p, next, Body }: Props) {
                     alt=""
                     fill
                     sizes="100vw"
+                    decoding="async"
                   />
                 </span>
               </span>

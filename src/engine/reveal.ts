@@ -4,7 +4,7 @@
 //   data-reveal="up|fade|clip|scale|left|right"  block reveal
 //   data-intro                       play with the page intro instead of on scroll
 //   data-delay="0.2"                 extra delay (seconds)
-//   data-parallax="0.15"             scrubbed vertical drift (fraction of element height)
+//   data-parallax="0.15"             scrubbed vertical drift (fraction of element height), 768px and up
 // Every effect is skipped under reduced motion; CSS keeps content visible without JS.
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -100,6 +100,9 @@ export function initReveals(root: ParentNode = document) {
     const t = blockTween(el, isIntro);
     if (isIntro) intro.add(() => { t.play(); }, 0);
   });
+  // Parallax is a desktop-only nicety: below 768px a scrubbed transform on a full-width image is paint
+  // work on every scrolled frame for a few pixels of drift, so phones keep the image still.
+  if (!matchMedia('(min-width: 768px)').matches) return intro;
   root.querySelectorAll<HTMLElement>('[data-parallax]').forEach((el) => {
     const amount = parseFloat(el.dataset.parallax || '0.15');
     gsap.fromTo(el, { yPercent: -amount * 100 }, {

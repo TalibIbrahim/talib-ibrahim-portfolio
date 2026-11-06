@@ -11,9 +11,13 @@
   background: var(--c-fg);
   color: var(--c-bg);
 }
-/* Handoff: About sits under the hero's last screen, so when the signed card has grown into paper and
-   the hero stage steps away, this page is already in place under it (no blank screen of paper). */
-:global(html.motion) .about { margin-top: -100svh; }
+/* Handoff, phones: About sits under the hero's last screen, so when the signed card has grown into paper
+   and the hero stage steps away, this page is already in place under it (no blank screen of paper).
+   Desktop: the hero ends on its commit graph and About follows the stage; the graph's line runs off the
+   stage's bottom edge at the pen line's x, and the pen line (about/line.ts) starts at this top edge. */
+@media (max-width: 767px) {
+  :global(html.motion) .about { margin-top: -100svh; }
+}
 .about ::selection { background: var(--c-bg); color: var(--c-fg); }
 
 /* The pen line (about/line.ts, desktop): one stroke down the left margin into the Work stage's git
@@ -320,8 +324,12 @@
 
 /* Wide screens: the second paragraph starts where the lead ends, in the column under the globe,
    so the lower half of the page is not left empty. */
+/* Desktop: the bio ends close to the Work stage, whose title waits near its top edge, so the paper
+   between them stays one short breath (~120px), not an empty screen. */
+@media (min-width: 768px) {
+  .text { padding-bottom: calc(var(--u) * 1); }
+}
 @media (min-width: 1200px) {
-  .text { padding-bottom: calc(var(--u) * 10); }
   .globe { grid-row: 3; }
   .body { grid-column: 9 / span 4; grid-row: 4; margin-top: calc(var(--u) * -2); }
 }

@@ -1,7 +1,7 @@
 /* ============================================================
    STACK: a paper page that turns in over the desk.
-   Base (no JS, reduced motion): desktop = 2x2 grid of groups; phones = scroll-snap row.
-   [data-pan] (desktop + motion, set by Stack.tsx): one pinned horizontal type strip.
+   One screen: the title over the four groups as columns (2x2 on tablets); phones = scroll-snap row.
+   [data-pin] (>= 1100px + motion, set by Stack.tsx): the same screen, pinned for one screen of scroll.
    GSAP-animated elements (.turn, .strip, [data-arrive], .chip, .bar) carry no CSS transform.
    ============================================================ */
 .section {
@@ -52,8 +52,6 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: calc(var(--u) * 8) var(--gutter);
 }
-/* Base (no pan): one group per row, so a long group name never runs into its neighbour */
-.section:not([data-pan]) .groups { grid-template-columns: minmax(0, 1fr); }
 .groups:focus-visible { outline: 2px solid var(--c-accent); outline-offset: -4px; } /* inset: the strip clips anything outside it */
 .arrive {
   display: grid;
@@ -82,47 +80,57 @@
   border: 1px solid rgb(11 11 12 / 0.28);
   white-space: nowrap;
 }
-.progress { display: none; }
 
-/* ---------- desktop + motion: the pinned type strip ---------- */
-.section[data-pan] .turn { height: 100svh; }
-.section[data-pan] .strip {
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: stretch;
-  gap: calc(var(--u) * 14);
-  width: max-content;
-  height: 100%;
-  padding: calc(var(--header-h) + var(--u) * 4) calc(var(--gutter) * 3) calc(var(--u) * 8) var(--gutter);
+/* ---------- desktop: one screen, title over the groups ---------- */
+@media (min-width: 768px) {
+  .strip {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--gutter);
+    row-gap: calc(var(--u) * 5);
+    align-content: center;
+    min-height: 100svh;
+    padding: calc(var(--header-h) + var(--u) * 3) var(--gutter) calc(var(--u) * 7);
+  }
+  .intro {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: calc(var(--u) * 1) var(--gutter);
+  }
+  .title { font-size: min(var(--t-mega), 21svh); }
+  .count { padding-bottom: 0.6em; }
+  .groups {
+    grid-column: 1 / -1;
+    gap: calc(var(--u) * 4) var(--gutter);
+  }
+  /* each group hangs from a hairline, like a column in a table */
+  .group {
+    padding-top: calc(var(--u) * 1.25);
+    border-top: 1px solid rgb(11 11 12 / 0.2);
+  }
+  .arrive { gap: calc(var(--u) * 1.25); }
+  .name {
+    font-size: min(var(--t-l), 3.3vw); /* the longest one-word name ("Frameworks") fits its column */
+    line-height: 0.95;
+    letter-spacing: var(--track-l);
+    text-wrap: balance;
+  }
 }
-.section[data-pan] .intro {
-  width: 44vw;
-  flex: none;
-  align-content: center;
+/* four columns of three: they hang from cols 1, 4, 7 and 10 */
+@media (min-width: 1100px) {
+  .groups { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
-.section[data-pan] .groups {
-  display: flex;
-  flex-wrap: nowrap;
-  gap: calc(var(--u) * 14);
-}
-.section[data-pan] .group {
-  flex: none;
-  display: flex;
-}
-/* Each group is centred on the strip's height: the one in front owns the screen; groups leaving on
-   the left fade out (Stack.tsx), so no orphan letters sit at the edge. */
-.section[data-pan] .group { align-items: center; }
-.section[data-pan] .arrive {
-  width: min-content; /* chips wrap to the width of the name (or 26rem) */
-}
-.section[data-pan] .name { font-size: clamp(5rem, 1.5rem + 8vw, 11rem); }
-.section[data-pan] .chips { min-width: 26rem; }
-.section[data-pan] .progress {
+.section[data-pin] .turn { height: 100svh; }
+.section[data-pin] .strip { height: 100%; }
+.progress { display: none; }
+.section[data-pin] .progress {
   display: block;
   position: absolute;
   left: var(--gutter);
   right: var(--gutter);
-  bottom: calc(var(--u) * 4);
+  bottom: calc(var(--u) * 3);
   height: 1px;
   background: rgb(11 11 12 / 0.14);
 }
@@ -149,6 +157,7 @@
     scroll-padding-inline: var(--gutter);
     padding-inline: var(--gutter);
     padding-bottom: calc(var(--u) * 2);
+    align-items: flex-start; /* each card is as tall as its own content */
     overscroll-behavior-x: contain;
     scrollbar-width: thin;
   }

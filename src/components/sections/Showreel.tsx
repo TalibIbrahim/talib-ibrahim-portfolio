@@ -62,6 +62,8 @@ export function Showreel() {
           {/* during the travel the line is drawn in full and this desk-black cover slides off it
               (a transform), so drawing it costs no repaint per frame */}
           <span className={styles.cover} aria-hidden="true" data-cover />
+          {/* where About's pen line ends: a commit node, the branch into project 01 leaves from it */}
+          <span className={styles.leadNode} aria-hidden="true" data-lead-node />
           <ol className={styles.list} role="list">
             {projects.map((p, i) => (
               <Reel key={p.slug} project={p} index={all.indexOf(p)} slot={SLOTS[i % SLOTS.length]} first={i === 0} />

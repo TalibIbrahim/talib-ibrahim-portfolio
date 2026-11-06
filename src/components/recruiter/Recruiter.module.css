@@ -2,8 +2,8 @@
 .page {
   max-width: 76rem;
   margin: 0 auto;
-  /* room for the open sell slider: its height (~110px) + its bottom offset + 24px */
-  padding: calc(var(--u) * 4) var(--gutter) calc(7rem + var(--gutter) + 24px);
+  /* room for the folded sell tab at the end: its height (3rem) + its bottom offset + 24px */
+  padding: calc(var(--u) * 4) var(--gutter) calc(3rem + var(--gutter) + 24px);
   color: var(--c-fg);
 }
 
@@ -161,22 +161,61 @@
 .links {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5em 1.25em;
+  gap: 0.5em 2.25em; /* room for the 12px slide and the arrow */
   font-size: var(--t-s);
 }
-/* Utility links: underline at rest, accent on hover. */
+/* Project links, the site's shared moving response: a hairline underline at rest; on hover or focus
+   the label slides 12px, the arrow nudges up-right, a blue underline draws in from the left. */
 .link {
   display: inline-flex;
   align-items: center;
+  gap: 0.3em;
   min-height: 1.5rem; /* 24px target */
+  transition: color 0.3s var(--ease-soft);
+}
+.linkText {
+  position: relative;
   text-decoration: underline;
-  text-underline-offset: 0.25em;
+  text-underline-offset: 0.3em;
   text-decoration-thickness: 1px;
   text-decoration-color: var(--c-line);
-  transition: color 0.3s var(--ease-soft), text-decoration-color 0.3s var(--ease-soft);
+  transition: translate 0.6s var(--ease-out);
+}
+.linkText::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.32em;
+  height: 2px;
+  background: var(--c-accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.7s var(--ease-out);
+}
+.linkArrow {
+  flex: none;
+  width: 0.9em;
+  height: 0.9em;
+  color: var(--c-accent-text);
+  transition: translate 0.5s var(--ease-soft);
 }
 .link:hover,
-.link:focus-visible { color: var(--c-accent-text); text-decoration-color: currentColor; }
+.link:focus-visible { color: var(--c-fg); }
+.link:hover .linkText,
+.link:focus-visible .linkText { translate: 12px 0; }
+.link:hover .linkText::after,
+.link:focus-visible .linkText::after { transform: scaleX(1); }
+.link:hover .linkArrow,
+.link:focus-visible .linkArrow { translate: calc(12px + 0.15em) -0.15em; }
+.link:active .linkText { translate: 8px 0; }
+@media (prefers-reduced-motion: reduce) {
+  .link:hover .linkText,
+  .link:focus-visible .linkText,
+  .link:hover .linkArrow,
+  .link:focus-visible .linkArrow { translate: none; }
+  .linkText::after { transition: none; }
+}
 
 .groups { display: grid; gap: calc(var(--u) * 1.5); }
 .group { display: grid; grid-template-columns: 11rem 1fr; gap: 1rem; align-items: baseline; }
@@ -202,13 +241,15 @@
 }
 
 /* ---------------------------------------------------------------- the sell slider */
+/* Docked in the page flow under the contact buttons; the dock keeps its height once the slider folds. */
+.dock {
+  margin-top: calc(var(--u) * 2.5);
+  width: min(36rem, 100%);
+}
 .slider {
-  position: fixed;
-  left: 50%;
-  bottom: var(--gutter);
-  translate: -50% 0;
+  position: relative;
   z-index: var(--z-toggle);
-  width: min(36rem, calc(100% - 2 * var(--gutter)));
+  width: 100%;
   padding: calc(var(--u) * 1.25) calc(var(--u) * 2);
   border: 1px solid var(--c-line);
   background: var(--c-bg); /* opaque: copy never shows through the bar */
@@ -286,8 +327,14 @@
   border: 4px solid var(--c-accent);
 }
 .range:active::-webkit-slider-thumb { scale: 1.2; }
-/* Once the visitor scrolls, the slider folds to a 48px bar (the range alone), so it never sits on
-   the copy; it opens again at the top, or while it has focus. */
+/* Desktop, once the dock has scrolled away: a fixed bar at the bottom of the label column (left of the
+   reading column, which never reaches it). Folded to the range alone; it opens while it has focus. */
+.slider[data-compact] {
+  position: fixed;
+  bottom: var(--gutter);
+  left: calc(max(0px, (100% - 76rem) / 2) + var(--gutter));
+  width: min(36rem, calc(100% - 2 * var(--gutter)));
+}
 .slider[data-compact]:not(:focus-within) {
   padding-block: 0.125rem;
   row-gap: 0;
@@ -295,12 +342,10 @@
 .slider[data-compact]:not(:focus-within) .end,
 .slider[data-compact]:not(:focus-within) .level { display: none; }
 .slider[data-compact]:not(:focus-within) { grid-template-columns: 1fr; }
-/* folded, it is a small tab in the bottom-right corner, clear of the reading column */
+/* folded, it is a small tab in the label column, clear of the reading column */
 .slider[data-compact]:not(:focus-within) {
-  left: auto;
-  right: var(--gutter);
-  translate: none;
   width: 11rem;
+  height: 3rem;
   padding-inline: calc(var(--u) * 1.25);
 }
 
@@ -315,7 +360,7 @@
   .rangeWrap { grid-column: 1 / -1; grid-row: 1; }
   .end { grid-row: 2; min-height: 1.5rem; font-size: var(--t-xs); }
   .level { grid-column: 2; grid-row: 2; }
-  .page { padding-bottom: calc(10.75rem + var(--gutter) + 24px); } /* the open slider on phones (~170px) + offset + 24px */
+  .page { padding-bottom: calc(var(--u) * 6); } /* phones keep the slider docked: nothing fixed to clear */
 }
 
 /* MDX case-study body in recruiter view */

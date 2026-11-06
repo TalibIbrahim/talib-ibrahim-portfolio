@@ -12,6 +12,7 @@ const umt: Education = {
   start: 'Oct 2023',
   end: 'July 2027 (expected)',
   gpa: '3.6/4.0',
+  short: 'UMT',
 };
 
 export const site: Site = {
@@ -52,6 +53,7 @@ export const site: Site = {
     {
       role: 'Core web development team member',
       org: 'Google Developer Group (GDGoC) UMT',
+      short: 'GDGoC UMT',
       place: 'Lahore, Pakistan',
       start: 'Nov 2024',
       end: 'Aug 2025',
@@ -145,6 +147,16 @@ export const site: Site = {
     // Current facts only. Radix Systems ended (Oct 2026), so it stays out.
     nameRow: [role, location, umt.degree],
     stackRow: ['Next.js', 'React.js', 'Node.js', 'Express.js', 'Bootstrap', 'Socket.IO', 'PeerJS'],
+    // Commits are site.education + site.experience (dates and roles read from there), plus LedgerERP on
+    // the Radix branch. No other projects: the Work section carries them.
+    graph: {
+      command: '$ git log --graph --all',
+      signed: 'signed',
+      ref: '(HEAD -> main)',
+      head: 'now',
+      note: 'open to full-stack roles', // contact.body: "I'm looking for full-stack roles"
+      onBranch: { org: 'Radix Systems', project: 'ledgererp' },
+    },
   },
   workIndex: {
     title: 'All projects',

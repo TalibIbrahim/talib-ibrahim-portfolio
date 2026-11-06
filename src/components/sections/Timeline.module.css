@@ -75,6 +75,7 @@
 .entry {
   padding-block: calc(var(--u) * 3) calc(var(--u) * 4);
   border-top: 1px solid var(--c-line);
+  scroll-margin-top: calc(var(--header-h) + var(--u) * 2); /* a row scrolled to (focus, anchor) lands below the header chips */
 }
 .entry:last-child { padding-bottom: 0; }
 

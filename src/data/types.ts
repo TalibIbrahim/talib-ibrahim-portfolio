@@ -79,6 +79,8 @@ export type Experience = {
   start: string; // display string, e.g. "Nov 2024"
   end: string; // display string or "Present"
   points: string[];
+  /** Short name where space is tight (the hero's commit graph); defaults to org. */
+  short?: string;
 };
 
 export type Education = {
@@ -87,6 +89,8 @@ export type Education = {
   start: string;
   end: string; // display string, e.g. "July 2027 (expected)"
   gpa?: string;
+  /** Short name where space is tight (the hero's commit graph); defaults to school. */
+  short?: string;
 };
 
 export type StackGroup = {
@@ -148,6 +152,16 @@ export type Site = {
     featured?: ProjectSlug; // defaults to the first featured project
     nameRow?: string[]; // after the first name; current facts only, no ended roles
     stackRow?: string[]; // site.stack items; the first one is what the surname decodes into
+    /** The end state's commit graph (desktop): the owner's journey, education and experience only. */
+    graph?: {
+      command: string; // printed over the graph
+      signed: string; // "signed" + the signature's hash, over HEAD
+      ref: string; // the HEAD ref, typed in
+      head: string; // the HEAD commit's title
+      note: string; // under it: what he is after now (from the contact copy)
+      /** A project committed on an experience's branch (its title and kind are read from projects). */
+      onBranch?: { org: string; project: ProjectSlug };
+    };
   };
   /** The /work index and the link to it from the home Work section. */
   workIndex: {
