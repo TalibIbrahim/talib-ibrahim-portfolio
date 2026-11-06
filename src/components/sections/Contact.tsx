@@ -52,8 +52,9 @@ export function Contact() {
                           <span key={i} className={styles.cm}>
                             <span className={styles.cr} data-char>
                               <span className={styles.cl} style={{ '--i': i } as CSSProperties}>
-                                <span className={styles.ca}>{ch}</span>
-                                <span className={styles.cb}>{ch}</span>
+                                {/* drawn from data-deco by CSS: the heading's text stays the sr-only copy */}
+                                <span className={styles.ca} data-deco={ch} />
+                                <span className={styles.cb} data-deco={ch} />
                               </span>
                             </span>
                           </span>

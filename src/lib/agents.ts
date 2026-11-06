@@ -14,6 +14,14 @@ const absolute = (src: string) => (src.startsWith('/') ? `${site.url}${src}` : s
 const factLine = (m: SourcedFact) =>
   `${m.value ? `${m.value} ` : ''}${m.text} (${m.source.kind === 'owner' ? 'self-reported' : m.source.href})`;
 
+const MONTHS = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+/** "Apr 2026" / "July 2027 (expected)" -> "2026-04" / "2027-07"; anything else (e.g. "Present") -> undefined. */
+const isoMonth = (d: string) => {
+  const m = d.match(/^([A-Za-z]{3})[a-z]*\.? (\d{4})/);
+  const i = m ? MONTHS.indexOf(m[1].toLowerCase()) : -1;
+  return m && i >= 0 ? `${m[2]}-${String(i + 1).padStart(2, '0')}` : undefined;
+};
+
 export function personLd() {
   return {
     '@context': 'https://schema.org',
@@ -27,6 +35,26 @@ export function personLd() {
     email: `mailto:${site.email}`,
     address: { '@type': 'PostalAddress', addressLocality: 'Lahore', addressCountry: 'PK' },
     alumniOf: site.education.map((e) => ({ '@type': 'CollegeOrUniversity', name: e.school })),
+    hasCredential: site.education.map((e) => ({
+      '@type': 'EducationalOccupationalCredential',
+      credentialCategory: 'degree',
+      name: e.degree,
+      description: `${e.degree}, ${e.school}, ${e.start} to ${e.end}${e.gpa ? `, GPA ${e.gpa}` : ''}`,
+      recognizedBy: { '@type': 'CollegeOrUniversity', name: e.school },
+    })),
+    // the schema.org Role pattern: each position with its dates (an endDate marks it as past)
+    worksFor: site.experience.map((e) => ({
+      '@type': 'EmployeeRole',
+      roleName: e.role,
+      startDate: isoMonth(e.start),
+      endDate: isoMonth(e.end),
+      worksFor: { '@type': 'Organization', name: e.org, address: e.place },
+    })),
+    hasOccupation: site.experience.map((e) => ({
+      '@type': 'Occupation',
+      name: e.role,
+      description: `${e.role}, ${e.org}, ${e.start} to ${e.end}. ${e.points.join(' ')}`,
+    })),
     knowsAbout: site.stack.flatMap((g) => g.items),
     sameAs: [site.links.github.href, site.links.linkedin.href],
   };
@@ -71,6 +99,18 @@ export function projectLd(p: Project) {
   };
 }
 
+/** A page's alternates: its canonical plus the markdown views, so every page links them in its head
+ *  (a page that sets `alternates` replaces the layout's, so each one goes through this). */
+export const alternates = (canonical: string) => ({
+  canonical,
+  types: {
+    'text/markdown': [
+      { url: '/llms.txt', title: 'llms.txt' },
+      { url: '/llms-full.txt', title: 'Full text' },
+    ],
+  },
+});
+
 /** Safe to inline in a <script type="application/ld+json">. */
 export const ldScript = (data: object) => JSON.stringify(data).replace(/</g, '\\u003c');
 
@@ -103,6 +143,7 @@ export async function llmsTxt({ full = false } = {}): Promise<string> {
     `- Role: ${site.role}`,
     `- Location: ${site.location}`,
     `- Email: ${site.email}`,
+    `- Contact form: ${site.url}/#contact`,
     `- GitHub: ${site.links.github.href}`,
     `- LinkedIn: ${site.links.linkedin.href}`,
     '',

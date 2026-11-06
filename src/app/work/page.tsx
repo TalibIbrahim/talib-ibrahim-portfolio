@@ -11,7 +11,7 @@ import { ArrowUpRight } from "lucide-react";
 import type { Project } from "@/data/types";
 import { coverOf, getFeatured, getProjects, getRest } from "@/data/projects";
 import { site } from "@/data/site";
-import { ldScript, workLd } from "@/lib/agents";
+import { alternates, ldScript, workLd } from "@/lib/agents";
 import styles from "./page.module.css";
 
 const copy = site.workIndex;
@@ -20,7 +20,7 @@ const og = site.ogImage;
 export const metadata: Metadata = {
   title: copy.title,
   description: copy.description,
-  alternates: { canonical: "/work" },
+  alternates: alternates('/work'),
   openGraph: {
     type: "website",
     url: `${site.url}/work`,

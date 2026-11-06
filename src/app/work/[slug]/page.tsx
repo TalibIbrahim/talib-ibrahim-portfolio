@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { CaseStudy } from '@/components/case/CaseStudy';
 import { coverOf, descriptionOf, getNext, getProject, getProjects } from '@/data/projects';
 import { site } from '@/data/site';
-import { ldScript, projectLd } from '@/lib/agents';
+import { alternates, ldScript, projectLd } from '@/lib/agents';
 import { loadCaseStudy } from '@/lib/mdx';
 
 export const dynamicParams = false;
@@ -23,7 +23,7 @@ export async function generateMetadata(props: PageProps<'/work/[slug]'>): Promis
   return {
     title: p.title,
     description,
-    alternates: { canonical: path },
+    alternates: alternates(path),
     openGraph: {
       type: 'article',
       url: `${site.url}${path}`,

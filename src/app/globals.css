@@ -133,6 +133,9 @@ html.lenis, html.lenis body { height: auto; }
 [data-split] > *, [data-split] > * > * { text-indent: 0; }
 [data-split] > :first-child, [data-split] > :first-child > :first-child { text-indent: inherit; }
 
+/* Decorative copies (aria-hidden) draw their text by CSS, so it is not in the server HTML's text */
+[data-deco]::before { content: attr(data-deco); }
+
 /* Boot screen (src/components/chrome/Loader.tsx, src/motion/loader.ts): first landing of a session only.
    Shown only while html.loading (set pre-paint by the boot script); the page loads underneath. */
 #loader {
@@ -144,6 +147,7 @@ html.lenis, html.lenis body { height: auto; }
   clip-path: inset(0 0 0 0);
 }
 html.loading #loader { display: flex; }
+#loader:not([data-run]) [data-final]::before { content: attr(data-final); } /* until loader.ts copies the text in */
 html.loaded #loader { opacity: 0; transition: opacity 0.35s var(--ease-soft); } /* the hard-cap fallback */
 .loader__term {
   display: grid; gap: 0.35em;

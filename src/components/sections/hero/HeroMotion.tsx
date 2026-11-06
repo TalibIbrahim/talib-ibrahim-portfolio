@@ -63,6 +63,8 @@ export function HeroMotion() {
     const headS = q('[data-head="stack"]');
     const from = headS.dataset.from ?? '';
     const to = headS.dataset.to ?? '';
+    headS.textContent = from; // the server HTML draws it from data-deco; from here on it is real text
+    headS.removeAttribute('data-deco');
     const firsts = qa('[data-word="first"]');
     const lasts = qa('[data-word="last"]');
     const words = [...firsts, ...lasts];

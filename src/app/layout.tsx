@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Analytics } from '@vercel/analytics/next';
 import { site } from '@/data/site';
 import { BOOT_SCRIPT } from '@/lib/mode-script';
-import { ldScript, personLd } from '@/lib/agents';
+import { alternates, ldScript, personLd } from '@/lib/agents';
 import { Header } from '@/components/chrome/Header';
 import { Curtain } from '@/components/chrome/Curtain';
 import { Loader } from '@/components/chrome/Loader';
@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   applicationName: site.name,
   authors: [{ name: site.name, url: site.url }],
   creator: site.name,
-  alternates: { canonical: './', types: { 'text/markdown': '/llms.txt' } },
+  alternates: alternates('./'),
   openGraph: {
     type: 'website',
     siteName: site.name,

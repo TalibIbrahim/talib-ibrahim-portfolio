@@ -10,6 +10,8 @@
 // Colour rule for the giant words (no blend modes): cream on the desk, desk-ink where a word crosses
 // the cream card, cream again over the person. Three stacked copies: the h1 (cream), a copy clipped
 // to the card (ink), a copy masked to the cut-out (cream). Only the h1 is in the accessibility tree.
+// Every decorative copy (the copies, rows, header, end caption) draws its text from data-deco by CSS,
+// so the server HTML's text reads the name, role and project once: clean for scrapers and ATS tools.
 import { createHash } from 'node:crypto';
 import type { CSSProperties } from 'react';
 import Image from 'next/image';
@@ -39,20 +41,21 @@ const width = Math.max(stackHead.length, last.length);
 const headFrom = last.toLowerCase().padStart(width);
 const headTo = stackHead.padStart(width);
 
-function Word({ which }: { which: 'first' | 'last' }) {
+function Word({ which, deco }: { which: 'first' | 'last'; deco?: boolean }) {
+  const text = which === 'first' ? first : last;
   return (
     <span className={`${styles.word} ${which === 'first' ? styles.first : styles.last}`} data-word={which}>
-      <span className={which === 'first' ? styles.rise : styles.drop}>{which === 'first' ? first : last}</span>
+      {deco ? (
+        <span className={which === 'first' ? styles.rise : styles.drop} data-deco={text} />
+      ) : (
+        <span className={which === 'first' ? styles.rise : styles.drop}>{text}</span>
+      )}
     </span>
   );
 }
 
 const chars = (s: string, cls?: string) =>
-  [...s].map((c, i) => (
-    <span key={i} className={cls} data-ch>
-      {c === ' ' ? ' ' : c}
-    </span>
-  ));
+  [...s].map((c, i) => <span key={i} className={cls} data-ch data-deco={c} />);
 
 export function Hero() {
   const project = (site.hero.featured && getProject(site.hero.featured)) || getFeatured()[0];
@@ -71,14 +74,14 @@ export function Hero() {
             <div className={styles.track} data-track>
               {[0, 1, 2].map((i) => (
                 <span key={i} className={styles.copy} data-copy-n>
-                  <span data-head={i === 1 ? 'name' : undefined}>{first}</span>
+                  <span data-head={i === 1 ? 'name' : undefined} data-deco={first} />
                   {nameRow.map((t) => (
                     <span key={t}>
-                      <i> · </i>
-                      {t}
+                      <i data-deco=" · " />
+                      <span data-deco={t} />
                     </span>
                   ))}
-                  <i> · </i>
+                  <i data-deco=" · " />
                 </span>
               ))}
             </div>
@@ -88,19 +91,18 @@ export function Hero() {
               {[0, 1, 2].map((i) => (
                 <span key={i} className={styles.copy} data-copy-s>
                   {i === 2 ? (
-                    <span data-head="stack" data-from={headFrom} data-to={headTo}>
-                      {headFrom}
-                    </span>
+                    // HeroMotion writes this head's text (it decodes); until then CSS draws data-deco
+                    <span data-head="stack" data-from={headFrom} data-to={headTo} data-deco={headFrom} />
                   ) : (
-                    <span>{headTo}</span>
+                    <span data-deco={headTo} />
                   )}
                   {stackRow.slice(1).map((t) => (
                     <span key={t}>
-                      <i> / </i>
-                      {t}
+                      <i data-deco=" / " />
+                      <span data-deco={t} />
                     </span>
                   ))}
-                  <i> / </i>
+                  <i data-deco=" / " />
                 </span>
               ))}
             </div>
@@ -117,8 +119,8 @@ export function Hero() {
         </h1>
         {/* the colour rule: ink where the name crosses the card */}
         <div className={`${styles.name} ${styles.inkCopy}`} aria-hidden="true" data-copy="card" data-drop>
-          <Word which="first" />
-          <Word which="last" />
+          <Word which="first" deco />
+          <Word which="last" deco />
         </div>
 
         <div className={styles.photoLayer} data-photo-layer data-drop>
@@ -154,14 +156,14 @@ export function Hero() {
           data-drop
           style={{ '--mask': `url(${PHOTO.mask})` } as CSSProperties}
         >
-          <Word which="first" />
-          <Word which="last" />
+          <Word which="first" deco />
+          <Word which="last" deco />
         </div>
 
         <p className={styles.header} aria-hidden="true" data-header>
           <span className={styles.label}>
             <span className={styles.slash}>{chars('// ')}</span>
-            <span data-core>{given}</span>
+            <span data-core data-deco={given} />
             {chars(` ${first} ${last}`)}
           </span>
           <span className={styles.signed}>
@@ -210,9 +212,7 @@ export function Hero() {
 
         {/* the signed card: one line under the frame, then the same project */}
         <div className={styles.end} data-caption="end">
-          <p className={styles.endRole} aria-hidden="true">
-            {site.role} · {site.location}
-          </p>
+          <p className={styles.endRole} aria-hidden="true" data-deco={`${site.role} · ${site.location}`} />
           {project && (
             <Link href={`/work/${project.slug}`} className={styles.work} data-transition-title={project.title}>
               <span className={styles.path}>

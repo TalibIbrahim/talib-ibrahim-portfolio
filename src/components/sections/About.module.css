@@ -248,6 +248,7 @@
 .body :global(.split-line) { line-height: inherit; }
 .fx { word-spacing: 0; } /* the slot is sized in ch: no extra word space inside it */
 .vis { position: relative; }
+.fx [data-text]::before { content: attr(data-text); } /* until about/text.ts copies the phrase in */
 .fx[data-state='noise'] .vis,
 .fx[data-state='noise'] .del { color: var(--paper-muted); }
 .caret {

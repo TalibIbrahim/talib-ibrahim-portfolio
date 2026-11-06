@@ -44,6 +44,9 @@ export function runLoader(): Promise<void> {
   if (!el || !root.classList.contains('loading')) return Promise.resolve();
   const reduced = prefersReducedMotion();
   const L = site.loader;
+  // the boot text lives in data-final (out of the server HTML text); copy it in before anything reads it
+  el.querySelectorAll<HTMLElement>('[data-final]').forEach((t) => (t.textContent = t.dataset.final ?? ''));
+  el.dataset.run = '';
   const lines = [...el.querySelectorAll<HTMLElement>('[data-boot-line]')];
   const texts = lines.map((l) => l.querySelector<HTMLElement>('[data-boot-text]'));
   const finals = texts.map((t) => t?.textContent ?? '');

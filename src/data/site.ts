@@ -95,7 +95,6 @@ export const site: Site = {
         'Socket.IO',
         'PeerJS',
         'Cloudinary',
-        'Redis (Upstash)',
         'LangChain',
         'RAG pipelines',
         'Vector search',
@@ -111,7 +110,7 @@ export const site: Site = {
     },
     {
       name: 'Databases',
-      items: ['MongoDB', 'MySQL', 'Firebase'],
+      items: ['MongoDB', 'MySQL', 'Firebase', 'Redis'],
     },
   ],
   ogImage: {

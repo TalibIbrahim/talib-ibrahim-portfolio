@@ -1,6 +1,9 @@
 // About's four key words, one effect each (DESIGN.md "Key words"): type-in, decode, diff, select.
 // The phrases come from site.aboutFx (each appears verbatim in site.about).
 // Each slot reserves its final width in ch (mono), so no effect ever reflows the paragraph.
+// The phrase is real text once (sr-only); the visual layers draw it from data-text by CSS until
+// about/text.ts copies it in, and the struck placeholder exists only client-side. So the server HTML
+// reads each phrase exactly once, as scrapers, ATS tools and AI readers should see it.
 import { Fragment, type CSSProperties, type ReactNode } from 'react';
 import { site } from '@/data/site';
 import styles from '../About.module.css';
@@ -33,16 +36,12 @@ function Slot({ fx }: { fx: Fx }) {
     return (
       <span className={cls} style={style} data-fx="diff">
         <span className="sr-only">{fx.phrase}</span>
-        <span className={styles.ghost} aria-hidden="true">
-          {fx.phrase}
-        </span>
+        <span className={styles.ghost} aria-hidden="true" data-text={fx.phrase} />
         <span className={styles.del} aria-hidden="true" data-del>
-          <span data-vis>{diffToken(fx.phrase.length)}</span>
+          <span data-vis />
           <span className={styles.strike} data-strike />
         </span>
-        <span className={styles.ins} aria-hidden="true" data-ins>
-          {fx.phrase}
-        </span>
+        <span className={styles.ins} aria-hidden="true" data-ins data-text={fx.phrase} />
       </span>
     );
   }
@@ -50,9 +49,7 @@ function Slot({ fx }: { fx: Fx }) {
     <span className={cls} style={style} data-fx={fx.kind} data-phrase={fx.phrase}>
       {fx.kind === 'select' && <span className={styles.selBg} data-selbg />}
       <span className="sr-only">{fx.phrase}</span>
-      <span className={styles.vis} aria-hidden="true" data-vis>
-        {fx.phrase}
-      </span>
+      <span className={styles.vis} aria-hidden="true" data-vis data-text={fx.phrase} />
       {fx.kind === 'type' && <span className={styles.caret} aria-hidden="true" data-caret />}
     </span>
   );

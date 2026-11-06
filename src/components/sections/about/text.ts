@@ -14,6 +14,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { SplitText } from 'gsap/SplitText';
 import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 import { ease } from '@/engine';
+import { diffToken } from './fx';
 
 gsap.registerPlugin(ScrollTrigger, SplitText, ScrambleTextPlugin);
 
@@ -63,6 +64,7 @@ function prepare(slot: HTMLElement, seed: number) {
     const strike = slot.querySelector<HTMLElement>('[data-strike]');
     const ins = slot.querySelector<HTMLElement>('[data-ins]');
     if (!del || !strike || !ins) return null;
+    vis.textContent = diffToken((ins.textContent ?? '').length); // the placeholder is client-only
     gsap.set(del, { display: 'block' });
     gsap.set(ins, { yPercent: 110 });
     tl.to(strike, { scaleX: 1, duration: 0.25, ease: ease.wipe })
@@ -98,6 +100,11 @@ function onArrival(line: HTMLElement, effects: gsap.core.Timeline[], done: Set<g
 
 export function initText(root: HTMLElement, styles: Classes) {
   const offs: (() => void)[] = [];
+  // the key-word layers are drawn from data-text by CSS in the server HTML; make them real text first
+  root.querySelectorAll<HTMLElement>('[data-fx] [data-text]').forEach((el) => {
+    el.textContent = el.dataset.text ?? '';
+    el.removeAttribute('data-text');
+  });
   const played = new Set<string>(); // effect kinds already played: a re-split restores them finished
 
   const track = (tl: gsap.core.Timeline, kind: string) => {
