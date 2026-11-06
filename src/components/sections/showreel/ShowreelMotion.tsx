@@ -46,6 +46,9 @@ const NOISE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 const ENTRANCE = 0.8; // screens of scroll for the entrance
 const RATIO = 1.5; // sideways px per px of scroll (eased from 1.7 when the gaps widened)
 const BAND = 0.4; // focus band, share of the stage width
+const RAMP = 0.06; // share of the travel spent accelerating from rest
+/** C1 ease-in start, then linear: ramp(0) = 0, ramp(1) = 1, slope 0 at 0, constant after RAMP. */
+const ramp = (q: number) => (q < RAMP ? (q * q) / (2 * RAMP) : q - RAMP / 2) / (1 - RAMP / 2);
 const THUMB_ROT = -4; // degrees
 
 export function ShowreelMotion() {
@@ -405,6 +408,7 @@ function initStrip(section: HTMLElement) {
 
   let glScene: EntranceScene | null = null;
   let release: (() => void) | null = null;
+  let fade: gsap.core.Tween | null = null; // the plane's fade-off after the landing
   let landed = false;
   let lastP = -1;
 
@@ -422,12 +426,28 @@ function initStrip(section: HTMLElement) {
     // the card
     const mid = p > 0 && p < 1;
     if (glScene && mid) {
+      fade?.kill();
+      fade = null;
       glScene.render(p);
-      glHost!.style.visibility = 'visible';
+      gsap.set(glHost, { autoAlpha: 1 });
       p1.frame.style.visibility = 'hidden';
       release ??= holdGL();
-    } else {
-      glHost!.style.visibility = 'hidden';
+    } else if (release && p >= 1 && !fade) {
+      // landed: the plane ends on exactly the DOM cover's rect, crop and colour; the DOM cover shows
+      // under it and the plane fades off over a few frames, so the handoff is never a one-frame swap
+      p1.frame.style.visibility = '';
+      fade = gsap.to(glHost, {
+        autoAlpha: 0,
+        duration: 0.16,
+        ease: 'none',
+        onComplete: () => {
+          fade = null;
+          release?.();
+          release = null;
+        },
+      });
+    } else if (!fade) {
+      gsap.set(glHost, { autoAlpha: 0 });
       p1.frame.style.visibility = '';
       release?.();
       release = null;
@@ -485,7 +505,9 @@ function initStrip(section: HTMLElement) {
   };
   function drive() {
     const p = fit(state.P, 0, split);
-    const qv = state.P <= split ? 0 : fit(state.P, split, 1);
+    // the travel starts from rest (the entrance ends at rest, on ease.inOut) and reaches full speed over
+    // its first RAMP: the track never lurches from a stop to 1.5 px per px of scroll at the split
+    const qv = state.P <= split ? 0 : ramp(fit(state.P, split, 1));
     state.p = p;
     state.q = qv;
     if (p >= 1 !== travelling) section.toggleAttribute('data-landed', p >= 1);
@@ -661,6 +683,7 @@ function initStrip(section: HTMLElement) {
     driver.scrollTrigger?.kill();
     driver.kill();
     late.forEach((t) => t.kill());
+    fade?.kill();
     release?.();
     glScene?.destroy();
     decode.revert();
