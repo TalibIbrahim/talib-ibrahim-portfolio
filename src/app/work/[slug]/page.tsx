@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { CaseStudy } from '@/components/case/CaseStudy';
-import { getNext, getProject, getProjects } from '@/data/projects';
+import { coverOf, descriptionOf, getNext, getProject, getProjects } from '@/data/projects';
 import { site } from '@/data/site';
-import { ldScript, projectLd } from '@/lib/agents';
+import { alternates, ldScript, projectLd } from '@/lib/agents';
 import { loadCaseStudy } from '@/lib/mdx';
 
 export const dynamicParams = false;
@@ -17,24 +17,25 @@ export async function generateMetadata(props: PageProps<'/work/[slug]'>): Promis
   const p = getProject(slug);
   if (!p) return {};
 
-  const poster = p.media.poster;
+  const poster = coverOf(p) ?? site.ogImage;
   const path = `/work/${p.slug}`;
+  const description = descriptionOf(p);
   return {
     title: p.title,
-    description: p.summary,
-    alternates: { canonical: path },
+    description,
+    alternates: alternates(path),
     openGraph: {
       type: 'article',
       url: `${site.url}${path}`,
       siteName: site.name,
       title: `${p.title}: ${p.kind}`,
-      description: p.summary,
+      description,
       images: [{ url: poster.src, width: poster.width, height: poster.height, alt: poster.alt }],
     },
     twitter: {
       card: 'summary_large_image',
       title: `${p.title}: ${p.kind}`,
-      description: p.summary,
+      description,
       images: [poster.src],
     },
   };

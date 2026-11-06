@@ -1,14 +1,15 @@
-## Context
+## The problem
 
-QuickDrop is privacy-first file sharing. Files move between devices peer to peer, and nothing is meant to stick around afterwards.
+Sending a file from one device to another usually means signing into something, and the file stays on a server long after it has been downloaded. QuickDrop needs no account, and files don't stick around.
+
+## The hard call
+
+Peer-to-peer transfer needs a signalling server to introduce the two devices. The easy route is a free public one, but some local ISPs seemed to block public WebRTC signalling servers, and connections failed. So I run my own on Render: a PeerJS server plus Socket.IO, which also groups devices by public IP so Local Radar can find phones on the same Wi-Fi. When a direct connection still can't be made, TURN relay servers carry the transfer.
 
 ## What I built
 
-- Peer-to-peer transfer using WebRTC, with a P2P architecture that uses TURN/open relay servers.
-- Strict auto-deletion logic to protect user privacy and security.
-- Lossless uploads.
-- QR code device pairing.
+Two modes. Cloud Upload shares files with a six-character code or a QR code, and deletes them from Cloudinary and the database after five minutes. P2P transfer connects two devices anywhere by room code, or nearby with Local Radar. Files are sent in chunks with no compression, and several files download as one ZIP.
 
-## Stack notes
+## Outcome
 
-The front end is React.js. Socket.IO and PeerJS handle the real-time and peer-to-peer side. MongoDB and Cloudinary round out the stack.
+It's live at quickdrop-file.vercel.app, with a cron job enforcing the five-minute expiry.

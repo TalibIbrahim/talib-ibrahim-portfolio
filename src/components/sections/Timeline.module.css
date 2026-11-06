@@ -4,7 +4,7 @@
    paper (continuing Stack) and the dark [data-sheet] is wiped in over it, led by an accent band.
    Base (no JS, reduced motion): the sheet is fully visible and covers the paper, plain flow.
    GSAP animates [data-sheet] / [data-wipe-ink] (clip-path), [data-depth] (y),
-   [data-entry] / [data-cert] (x, y, opacity, clip-path). None of them carry a CSS transform.
+   [data-entry] (x, y, opacity, clip-path), [data-ticker-run] / [data-ticker-copy] (x). None of them carry a CSS transform.
    ============================================================ */
 
 .section {
@@ -57,7 +57,6 @@
 .layer { min-width: 0; }
 .layerA { grid-column: 1 / span 7; grid-row: 1; }
 .layerB { grid-column: 9 / span 4; grid-row: 1; margin-top: calc(var(--u) * 14); }
-.layerC { grid-column: 5 / span 8; grid-row: 2; margin-top: calc(var(--u) * 10); }
 
 .label {
   font-size: var(--t-xs);
@@ -157,22 +156,51 @@
   font-variant-numeric: tabular-nums;
 }
 
-/* Certifications: compact list */
-.certs {
-  list-style: none;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: var(--gutter);
-  border-top: 1px solid var(--c-line);
-}
-.cert {
+/* Certifications: one slim mono ticker line under the entries.
+   Base (no JS, reduced motion): the label and the list wrap as plain text; the copy is hidden.
+   html.motion: the list and its copy run side by side and drift (TimelineMotion, GSAP ticker). */
+.ticker {
   display: flex;
-  gap: 1.25em;
   align-items: baseline;
-  padding-block: calc(var(--u) * 1.5);
-  border-bottom: 1px solid var(--c-line);
-  font-size: var(--t-s);
+  gap: 0 1.1em;
+  margin-top: calc(var(--u) * 10);
+  padding-block: calc(var(--u) * 1.75);
+  border-block: 1px solid var(--c-line);
+  font-family: var(--f-mono);
+  font-size: var(--t-xs);
+  letter-spacing: 0.06em;
+  line-height: 1.5;
+  text-transform: uppercase;
+}
+.tickerLabel {
+  flex: none;
+  color: var(--c-accent-text);
+  font-weight: 500;
+}
+.tickerLabel::after { content: '·' / ''; margin-left: 1.1em; color: var(--c-muted); }
+.tickerWindow { min-width: 0; flex: 1; }
+.tickerList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  color: color-mix(in oklab, var(--c-fg) 88%, var(--c-bg));
+}
+.tickerItem { white-space: nowrap; }
+.tickerItem::after { content: '·' / ''; margin-inline: 1.1em; color: var(--c-muted); }
+.tickerList[aria-hidden] { display: none; }
+
+:global(html.motion) .tickerWindow {
+  display: flex;
+  overflow: clip;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 4%, #000 92%, transparent);
+  mask-image: linear-gradient(to right, transparent, #000 4%, #000 92%, transparent);
+}
+:global(html.motion) .tickerList { flex: none; flex-wrap: nowrap; }
+:global(html.motion) .tickerList[aria-hidden] { display: flex; }
+@media (prefers-reduced-motion: reduce) {
+  .tickerList[aria-hidden] { display: none !important; }
 }
 
 /* ---------- phones: one column, document order ---------- */
@@ -181,11 +209,18 @@
   .title { grid-column: 1 / -1; }
   .head { padding-bottom: calc(var(--u) * 6); }
   .grid { row-gap: calc(var(--u) * 8); }
-  .layerA, .layerB, .layerC { grid-column: 1 / -1; grid-row: auto; margin-top: 0; }
-  .certs { grid-template-columns: 1fr; }
+  .layerA, .layerB { grid-column: 1 / -1; grid-row: auto; margin-top: 0; }
+  .ticker { flex-direction: column; gap: calc(var(--u) * 1); }
+  .tickerLabel::after { content: none; }
+  :global(html.motion) .tickerWindow { width: 100%; }
 }
 @media (min-width: 768px) and (max-width: 1099px) {
   .layerA { grid-column: 1 / span 7; }
   .layerB { grid-column: 8 / span 5; }
-  .layerC { grid-column: 1 / -1; }
+}
+
+/* Desktop motion: the sheet is its own layer, so its scrubbed clip-path edge never repaints the
+   whole sheet's content each frame (measured: ~40 -> ~47 fps through this section). */
+@media (min-width: 768px) {
+  :global(html.motion) .sheet { will-change: transform; }
 }

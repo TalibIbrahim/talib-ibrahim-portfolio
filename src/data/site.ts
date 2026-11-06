@@ -1,47 +1,52 @@
-import type { Site } from './types';
+import { LEDGER_CLIENT_NAME } from './clients';
+import type { Education, Site } from './types';
 
 // All site copy. Facts only: every line here traces back to the previous portfolio or the owner.
 
+const name = 'Muhammad Talib Ibrahim';
+const role = 'Full-stack developer';
+const location = 'Lahore, Pakistan';
+const umt: Education = {
+  school: 'University of Management & Technology (UMT)',
+  degree: 'BS Computer Science',
+  start: 'Oct 2023',
+  end: 'July 2027 (expected)',
+  gpa: '3.6/4.0',
+};
+
 export const site: Site = {
-  name: 'Muhammad Talib Ibrahim',
+  name,
   shortName: 'Talib Ibrahim',
-  role: 'Full-stack developer',
+  role,
   url: 'https://www.muhammad-talib.dev',
   description:
     'Muhammad Talib Ibrahim, full-stack developer in Lahore. Scalable web apps, real-time systems and AI-powered tools with the MERN stack and Next.js.',
-  location: 'Lahore, Pakistan',
+  location,
   globe: { caption: 'Globe showing Lahore, Pakistan', timeCaption: 'local time' },
   email: 'talibibrahim04@gmail.com',
   tagline:
     'I build scalable web applications with modern JavaScript, from real-time systems to AI-powered tools.',
+  taglineAccents: ['scalable', 'real-time', 'AI-powered'],
   about: [
     "I'm a full-stack developer studying Computer Science at UMT in Lahore. I specialize in the MERN stack and Next.js, and I build everything from food review platforms to AI-powered codebase assistants, with a soft spot for real-time systems.",
-    'I also co-founded Radix Systems, where I lead technical development and architecture. Before that I spent a summer at Mindstorm Studios scripting portals, obstacles and drag-and-release physics in C#.',
+    `I also co-founded Radix Systems, where I built LedgerERP for ${LEDGER_CLIENT_NAME}. Before that I spent a summer at Mindstorm Studios scripting portals, obstacles and drag-and-release physics in C#.`,
   ],
   links: {
     github: { label: 'GitHub', href: 'https://github.com/TalibIbrahim' },
     linkedin: { label: 'LinkedIn', href: 'https://www.linkedin.com/in/muhammad-talib-ibrahim' },
     site: { label: 'muhammad-talib.dev', href: 'https://www.muhammad-talib.dev' },
   },
-  education: [
-    {
-      school: 'University of Management & Technology (UMT)',
-      degree: 'BS Computer Science',
-      start: 'Oct 2023',
-      end: 'July 2027 (expected)',
-      gpa: '3.6/4.0',
-    },
-  ],
+  education: [umt],
   experience: [
     {
       role: 'Co-founder',
       org: 'Radix Systems',
       place: 'Lahore, Pakistan',
       start: 'Apr 2026',
-      end: 'Present',
+      end: 'Oct 2026', // owner, 2026-11-04
       points: [
-        'Co-founded Radix Systems to deliver high-quality web applications and software solutions.',
-        'Leading technical development and architecture using modern technologies like Next.js and React.',
+        `Co-founded Radix Systems and built LedgerERP, an inventory and ledger desktop app, for ${LEDGER_CLIENT_NAME}.`,
+        'Shipped LedgerERP as a Windows installer and a macOS DMG, with auto-updates published by a GitHub Actions release workflow. I still ship updates to the client.',
       ],
     },
     {
@@ -51,8 +56,8 @@ export const site: Site = {
       start: 'Nov 2024',
       end: 'Aug 2025',
       points: [
-        "Engineered and integrated a secure user authentication system for the chapter's official blog website.",
-        'Facilitated technical workshops on Modern Web Development and React.js to upskill university students.',
+        "Built user authentication for the chapter's official blog.",
+        'Ran workshops for university students on modern web development and React.js.',
       ],
     },
     {
@@ -61,9 +66,10 @@ export const site: Site = {
       place: 'Lahore, Pakistan',
       start: 'Jun 2024',
       end: 'Aug 2024',
+      // The game was built in Unity (owner, 2026-11-04); Experience has no tools field, so it is not shown here.
       points: [
         'Developed a physics-based puzzle game featuring custom drag-and-release mechanics, portals, and dynamic environmental obstacles.',
-        'Scripted complex object behaviors and level logic in C#, optimizing physics calculations for smooth gameplay performance.',
+        'Scripted the portals, obstacles and drag-and-release physics in C#.',
       ],
     },
   ],
@@ -89,7 +95,6 @@ export const site: Site = {
         'Socket.IO',
         'PeerJS',
         'Cloudinary',
-        'Redis (Upstash)',
         'LangChain',
         'RAG pipelines',
         'Vector search',
@@ -105,12 +110,59 @@ export const site: Site = {
     },
     {
       name: 'Databases',
-      items: ['MongoDB', 'MySQL', 'Firebase'],
+      items: ['MongoDB', 'MySQL', 'Firebase', 'Redis'],
     },
   ],
+  ogImage: {
+    src: '/og.png',
+    alt: `${name}, ${role}`,
+    width: 1200,
+    height: 630,
+  },
+  pitch: {
+    frontEnd: "React and Next.js interfaces, from Byters' restaurant search to Orbit's phone PWA.",
+    backEnd: 'WebRTC transfers in QuickDrop; a RAG pipeline over repos in GitChat.',
+  },
+  layers: {
+    heading: 'Front end and back end',
+    end: 'End',
+    usedIn: 'used in',
+    sides: [
+      { key: 'front', layer: 'client', top: 'Front', tools: ['React.js', 'Next.js', 'Tailwind CSS'] },
+      { key: 'back', layer: 'server', top: 'Back', tools: ['Node.js', 'Express.js', 'MongoDB'] },
+    ],
+  },
+  // Key words in site.about, verbatim, one effect each.
+  aboutFx: {
+    type: 'full-stack developer',
+    decode: 'Next.js',
+    diff: 'real-time systems',
+    select: 'Radix Systems', // past tense in the copy ("co-founded"), so it is not a current role
+    placeholder: '-{TODO_specialty}',
+  },
+  hero: {
+    featured: 'byters',
+    // Current facts only. Radix Systems ended (Oct 2026), so it stays out.
+    nameRow: [role, location, umt.degree],
+    stackRow: ['Next.js', 'React.js', 'Node.js', 'Express.js', 'Bootstrap', 'Socket.IO', 'PeerJS'],
+  },
+  workIndex: {
+    title: 'All projects',
+    description:
+      `Every project by ${name}, ${role.toLowerCase()} in Lahore, with its stack, year and links to the live site, the code and the case study.`,
+    intro: 'Selected work first, then everything else.',
+    featuredHeading: 'Selected work',
+    restHeading: 'More projects',
+    homeLink: 'All projects',
+    log: 'git log --featured',
+    live: 'Live site',
+    repo: 'Code',
+    client: "Client's site",
+    caseStudy: 'Case study',
+  },
   contact: {
     heading: 'Email me',
-    body: "I'm currently open to new opportunities and collaborations. Whether you have a question, a project idea, or just want to say hi, my inbox is always open.",
+    body: "I'm looking for full-stack roles working with React, Next.js and Node.js. Send me the role, or a project you want built, and I'll reply.",
     subjects: [
       { value: 'Website Inquiry', label: 'General inquiry' },
       { value: 'Requesting your Resume', label: 'Ask for my resume' },
@@ -147,7 +199,7 @@ export const site: Site = {
       writeTitle: 'Or write it here',
       writeNote: 'Every field except the subject is required.',
       backToTop: 'Back to top',
-      colophon: 'Set in Clash Display and General Sans. Built with Next.js, GSAP, Lenis and OGL.',
+      colophon: 'Set in Clash Display and General Sans, with JetBrains Mono, Departure Mono and Fraunces. Built with Next.js, GSAP, Lenis and OGL.',
       copy: { label: 'Copy email address', copied: 'Copied', failed: 'Selected, press Ctrl+C' },
     },
     // The ending: breakout with an ink drop and a pen; the bricks are the site.stack items.
@@ -182,6 +234,25 @@ export const site: Site = {
       },
     },
   },
+  footer: {
+    pagesLabel: 'Pages',
+    stackLabel: 'Stack',
+    pages: [
+      { label: 'Work', href: '/#work' },
+      { label: 'About', href: '/#about' },
+      { label: 'Contact', href: '/#contact' },
+    ],
+    nowBuilding: '// now building:',
+    lastCommit: 'last commit',
+  },
+  loader: {
+    command: '$ talib boot',
+    checks: { fonts: 'fonts loaded', images: 'portrait decoded', scroll: 'scroll timeline measured' },
+    ok: 'ok',
+    skip: 'skip',
+    pending: '..',
+    ready: 'ready',
+  },
   recruiter: {
     toggle: 'Recruiter mode',
     back: 'Back to the full site',
@@ -189,6 +260,6 @@ export const site: Site = {
     more: 'Hard sell',
     levels: ['Barely selling', 'Soft sell', 'Firm sell', 'Hard sell'],
     brief:
-      "I'm Talib, a full-stack developer in Lahore studying Computer Science at UMT. I build web apps with the MERN stack and Next.js, and I co-founded Radix Systems.",
+      "I'm Talib, a full-stack developer in Lahore studying Computer Science at UMT. I build web apps with the MERN stack and Next.js, and I co-founded Radix Systems, where I built LedgerERP.",
   },
 };

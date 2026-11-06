@@ -59,7 +59,7 @@ export function RecruiterHome() {
             {sell >= 1 &&
               [site.links.github, site.links.linkedin].map((l) => (
                 <li key={l.href}>
-                  <a className={styles.pill} href={l.href} target="_blank" rel="noreferrer">
+                  <a className={styles.pill} href={l.href} target="_blank" rel="noopener noreferrer">
                     {l.label}
                     <ArrowUpRight aria-hidden="true" size={14} strokeWidth={1.5} />
                     <span className="sr-only"> (opens in a new tab)</span>
@@ -114,6 +114,9 @@ export function RecruiterHome() {
                     {p.highlights.map((h) => (
                       <li key={h}>{h}</li>
                     ))}
+                    {(p.facts ?? []).map((f) => (
+                      <li key={f.text}>{f.value ? `${f.value} ${f.text}` : f.text}</li>
+                    ))}
                   </ul>
                 )}
                 {sell >= 2 && (
@@ -126,13 +129,13 @@ export function RecruiterHome() {
                 {sell >= 2 && (p.links.live || p.links.repo) && (
                   <p className={styles.links}>
                     {p.links.live && (
-                      <a className={styles.link} href={p.links.live} target="_blank" rel="noreferrer">
+                      <a className={styles.link} href={p.links.live} target="_blank" rel="noopener noreferrer">
                         Live: {bare(p.links.live)}
                         <span className="sr-only"> (opens in a new tab)</span>
                       </a>
                     )}
                     {p.links.repo && (
-                      <a className={styles.link} href={p.links.repo} target="_blank" rel="noreferrer">
+                      <a className={styles.link} href={p.links.repo} target="_blank" rel="noopener noreferrer">
                         Code: {bare(p.links.repo)}
                         <span className="sr-only"> (opens in a new tab)</span>
                       </a>

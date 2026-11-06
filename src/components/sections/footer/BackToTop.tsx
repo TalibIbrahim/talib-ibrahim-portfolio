@@ -4,7 +4,7 @@
 import { ArrowUp } from 'lucide-react';
 import { scrollToTarget } from '@/engine';
 import { RollText } from '@/components/chrome/RollText';
-import styles from '../Contact.module.css';
+import styles from '../Footer.module.css';
 
 export function BackToTop({ label }: { label: string }) {
   return (

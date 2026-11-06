@@ -1,6 +1,6 @@
 // Experience + education. Server-rendered, complete and readable without JS.
-// Boundary 8 (Stack -> Experience) is a diagonal strike-through wipe; the body is three depth
-// layers (experience / education / certifications). TimelineMotion wires both; see its header.
+// Boundary 8 (Stack -> Experience) is a diagonal strike-through wipe; the body is two depth
+// layers (experience / education) and a certifications ticker line. TimelineMotion wires both; see its header.
 import { site } from '@/data/site';
 import { TimelineMotion } from './timeline/TimelineMotion';
 import styles from './Timeline.module.css';
@@ -82,25 +82,24 @@ export function Timeline() {
             </div>
           </div>
 
-          {/* Layer C: certifications. Farthest layer, arrives from below. */}
-          {certifications.length > 0 && (
-            <div className={`${styles.layer} ${styles.layerC}`} data-drop>
-              <div data-depth="c">
-                <h3 className={styles.label}>Certifications</h3>
-                <ul className={styles.certs} role="list">
-                  {certifications.map((c, i) => (
-                    <li key={c} className={styles.cert} data-cert>
-                      <span className={styles.index} aria-hidden="true">
-                        {pad(i + 1)}
-                      </span>
-                      <span>{c}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-          )}
         </div>
+
+        {/* Certifications: one slim mono line that drifts by. The list is the real content (screen
+            readers, no JS, reduced motion: a plain wrapped line); motion adds an aria-hidden copy to loop. */}
+        {certifications.length > 0 && (
+          <div className={styles.ticker} data-ticker data-drop>
+            <h3 className={styles.tickerLabel}>Certifications</h3>
+            <div className={styles.tickerWindow}>
+              <ul className={styles.tickerList} role="list" data-ticker-run>
+                {certifications.map((c) => (
+                  <li key={c} className={styles.tickerItem}>
+                    {c}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        )}
       </div>
 
       <TimelineMotion />

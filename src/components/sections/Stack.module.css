@@ -52,6 +52,8 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: calc(var(--u) * 8) var(--gutter);
 }
+/* Base (no pan): one group per row, so a long group name never runs into its neighbour */
+.section:not([data-pan]) .groups { grid-template-columns: minmax(0, 1fr); }
 .groups:focus-visible { outline: 2px solid var(--c-accent); outline-offset: -4px; } /* inset: the strip clips anything outside it */
 .arrive {
   display: grid;
@@ -107,11 +109,9 @@
   flex: none;
   display: flex;
 }
-/* Each group sits at its own height on the strip, so the line reads like set type, not cards. */
-.section[data-pan] .group:nth-child(4n + 1) { align-items: flex-end; }
-.section[data-pan] .group:nth-child(4n + 2) { align-items: flex-start; }
-.section[data-pan] .group:nth-child(4n + 3) { align-items: center; }
-.section[data-pan] .group:nth-child(4n + 4) { align-items: flex-end; padding-bottom: 8svh; }
+/* Each group is centred on the strip's height: the one in front owns the screen; groups leaving on
+   the left fade out (Stack.tsx), so no orphan letters sit at the edge. */
+.section[data-pan] .group { align-items: center; }
 .section[data-pan] .arrive {
   width: min-content; /* chips wrap to the width of the name (or 26rem) */
 }

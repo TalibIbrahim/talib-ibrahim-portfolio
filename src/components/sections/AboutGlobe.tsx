@@ -8,7 +8,7 @@
 //            it coasts on release and eases back to Lahore
 //   touch    sideways drags turn it (vertical drags still scroll the page: touch-action pan-y)
 //   scroll   the globe tips north to south and swells a touch as it passes the viewport
-// Rendered on gsap.ticker only while on screen.
+// Rendered on gsap.ticker only while on screen, and never while the Work entrance holds the GPU.
 import { useRef, useSyncExternalStore } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -17,6 +17,8 @@ import { usePage } from '@/engine/next';
 import { ease } from '@/engine';
 import { GLOBE_FACE, GLOBE_LIMB, GLOBE_RADIUS, GLOBE_REST, GLOBE_VB, LAHORE_AT } from './globe-dots';
 import type { GlobeScene } from './globe-scene';
+import { webglOK } from '@/lib/webgl';
+import { glHeld } from '@/lib/gl-hold';
 import styles from './About.module.css';
 
 gsap.registerPlugin(ScrollTrigger);
@@ -161,11 +163,8 @@ function initGlobe(el: HTMLElement, gl: HTMLDivElement, mark: HTMLDivElement, ph
   async function load() {
     if (loading || disposed) return;
     loading = true;
-    const [mod, probe] = await Promise.all([
-      import('./globe-scene').catch(() => null),
-      import('./signature-scene').catch(() => null),
-    ]);
-    if (disposed || !mod || !probe || !probe.webglOK()) return;
+    const mod = await import('./globe-scene').catch(() => null);
+    if (disposed || !mod || !webglOK()) return;
     const css = getComputedStyle(document.documentElement);
     scene = mod.createGlobeScene(gl, {
       mobile: phone,
@@ -279,8 +278,17 @@ function initGlobe(el: HTMLElement, gl: HTMLDivElement, mark: HTMLDivElement, ph
 
   /* one clock */
   let time = 0;
-  const tick = (t: number, dt: number) => {
-    if (!scene || !st.visible) return;
+  // Phones: the dot sphere is drawn at 30 fps (every other tick). Its motion is slow and spring-damped,
+  // so it reads the same, and it stops taking half the frame budget while the page scrolls past it.
+  let skip = 0, held = 0;
+  const tick = (t: number, dtRaw: number) => {
+    if (!scene || !st.visible || glHeld()) return; // the Work entrance has the GPU
+    if (phone && skip++ % 2) {
+      held += dtRaw;
+      return;
+    }
+    const dt = dtRaw + held;
+    held = 0;
     const s = Math.min(dt, 64) / 1000;
     time = t;
     // pointer strength: damped spring, stiffer in than out (the dots overshoot a hair, then settle)

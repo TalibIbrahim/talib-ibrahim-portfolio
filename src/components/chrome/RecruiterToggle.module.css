@@ -27,20 +27,27 @@
 .toggle svg { flex: none; transition: rotate 0.6s var(--ease-out); }
 .toggle:hover svg { rotate: -14deg; }
 
-/* Phones: a 44px icon button that steps aside while scrolling down (returns on scroll up), so it
-   never sits on top of content. The label stays in the accessible name. */
+/* Steps aside while scrolling down (back on scroll up) so it never parks on content, and hides where a
+   section needs the corner (data-hide: the contact form; on phones, the landing). Focus brings it back. */
+.toggle { transition: translate 0.6s var(--ease-hard), opacity 0.4s var(--ease-soft), visibility 0.4s,
+  background-color 0.4s var(--ease-soft), color 0.4s var(--ease-soft), border-color 0.4s var(--ease-soft); }
+:global(html.frame-away) .toggle:not(:focus-visible) { translate: 0 calc(100% + var(--gutter) + 8px); }
+.toggle[data-hide]:not(:focus-visible) { opacity: 0; visibility: hidden; translate: 0 calc(100% + var(--gutter) + 8px); }
+
 @media (max-width: 767px) {
+  .toggle[data-down]:not(:focus-visible) { opacity: 0; visibility: hidden; translate: 0 calc(100% + var(--gutter) + 8px); }
   .toggle {
-    width: 2.75rem;
-    padding: 0;
-    justify-content: center;
-    border-radius: 50%;
-    transition: translate 0.5s var(--ease-hard), background-color 0.4s var(--ease-soft), color 0.4s var(--ease-soft);
+    min-height: 2.5rem;
+    padding: 0 0.85em;
+    font-size: var(--t-xs);
   }
+}
+/* Small phones: a 48px icon button (the name stays in aria-label), out of the way of tags and images. */
+@media (max-width: 599px) {
+  .toggle { width: 3rem; height: 3rem; padding: 0; justify-content: center; }
   .toggle svg { width: 18px; height: 18px; }
   .label {
     position: absolute; width: 1px; height: 1px; overflow: hidden;
-    clip: rect(0 0 0 0); white-space: nowrap;
+    clip-path: inset(50%); white-space: nowrap;
   }
-  :global(html.frame-away) .toggle:not(:focus-visible) { translate: 0 calc(100% + var(--gutter) + 8px); }
 }

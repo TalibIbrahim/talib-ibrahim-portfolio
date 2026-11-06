@@ -26,6 +26,11 @@
 :is(a, button):focus-visible .roll .ch {
   translate: 0 -100%;
 }
+/* keyboard focus: the roll lands at once (no stagger), never caught mid-state */
+:is(a, button):focus-visible .roll .ch {
+  transition-duration: 0.18s;
+  transition-delay: 0s;
+}
 
 @media (prefers-reduced-motion: reduce) {
   .copy { display: none; }

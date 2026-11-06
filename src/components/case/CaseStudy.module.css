@@ -46,7 +46,8 @@
 .tagline {
   margin-top: calc(var(--u) * 2.5);
   max-width: 30ch;
-  font-family: var(--f-display);
+  font-family: var(--f-display);
+
   font-size: var(--t-m);
   line-height: 1.2;
   letter-spacing: -0.01em;
@@ -311,7 +312,7 @@
   content: '';
   position: absolute;
   left: 0;
-  right: 0.5em;
+  right: 0;
   bottom: 0;
   height: 2px;
   background: var(--c-accent);
@@ -367,23 +368,52 @@
 }
 
 .nextLink:focus-visible { outline-offset: -6px; }
+/* Hover and keyboard focus answer the same way: the title steps 8px right, the blue underline draws
+   to full width, the preview un-dims and scales to 1.03. */
+.nextLink { transition: color 0.4s var(--ease-soft); }
+.nextLink:hover .nextLabel,
+.nextLink:focus-visible .nextLabel { color: var(--c-fg); }
+.nextLabel { transition: color 0.4s var(--ease-soft), translate 0.6s var(--ease-out); }
+.nextLink:hover .nextLabel,
+.nextLink:focus-visible .nextLabel { translate: 8px 0; }
+.nextLink:active .nextTitleText { translate: 4px 0; }
+.nextLink:hover .nextTitle::after,
 .nextLink:focus-visible .nextTitle::after { transform: scaleX(1); }
-.nextLink:focus-visible .nextTitleText { translate: 0.06em 0; }
-.nextLink:focus-visible .nextArrow { translate: 0.06em -0.06em; }
+.nextLink:hover .nextTitleText,
+.nextLink:focus-visible .nextTitleText { translate: 8px 0; }
+.nextLink:hover .nextArrow,
+.nextLink:focus-visible .nextArrow { translate: calc(8px + 0.06em) -0.06em; }
+.nextLink:hover .nextMedia,
 .nextLink:focus-visible .nextMedia { clip-path: inset(2% 2% 2% 2%); }
+.nextLink:hover .nextPoster,
+.nextLink:focus-visible .nextPoster { scale: 1.03; }
+.nextLink:hover .nextMedia::after,
 .nextLink:focus-visible .nextMedia::after { opacity: 0; }
-@media (hover: hover) and (pointer: fine) {
-  .nextLink:hover .nextTitle::after { transform: scaleX(1); }
-  .nextLink:hover .nextTitleText { translate: 0.06em 0; }
-  .nextLink:hover .nextArrow { translate: 0.06em -0.06em; }
-  .nextLink:hover .nextMedia { clip-path: inset(2% 2% 2% 2%); }
-  .nextLink:hover .nextPoster { scale: 1.04; }
-  .nextLink:hover .nextMedia::after { opacity: 0; }
-}
 .nextLink:active .nextMedia { clip-path: inset(3% 3% 3% 3%); }
 
 @media (prefers-reduced-motion: reduce) {
   .nextLink:hover .nextTitleText,
+  .nextLink:hover .nextLabel,
   .nextLink:hover .nextArrow { translate: none; }
   .nextLink:hover .nextPoster { scale: none; }
+}
+
+/* ---------- gallery (extra stills after the body; minimal, lucius to design) ---------- */
+.gallery {
+  display: grid;
+  gap: calc(var(--u) * 4);
+  justify-items: center;
+  padding-inline: var(--gutter);
+  margin-top: calc(var(--u) * 12);
+}
+.galleryItem {
+  margin: 0;
+  max-width: min(100%, 80rem);
+}
+.galleryImg {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  height: auto;
+  max-height: 90svh;
 }

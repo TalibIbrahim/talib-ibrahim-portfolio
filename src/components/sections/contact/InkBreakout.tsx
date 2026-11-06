@@ -59,7 +59,6 @@ export function InkBreakout() {
     const reduced = prefersReducedMotion();
     const ink = token('--c-bg', '#0b0b0c');
     const blue = token('--c-accent', '#4d6bff');
-    let body = family('--f-body');
     let mono = family('--f-mono');
 
     let w = 0;
@@ -109,11 +108,11 @@ export function InkBreakout() {
       const bh = phone ? 24 : clamp(h * 0.055, 30, 40);
       const bw = (w - pad * 2 - gap * (cols - 1)) / cols;
       const max = phone ? 13 : 15;
-      ctx.font = `500 ${max}px ${body}`;
+      ctx.font = `500 ${max}px ${mono}`; // measured in the face it is drawn in
       bricks = ITEMS.map((label, i) => {
         const c = i % cols;
         const r = Math.floor(i / cols);
-        const fit = Math.min(max, (max * (bw - 12)) / ctx.measureText(label).width);
+        const fit = Math.min(max, (max * (bw - (phone ? 10 : 14))) / ctx.measureText(label).width);
         return {
           x: pad + c * (bw + gap),
           y: top + r * (bh + gap),
@@ -122,7 +121,7 @@ export function InkBreakout() {
           label,
           alive: prev[i]?.alive ?? true,
           fade: prev[i]?.fade ?? 1,
-          fs: Math.max(9, fit),
+          fs: Math.max(phone ? 7.5 : 9, fit),
         };
       });
       pen.w = phone ? 96 : 132;
@@ -426,13 +425,13 @@ export function InkBreakout() {
         c.globalAlpha = k;
         c.translate(br.x + br.w / 2, br.y + br.h / 2);
         c.scale(0.8 + 0.2 * k, 0.8 + 0.2 * k);
-        c.fillStyle = 'rgba(11,11,12,0.04)';
-        c.fillRect(-br.w / 2, -br.h / 2, br.w, br.h);
-        c.strokeStyle = ink;
-        c.lineWidth = 1.25;
+        // the site's tag style: a 1px hairline chip with a mono label; blue once it is hit
+        const hitColour = br.alive ? null : blue;
+        c.strokeStyle = hitColour ?? 'rgba(11,11,12,0.28)';
+        c.lineWidth = 1;
         c.strokeRect(-br.w / 2 + 0.5, -br.h / 2 + 0.5, br.w - 1, br.h - 1);
-        c.fillStyle = ink;
-        c.font = `500 ${br.fs}px ${body}`;
+        c.fillStyle = hitColour ?? ink;
+        c.font = `500 ${br.fs}px ${mono}`;
         c.fillText(br.label, 0, 1);
         c.restore();
       }
@@ -547,7 +546,6 @@ export function InkBreakout() {
     let alive = true;
     document.fonts?.ready.then(() => {
       if (!alive) return;
-      body = family('--f-body');
       mono = family('--f-mono');
       layout();
       draw();

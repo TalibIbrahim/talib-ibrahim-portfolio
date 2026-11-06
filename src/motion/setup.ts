@@ -1,9 +1,14 @@
 // Global motion: runs once on the client, before the first page initializes.
-import { onScroll } from '@/engine';
+import { holdIntro, onScroll } from '@/engine';
+import { runLoader } from './loader';
 
 export function setupMotion() {
-  // Header steps aside on scroll down, returns on scroll up. Hysteresis (48px down / 20px up)
-  // keeps it from flickering; always visible near the top.
+  // First landing of the session: the boot screen runs its checks, then the first intro plays.
+  holdIntro(runLoader());
+
+  // Header (and the Recruiter mode button) step aside on scroll down and return on a deliberate scroll
+  // up. Hysteresis (40px down / 96px up) keeps small corrections and smooth-scroll overshoot from
+  // bringing them back over the content; always visible near the top. Runs on every page.
   let anchor = 0;
   let hidden = false;
   const root = document.documentElement;
@@ -14,11 +19,11 @@ export function setupMotion() {
       anchor = y;
       return;
     }
-    if (!hidden && y - anchor > 48) {
+    if (!hidden && y - anchor > 40) {
       hidden = true;
       root.classList.add('frame-away');
       anchor = y;
-    } else if (hidden && anchor - y > 20) {
+    } else if (hidden && anchor - y > 96) {
       hidden = false;
       root.classList.remove('frame-away');
       anchor = y;

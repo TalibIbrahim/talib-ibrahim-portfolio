@@ -108,6 +108,9 @@
   padding-top: calc(var(--u) * 1);
 }
 .submit {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: inline-flex;
   align-items: center;
   gap: 0.75em;
@@ -120,12 +123,27 @@
   transition: background-color 0.4s var(--ease-soft), color 0.4s var(--ease-soft);
 }
 .submit:hover,
-.submit:focus-visible { background: var(--c-accent); color: #fff; }
+.submit:focus-visible { color: #fff; }
+/* hover / focus: an accent fill wipes in from the left (transform only), the label turns white */
+.submit::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--c-accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.5s var(--ease-out);
+}
+.submit[data-state='idle']:hover::before,
+.submit[data-state='idle']:focus-visible::before { transform: scaleX(1); }
+
 .submit:active { scale: 0.98; }
 .submit[aria-disabled='true'] { cursor: progress; background: var(--f-muted); color: var(--c-fg); }
 .submit[data-state='sent'] { background: var(--c-accent); color: #fff; }
 .icon { flex: none; transition: translate 0.6s var(--ease-out); }
-.submit[data-state='idle']:hover .icon { translate: 3px -3px; }
+.submit[data-state='idle']:hover .icon,
+.submit[data-state='idle']:focus-visible .icon { translate: 3px -3px; }
 .submit[data-state='sending'] .icon { animation: spin 0.9s linear infinite; }
 @keyframes spin { to { rotate: 360deg; } }
 

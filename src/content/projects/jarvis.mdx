@@ -1,0 +1,15 @@
+## The problem
+
+I use Siri a lot, and I wanted the same kind of assistant on my PC and laptop for small things: turn the volume down, raise the brightness, open an app, set a reminder or an alarm. I also wanted to work the laptop from across the room at night with my hand, without getting up.
+
+## The hard call
+
+Where the work runs. Hand tracking, the wake word and intent matching all run on the machine. MediaPipe tracks the hand and openWakeWord listens locally. A local intent engine decides most commands in under a millisecond, and maths runs locally too. Only speech-to-text and AI replies go to Groq, and a privacy log records every cloud request. So the cursor never waits on the network, and with no internet the island says speech is unavailable while gestures keep working.
+
+## What I built
+
+Gesture control with one-handed zoom, a listen gesture and flicks to switch windows. A voice pipeline with Silero speech detection and ducking of other apps' audio. A native PySide6 Dynamic Island at 60 FPS that is click-through and never takes focus. Crashed workers restart on their own.
+
+## Outcome
+
+Version 2.6.0 is on GitHub Releases, with over 1,000 tests, including pixel-exact checks of every island page. Memory levels off around 150 MB.

@@ -2,12 +2,13 @@ import type { Metadata, Viewport } from 'next';
 import { Analytics } from '@vercel/analytics/next';
 import { site } from '@/data/site';
 import { BOOT_SCRIPT } from '@/lib/mode-script';
-import { ldScript, personLd } from '@/lib/agents';
+import { alternates, ldScript, personLd } from '@/lib/agents';
 import { Header } from '@/components/chrome/Header';
 import { Curtain } from '@/components/chrome/Curtain';
+import { Loader } from '@/components/chrome/Loader';
 import { RecruiterToggle } from '@/components/chrome/RecruiterToggle';
 import { Motion } from '@/components/Motion';
-import { azeret, clash, general } from './fonts';
+import { clash, general, mono } from './fonts';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
   applicationName: site.name,
   authors: [{ name: site.name, url: site.url }],
   creator: site.name,
-  alternates: { canonical: './', types: { 'text/markdown': '/llms.txt' } },
+  alternates: alternates('./'),
   openGraph: {
     type: 'website',
     siteName: site.name,
@@ -25,13 +26,13 @@ export const metadata: Metadata = {
     url: site.url,
     title: `${site.name} | ${site.role}`,
     description: site.description,
-    images: [{ url: '/og.png', width: 1200, height: 630, alt: `${site.name}, ${site.role}` }],
+    images: [{ url: site.ogImage.src, width: site.ogImage.width, height: site.ogImage.height, alt: site.ogImage.alt }],
   },
   twitter: {
     card: 'summary_large_image',
     title: `${site.name} | ${site.role}`,
     description: site.description,
-    images: ['/og.png'],
+    images: [site.ogImage.src],
   },
   verification: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION
     ? { google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION }
@@ -45,13 +46,14 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
-    <html lang="en" className={`${clash.variable} ${general.variable} ${azeret.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${clash.variable} ${general.variable} ${mono.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: BOOT_SCRIPT }} />
       </head>
       <body>
         <a className="skip-link" href="#main">Skip to content</a>
         <Curtain />
+        <Loader />
         <div id="cursor" aria-hidden="true">
           <span className="cursor__dot" />
           <span className="cursor__label" data-cursor-label />

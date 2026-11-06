@@ -54,3 +54,8 @@ design-refs/
 .claude/agents/
 CLAUDE.local.md
 .claude/skills/
+
+# isolated QA builds (NEXT_DIST_DIR)
+/.next-qa/
+.shots-*/
+/.next-*/
